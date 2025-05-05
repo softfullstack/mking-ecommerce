@@ -1,6 +1,6 @@
 import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip } from "@mui/material"
 import { Link } from "react-router-dom"
-import { Product } from "../interfaces/Product"
+import { Product } from "../interfaces/ProductInterface"
 
 const ProductCard = ({ product }: { product: Product }) => {
     const { id, name, price, images, colors, isNew, discount } = product

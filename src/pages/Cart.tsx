@@ -33,13 +33,13 @@ const Cart = () => {
 
     const steps = ["Carrito", "Envío", "Pago", "Confirmación"]
 
-    const handleQuantityChange = (index, newQuantity) => {
+    const handleQuantityChange = (index: number, newQuantity: number) => {
         if (newQuantity >= 1 && newQuantity <= 10) {
             updateQuantity(index, newQuantity)
         }
     }
 
-    const handleRemoveItem = (index) => {
+    const handleRemoveItem = (index:number) => {
         removeFromCart(index)
     }
 
@@ -75,8 +75,8 @@ const Cart = () => {
         setActiveStep((prevStep) => prevStep - 1)
     }
 
-    const getColorName = (colorId) => {
-        const colorMap = {
+    const getColorName = (colorId: string) => {
+        const colorMap: { [key: string]: string } = {
             negro: "Negro",
             rojo: "Rojo",
             amarillo: "Amarillo",
@@ -87,8 +87,8 @@ const Cart = () => {
         return colorMap[colorId] || colorId
     }
 
-    const getSizeName = (sizeId) => {
-        const sizeMap = {
+    const getSizeName = (sizeId:string) => {
+        const sizeMap: { [key: string]: string } = {
             xs: "XS",
             s: "S",
             m: "M",
@@ -138,7 +138,7 @@ const Cart = () => {
                             Carrito de Compras ({totalItems} {totalItems === 1 ? "producto" : "productos"})
                         </Typography>
 
-                        {items.map((item, index) => (
+                        {items.map((item:any, index) => (
                             <Card key={index} sx={{ mb: 2, backgroundColor: "#1e1e1e" }}>
                                 <CardContent sx={{ p: 2 }}>
                                     <Grid container spacing={2} alignItems="center">

@@ -1,13 +1,19 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-
-const useAuthStore = create(
+interface AuthStore {
+    isAuthenticated: boolean;
+    user: any;
+    login: (userData: any) => void;
+    logout: () => void;
+    updateUser: (userData: any) => void;
+}
+const useAuthStore = create<AuthStore>()(
     persist(
         (set) => ({
             user: null,
             isAuthenticated: false,
 
-            login: (userData) => {
+            login: (userData:any) => {
                 set({
                     user: userData,
                     isAuthenticated: true,
@@ -21,8 +27,8 @@ const useAuthStore = create(
                 })
             },
 
-            updateUser: (userData) => {
-                set((state) => ({
+            updateUser: (userData:any) => {
+                set((state:any) => ({
                     user: {
                         ...state.user,
                         ...userData,

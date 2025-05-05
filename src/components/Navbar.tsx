@@ -119,7 +119,7 @@ const Navbar = () => {
                             textDecoration: "none",
                         }}
                     >
-                        <Logo src="images/logo.png" alt="SafetyVest" />
+                        <Logo src="images/logo.png" alt="SafetyVest" sx={{borderRadius: 1}} />
                         MKing
                     </Typography>
 
@@ -152,7 +152,7 @@ const Navbar = () => {
                             textDecoration: "none",
                         }}
                     >
-                        <Logo src="images/logo.png" alt="SafetyVest" />
+                        <Logo src="images/logo.png" alt="SafetyVest" sx={{borderRadius: 1}}     />
                         MKing
                     </Typography>
 
