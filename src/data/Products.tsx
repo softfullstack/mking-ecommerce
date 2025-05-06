@@ -363,6 +363,6 @@ export const products = [
 export const featuredProducts = products.filter((product) => product.isFeatured)
 
 // Función para obtener productos relacionados
-export const getRelatedProducts = (productId, category, limit = 4) => {
+export const getRelatedProducts = (productId: number, category: string, limit = 4) => {
     return products.filter((product) => product.id !== productId && product.categories.includes(category)).slice(0, limit)
 }

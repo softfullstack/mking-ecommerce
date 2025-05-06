@@ -2,41 +2,19 @@
 
 import { useState, useEffect } from "react"
 import { useParams, Link as RouterLink } from "react-router-dom"
-import {
-    Box,
-    Container,
-    Grid,
-    Typography,
-    Button,
-    Divider,
-    Rating,
-    Tabs,
-    Tab,
-    List,
-    ListItem,
-    ListItemText,
-    Chip,
-    IconButton,
-    Snackbar,
-    Alert,
-    FormControl,
-    FormLabel,
-    RadioGroup,
-    FormControlLabel,
-    Radio,
-    Breadcrumbs,
-    Link,
-} from "@mui/material"
+import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, List, ListItem, ListItemText, Chip, IconButton, Snackbar, Alert, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Breadcrumbs, Link, AlertColor } from "@mui/material"
 import { Favorite, FavoriteBorder, Share, LocalShipping, Verified, ArrowBack } from "@mui/icons-material"
+import { SnackbarCloseReason } from "@mui/material/Snackbar"
 import ProductCarousel from "../components/ProductCarousel"
 import { products, getRelatedProducts } from "../data/Products"
 import ProductCard from "../components/ProductCard"
 import useCartStore from "../store/CartStore"
+import { Product } from "../interfaces/Product"
 
 const ProductDetail = () => {
     const { id } = useParams()
-    const [product, setProduct] = useState(null)
-    const [relatedProducts, setRelatedProducts] = useState([])
+    const [product, setProduct] = useState<Product | null>(null)
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
     const [selectedColor, setSelectedColor] = useState("")
     const [selectedSize, setSelectedSize] = useState("")
     const [quantity, setQuantity] = useState(1)
@@ -44,22 +22,24 @@ const ProductDetail = () => {
     const [isFavorite, setIsFavorite] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState("")
-    const [snackbarSeverity, setSnackbarSeverity] = useState("success")
+    const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("success")
 
     const { addToCart } = useCartStore()
 
     // Fetch product data
     useEffect(() => {
         // In a real app, this would be an API call
-        const foundProduct = products.find((p) => p.id === Number.parseInt(id))
-        if (foundProduct) {
-            setProduct(foundProduct)
-            setSelectedColor(foundProduct.colorIds[0] || "")
-            setSelectedSize(foundProduct.sizes[0] || "")
+        if (id) {
+            const foundProduct = products.find((p) => p.id === Number.parseInt(id))
+            if (foundProduct) {
+                setProduct(foundProduct)
+                setSelectedColor(foundProduct.colorIds[0] || "")
+                setSelectedSize(foundProduct.sizes[0] || "")
 
-            // Get related products
-            const related = getRelatedProducts(foundProduct.id, foundProduct.categories[0])
-            setRelatedProducts(related)
+                // Get related products
+                const related = getRelatedProducts(foundProduct.id, foundProduct.categories[0])
+                setRelatedProducts(related)
+            }
         }
     }, [id])
 
@@ -71,19 +51,19 @@ const ProductDetail = () => {
         )
     }
 
-    const handleTabChange = (event, newValue) => {
+    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue)
     }
 
-    const handleColorChange = (event) => {
+    const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedColor(event.target.value)
     }
 
-    const handleSizeChange = (event) => {
+    const handleSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedSize(event.target.value)
     }
 
-    const handleQuantityChange = (newQuantity) => {
+    const handleQuantityChange = (newQuantity: number) => {
         if (newQuantity >= 1 && newQuantity <= 10) {
             setQuantity(newQuantity)
         }
@@ -120,15 +100,15 @@ const ProductDetail = () => {
         setSnackbarOpen(true)
     }
 
-    const handleCloseSnackbar = (event, reason) => {
+    const handleCloseSnackbar = (_event: Event | React.SyntheticEvent<any, Event>, reason: SnackbarCloseReason) => {
         if (reason === "clickaway") {
             return
         }
         setSnackbarOpen(false)
     }
 
-    const getColorName = (colorId) => {
-        const colorMap = {
+    const getColorName = (colorId: string) => {
+        const colorMap: Record<string, string> = {
             negro: "Negro",
             rojo: "Rojo",
             amarillo: "Amarillo",
@@ -139,8 +119,8 @@ const ProductDetail = () => {
         return colorMap[colorId] || colorId
     }
 
-    const getColorHex = (colorId) => {
-        const colorMap = {
+    const getColorHex = (colorId: string) => {
+        const colorMap: Record<string, string> = {
             negro: "#000000",
             rojo: "#ff0000",
             amarillo: "#ffff00",
@@ -151,8 +131,8 @@ const ProductDetail = () => {
         return colorMap[colorId] || "#cccccc"
     }
 
-    const getSizeName = (sizeId) => {
-        const sizeMap = {
+    const getSizeName = (sizeId: string) => {
+        const sizeMap: Record<string, string> = {
             xs: "XS",
             s: "S",
             m: "M",
@@ -439,7 +419,7 @@ const ProductDetail = () => {
                 onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
-                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: "100%" }}>
+                <Alert onClose={(event) => handleCloseSnackbar(event, "timeout")} severity={snackbarSeverity} sx={{ width: "100%" }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

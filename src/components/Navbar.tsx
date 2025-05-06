@@ -1,26 +1,6 @@
 import { useState } from "react"
 import { Link as RouterLink } from "react-router-dom"
-import {
-    AppBar,
-    Box,
-    Toolbar,
-    IconButton,
-    Typography,
-    Menu,
-    Container,
-    Avatar,
-    Button,
-    Tooltip,
-    MenuItem,
-    Badge,
-    InputBase,
-    Drawer,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemButton,
-    Divider,
-} from "@mui/material"
+import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem, Badge, InputBase, Drawer, List, ListItem, ListItemText, ListItemButton, Divider } from "@mui/material"
 import { styled, alpha } from "@mui/material/styles"
 import { Menu as MenuIcon, Search as SearchIcon, ShoppingCart, Close } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
@@ -74,10 +54,10 @@ const Navbar = () => {
     const [anchorElUser, setAnchorElUser] = useState(null)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-    const { totalItems } = useCartStore()
+    const { totalItems } = useCartStore() as { totalItems: number }
     const { isAuthenticated, user, logout } = useAuthStore()
 
-    const handleOpenUserMenu = (event) => {
+    const handleOpenUserMenu = (event: any) => {
         setAnchorElUser(event.currentTarget)
     }
 

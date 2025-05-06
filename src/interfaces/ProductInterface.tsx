@@ -11,5 +11,16 @@ export interface Product {
     sizes: string[]
     categories: string[]
     isNew: boolean
-    reviews: { rating: number; comment: string }[]
+    rating: number
+    reviewCount: number
+    reviews: {
+        author: string
+        rating: number
+        date: string
+        comment: string
+    }[]
+    specifications: {
+        name: string
+        value: string
+    }[]
 }

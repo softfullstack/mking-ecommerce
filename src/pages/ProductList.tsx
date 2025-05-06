@@ -37,10 +37,10 @@ const ProductList = () => {
         setDrawerOpen(!drawerOpen)
     }
 
-    const handlePriceChange = (e: Event, newValue: number[]) => {
-        console.log(e);
-
-        setPriceRange(newValue)
+    const handlePriceChange = (event: Event, value: number | number[], activeThumb: number) => {
+        if (Array.isArray(value)) {
+            setPriceRange(value)
+        }
     }
 
     const handleCategoryToggle = (categoryId: string) => {

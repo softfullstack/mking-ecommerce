@@ -1,45 +1,29 @@
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
-interface AuthStore {
-    isAuthenticated: boolean;
-    user: any;
-    login: (userData: any) => void;
-    logout: () => void;
-    updateUser: (userData: any) => void;
+
+interface User {
+    id: number
+    name: string
+    email: string
+    avatar?: string
 }
-const useAuthStore = create<AuthStore>()(
-    persist(
-        (set) => ({
-            user: null,
-            isAuthenticated: false,
 
-            login: (userData:any) => {
-                set({
-                    user: userData,
-                    isAuthenticated: true,
-                })
-            },
+interface AuthState {
+    user: User | null
+    isAuthenticated: boolean
+    login: (userData: User) => void
+    logout: () => void
+    updateUser: (userData: Partial<User>) => void
 
-            logout: () => {
-                set({
-                    user: null,
-                    isAuthenticated: false,
-                })
-            },
+}
 
-            updateUser: (userData:any) => {
-                set((state:any) => ({
-                    user: {
-                        ...state.user,
-                        ...userData,
-                    },
-                }))
-            },
-        }),
-        {
-            name: "auth-storage",
-        },
-    ),
-)
+const useAuthStore = create<AuthState>((set) => ({
+    user: null,
+    isAuthenticated: false,
+    login: (userData: User) => set({ user: userData, isAuthenticated: true }),
+    logout: () => set({ user: null, isAuthenticated: false }),
+    updateUser: (userData: Partial<User>) => set((state: AuthState) => ({
+        user: state.user ? { ...state.user, ...userData } : null
+    }))
+}))
 
 export default useAuthStore

@@ -1,25 +1,17 @@
-"use client"
-
 import React from "react"
 import { useNavigate, Link as RouterLink } from "react-router-dom"
-import {
-    Box,
-    Container,
-    Typography,
-    TextField,
-    Button,
-    Divider,
-    Link,
-    InputAdornment,
-    IconButton,
-    Paper,
-    Checkbox,
-    FormControlLabel,
-    Alert,
-} from "@mui/material"
+import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Checkbox, FormControlLabel, Alert } from "@mui/material"
 import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
-import { useForm } from "react-hook-form"
+import { useForm, FieldValues } from "react-hook-form"
 import useAuthStore from "../store/AuthStore"
+
+interface RegisterFormData extends FieldValues {
+    name: string
+    email: string
+    password: string
+    confirmPassword: string
+    terms: boolean
+}
 
 const Register = () => {
     const navigate = useNavigate()
@@ -33,11 +25,12 @@ const Register = () => {
         handleSubmit,
         watch,
         formState: { errors },
-    } = useForm()
-    const password = React.useRef({})
+    } = useForm<RegisterFormData>()
+
+    const password = React.useRef("")
     password.current = watch("password", "")
 
-    const onSubmit = (data) => {
+    const onSubmit = (data: RegisterFormData) => {
         // In a real app, this would call an API
         setRegisterSuccess(true)
 
@@ -104,7 +97,7 @@ const Register = () => {
                             required: "El nombre es requerido",
                         })}
                         error={!!errors.name}
-                        helperText={errors.name?.message}
+                        helperText={errors.name?.message as string}
                     />
 
                     <TextField
@@ -120,7 +113,7 @@ const Register = () => {
                             },
                         })}
                         error={!!errors.email}
-                        helperText={errors.email?.message}
+                        helperText={errors.email?.message as string}
                     />
 
                     <TextField
@@ -137,7 +130,7 @@ const Register = () => {
                             },
                         })}
                         error={!!errors.password}
-                        helperText={errors.password?.message}
+                        helperText={errors.password?.message as string}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
@@ -160,7 +153,7 @@ const Register = () => {
                             validate: (value) => value === password.current || "Las contraseñas no coinciden",
                         })}
                         error={!!errors.confirmPassword}
-                        helperText={errors.confirmPassword?.message}
+                        helperText={errors.confirmPassword?.message as string}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
@@ -200,7 +193,7 @@ const Register = () => {
                     />
                     {errors.terms && (
                         <Typography variant="caption" color="error">
-                            {errors.terms.message}
+                            {errors.terms.message as string}
                         </Typography>
                     )}
 
