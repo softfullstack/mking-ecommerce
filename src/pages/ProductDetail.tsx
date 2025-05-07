@@ -9,7 +9,7 @@ import ProductCarousel from "../components/ProductCarousel"
 import { products, getRelatedProducts } from "../data/Products"
 import ProductCard from "../components/ProductCard"
 import useCartStore from "../store/CartStore"
-import { Product } from "../interfaces/Product"
+import { Product } from "../interfaces/ProductInterface"
 
 const ProductDetail = () => {
     const { id } = useParams()
