@@ -23,7 +23,6 @@ const ProductDetail = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState("")
     const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("success")
-
     const { addToCart } = useCartStore()
 
     // Fetch product data

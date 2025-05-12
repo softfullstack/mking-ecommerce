@@ -5,17 +5,17 @@ import { Box, Container, Grid, Typography, Drawer, List, ListItem, ListItemButto
 import { FilterList, Close } from "@mui/icons-material"
 import ProductCard from "../components/ProductCard"
 import { products } from "../data/Products"
+import { ProducList } from "../services/MKing.service"
 
 const ProductList = () => {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down("md"))
     const [drawerOpen, setDrawerOpen] = useState(false)
-    const [filteredProducts, setFilteredProducts] = useState(products)
+    const [filteredProducts, setFilteredProducts] = useState([])
     const [priceRange, setPriceRange] = useState([0, 500])
     const [selectedCategories, setSelectedCategories] = useState<string[]>([])
     const [selectedColors, setSelectedColors] = useState<string[]>([])
     const [sortBy, setSortBy] = useState("featured")
-
     const categories = [
         { id: "alta-visibilidad", name: "Alta Visibilidad" },
         { id: "multibolsillos", name: "Multibolsillos" },
@@ -23,7 +23,6 @@ const ProductList = () => {
         { id: "reflectantes", name: "Reflectantes" },
         { id: "termicos", name: "Térmicos" },
     ]
-
     const colors = [
         { id: "negro", name: "Negro", hex: "#000000" },
         { id: "rojo", name: "Rojo", hex: "#ff0000" },
@@ -33,6 +32,16 @@ const ProductList = () => {
         { id: "verde", name: "Verde", hex: "#00ff00" },
     ]
 
+    useEffect(() => {
+        ProducList().then((res: any) => {
+            setFilteredProducts(res.data.products)
+            console.log(res.data.products)
+
+            console.log(res.data)
+        }), (err: any) => {
+            console.log(err)
+        }
+    }, [])
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen)
     }

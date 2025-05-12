@@ -61,7 +61,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                         {name}
                     </Typography>
 
-                    <Box sx={{ display: "flex", gap: 0.5, mb: 1 }}>
+                    {/* <Box sx={{ display: "flex", gap: 0.5, mb: 1 }}>
                         {colors.map((color, index) => (
                             <Box
                                 key={index}
@@ -74,7 +74,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                                 }}
                             />
                         ))}
-                    </Box>
+                    </Box> */}
 
                     <Box sx={{ mt: "auto" }}>
                         {discount > 0 ? (
@@ -88,7 +88,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                             </Box>
                         ) : (
                             <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
-                                ${price.toFixed(2)}
+                                {/* ${price.toFixed(2)} */}
                             </Typography>
                         )}
                     </Box>
