@@ -46,7 +46,13 @@ axios.interceptors.response.use(
 export const LoginService = (body: any) => axios.post(`${apiUrl}/login`, body);
 
 
-export const ProducList = () => axios.get(`${apiUrl}/products`);
+export const ProducList = async () => {
+    return axios.get(`${apiUrl}/products`)
+}
+
+export const ProductDetail = async (id: number) => {
+    return axios.get(`${apiUrl}/products/${id}`)
+}
 
 export const TotalesService = (body: any) => axios.post(apiUrl, body);
 

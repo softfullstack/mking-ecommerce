@@ -32,7 +32,7 @@ export interface ApiProduct {
     deleted_at: string | null
     category: ApiCategory
     images: ApiImage[]
-    color: ApiColor
+    colors: ApiColor[]
 }
 
 export interface Product {
@@ -43,7 +43,6 @@ export interface Product {
     description: string
     details: string
     images: string[]
-    // colorIds: string[]
     colors: string[]
     sizes: string[]
     categories: string[]
@@ -63,7 +62,20 @@ export interface Product {
 }
 
 // Función para transformar un ApiProduct en Product
+// Mapeo de colores a valores hexadecimales
+const colorNameToHex: Record<string, string> = {
+    negro: '#000000',
+    rojo: '#ff0000',
+    verde: '#00ff00',
+    azul: '#0000ff',
+    amarillo: '#ffff00',
+    blanco: '#ffffff',
+    naranja: '#ff9800'
+};
+
 export function transformApiProduct(apiProduct: ApiProduct): Product {
+    const colorHex = colorNameToHex[apiProduct.colors.name] || '#cccccc'; // Color gris por defecto si no se encuentra
+
     return {
         id: apiProduct.id,
         name: apiProduct.name,
@@ -72,8 +84,7 @@ export function transformApiProduct(apiProduct: ApiProduct): Product {
         description: apiProduct.description,
         details: apiProduct.description, // Usando la misma descripción para details
         images: apiProduct.images.map(img => `http://tu-api-url.com/${img.image_path}`), // Ajusta la URL base según tu API
-        colorIds: [apiProduct.color.name.toLowerCase()],
-        colors: [apiProduct.color.name],
+        colors: [colorHex],
         sizes: ["s", "m", "l", "xl"], // Tamaños por defecto
         categories: [apiProduct.category.name.toLowerCase()],
         isNew: new Date(apiProduct.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Producto nuevo si tiene menos de 7 días
@@ -83,7 +94,7 @@ export function transformApiProduct(apiProduct: ApiProduct): Product {
         specifications: [
             { name: "SKU", value: apiProduct.sku },
             { name: "Categoría", value: apiProduct.category.name },
-            { name: "Color", value: apiProduct.color.name }
+            { name: "Color", value: apiProduct.colors.name }
         ]
     }
 }

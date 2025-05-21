@@ -4,44 +4,71 @@ import { useState, useEffect } from "react"
 import { Box, Container, Grid, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Checkbox, Slider, Button, FormControl, InputLabel, Select, MenuItem, Divider, Chip, IconButton, useMediaQuery, useTheme, SelectChangeEvent } from "@mui/material"
 import { FilterList, Close } from "@mui/icons-material"
 import ProductCard from "../components/ProductCard"
-import { products } from "../data/Products"
 import { ProducList } from "../services/MKing.service"
+import { Product, transformApiProduct } from "../interfaces/Product"
+
+interface CategoryType {
+    id: string
+    name: string
+}
+
+interface ColorType {
+    id: string
+    name: string
+    hex: string
+}
+
+const categories: CategoryType[] = [
+    { id: "alta-visibilidad", name: "Alta Visibilidad" },
+    { id: "multibolsillos", name: "Multibolsillos" },
+    { id: "ignifugos", name: "Ignífugos" },
+    { id: "sencillo", name: "Sencillo" },
+    { id: "formales", name: "Formales" },
+    { id: "ejecutivo", name: "Ejecutivo" }
+]
+
+const colors: ColorType[] = [
+    { id: "negro", name: "Negro", hex: "#000000" },
+    { id: "rojo", name: "Rojo", hex: "#ff0000" },
+    { id: "verde", name: "Verde", hex: "#00ff00" },
+    { id: "azul", name: "Azul", hex: "#0000ff" },
+    { id: "amarillo", name: "Amarillo", hex: "#ffff00" },
+    { id: "blanco", name: "Blanco", hex: "#ffffff" }
+]
 
 const ProductList = () => {
     const theme = useTheme()
     const isMobile = useMediaQuery(theme.breakpoints.down("md"))
     const [drawerOpen, setDrawerOpen] = useState(false)
-    const [filteredProducts, setFilteredProducts] = useState([])
+    const [products, setProducts] = useState<Product[]>([])
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
     const [priceRange, setPriceRange] = useState([0, 500])
     const [selectedCategories, setSelectedCategories] = useState<string[]>([])
     const [selectedColors, setSelectedColors] = useState<string[]>([])
     const [sortBy, setSortBy] = useState("featured")
-    const categories = [
-        { id: "alta-visibilidad", name: "Alta Visibilidad" },
-        { id: "multibolsillos", name: "Multibolsillos" },
-        { id: "ignifugos", name: "Ignífugos" },
-        { id: "reflectantes", name: "Reflectantes" },
-        { id: "termicos", name: "Térmicos" },
-    ]
-    const colors = [
-        { id: "negro", name: "Negro", hex: "#000000" },
-        { id: "rojo", name: "Rojo", hex: "#ff0000" },
-        { id: "amarillo", name: "Amarillo", hex: "#ffff00" },
-        { id: "naranja", name: "Naranja", hex: "#ff9800" },
-        { id: "azul", name: "Azul", hex: "#0000ff" },
-        { id: "verde", name: "Verde", hex: "#00ff00" },
-    ]
 
     useEffect(() => {
-        ProducList().then((res: any) => {
-            setFilteredProducts(res.data.products)
-            console.log(res.data.products)
-
-            console.log(res.data)
-        }), (err: any) => {
-            console.log(err)
+        const fetchProducts = async () => {
+            try {
+                const response = await ProducList()
+                if (response.data.products) {
+                    const transformedProducts = response.data.products.map(transformApiProduct)
+                    setProducts(transformedProducts)
+                    setFilteredProducts(transformedProducts)
+                }
+                setLoading(false)
+            } catch (err) {
+                setError("Error al cargar los productos")
+                setLoading(false)
+                console.error(err)
+            }
         }
+
+        fetchProducts()
     }, [])
+
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen)
     }
@@ -96,8 +123,10 @@ const ProductList = () => {
         setSelectedColors(selectedColors.filter((id) => id !== colorId))
     }
 
-    // Apply filters and sorting
+    // Modificar la función de filtrado
     useEffect(() => {
+        if (products.length === 0) return
+
         let result = [...products]
 
         // Filter by price
@@ -110,7 +139,7 @@ const ProductList = () => {
 
         // Filter by color
         if (selectedColors.length > 0) {
-            result = result.filter((product) => product.colorIds.some((color) => selectedColors.includes(color)))
+            result = result.filter((product) => product.colors.some((color) => selectedColors.includes(color)))
         }
 
         // Sort products
@@ -122,15 +151,14 @@ const ProductList = () => {
                 result.sort((a, b) => b.price - a.price)
                 break
             case "newest":
-                result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                result.sort((a, b) => (b.isNew === a.isNew ? 0 : b.isNew ? 1 : -1))
                 break
             default:
-                // 'featured' - no sorting needed as products are already sorted by featured
                 break
         }
 
         setFilteredProducts(result)
-    }, [priceRange, selectedCategories, selectedColors, sortBy])
+    }, [products, priceRange, selectedCategories, selectedColors, sortBy])
 
     const filterDrawerContent = (
         <Box
@@ -235,6 +263,25 @@ const ProductList = () => {
             </Button>
         </Box>
     )
+
+    if (loading) {
+        return (
+            <Container sx={{ py: 8, textAlign: "center" }}>
+                <Typography variant="h5">Cargando productos...</Typography>
+            </Container>
+        )
+    }
+
+    if (error) {
+        return (
+            <Container sx={{ py: 8, textAlign: "center" }}>
+                <Typography variant="h5" color="error">{error}</Typography>
+                <Button variant="contained" onClick={() => window.location.reload()} sx={{ mt: 2 }}>
+                    Reintentar
+                </Button>
+            </Container>
+        )
+    }
 
     return (
         <Container maxWidth="xl" sx={{ py: 4 }}>
