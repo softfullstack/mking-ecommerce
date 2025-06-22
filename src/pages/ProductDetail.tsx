@@ -6,10 +6,10 @@ import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, L
 import { Favorite, FavoriteBorder, Share, LocalShipping, Verified, ArrowBack } from "@mui/icons-material"
 import { SnackbarCloseReason } from "@mui/material/Snackbar"
 import ProductCarousel from "../components/ProductCarousel"
-import { products, getRelatedProducts } from "../data/Products"
 import ProductCard from "../components/ProductCard"
 import useCartStore from "../store/CartStore"
 import { Product } from "../interfaces/ProductInterface"
+import { getProductById } from "../services/MKing.service"
 
 const ProductDetail = () => {
     const { id } = useParams()
@@ -27,19 +27,26 @@ const ProductDetail = () => {
 
     // Fetch product data
     useEffect(() => {
-        // In a real app, this would be an API call
-        if (id) {
-            const foundProduct = products.find((p) => p.id === Number.parseInt(id))
-            if (foundProduct) {
-                setProduct(foundProduct)
-                setSelectedColor(foundProduct.colorIds[0] || "")
-                setSelectedSize(foundProduct.sizes[0] || "")
-
-                // Get related products
-                const related = getRelatedProducts(foundProduct.id, foundProduct.categories[0])
-                setRelatedProducts(related)
+        const fetchProduct = async () => {
+            if (id) {
+                try {
+                    const foundProduct = await getProductById(Number.parseInt(id))
+                    setProduct(foundProduct)
+                    if (foundProduct.colors.length > 0) {
+                        setSelectedColor(foundProduct.colors[0])
+                    }
+                    if (foundProduct.sizes.length > 0) {
+                        setSelectedSize(foundProduct.sizes[0])
+                    }
+                    // TODO: Implement fetching related products from the API
+                } catch (error) {
+                    console.error("Failed to fetch product", error)
+                    // Optionally, set an error state to show a message to the user
+                }
             }
         }
+
+        fetchProduct()
     }, [id])
 
     if (!product) {
@@ -107,15 +114,7 @@ const ProductDetail = () => {
     }
 
     const getColorName = (colorId: string) => {
-        const colorMap: Record<string, string> = {
-            negro: "Negro",
-            rojo: "Rojo",
-            amarillo: "Amarillo",
-            naranja: "Naranja",
-            azul: "Azul",
-            verde: "Verde",
-        }
-        return colorMap[colorId] || colorId
+        return colorId;
     }
 
     const getColorHex = (colorId: string) => {
@@ -127,7 +126,7 @@ const ProductDetail = () => {
             azul: "#0000ff",
             verde: "#00ff00",
         }
-        return colorMap[colorId] || "#cccccc"
+        return colorMap[colorId.toLowerCase()] || "#cccccc"
     }
 
     const getSizeName = (sizeId: string) => {
@@ -162,7 +161,7 @@ const ProductDetail = () => {
             <Grid container spacing={4}>
                 {/* Product Images */}
                 <Grid item xs={12} md={6}>
-                    <ProductCarousel images={product.images} />
+                    <ProductCarousel images={product.images.map((img) => img.url || "")} />
                 </Grid>
 
                 {/* Product Info */}
@@ -213,21 +212,21 @@ const ProductDetail = () => {
                                 Color
                             </FormLabel>
                             <RadioGroup row aria-label="color" name="color" value={selectedColor} onChange={handleColorChange}>
-                                {product.colorIds.map((colorId) => (
+                                {product.colors.map((color) => (
                                     <FormControlLabel
-                                        key={colorId}
-                                        value={colorId}
+                                        key={color}
+                                        value={color}
                                         control={
                                             <Radio
                                                 sx={{
-                                                    color: getColorHex(colorId),
+                                                    color: getColorHex(color),
                                                     "&.Mui-checked": {
-                                                        color: getColorHex(colorId),
+                                                        color: getColorHex(color),
                                                     },
                                                 }}
                                             />
                                         }
-                                        label={getColorName(colorId)}
+                                        label={getColorName(color)}
                                     />
                                 ))}
                             </RadioGroup>
