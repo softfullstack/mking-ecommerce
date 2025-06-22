@@ -5,7 +5,11 @@ export interface Product {
     discount: number
     description: string
     details: string
-    images: string[]
+    images: {
+        id?: number
+        image_path?: string
+        url?: string
+    }[]
     colorIds: string[]
     colors: string[]
     sizes: string[]

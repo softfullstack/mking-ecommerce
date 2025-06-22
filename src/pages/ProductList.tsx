@@ -4,37 +4,19 @@ import { useState, useEffect } from "react"
 import { Box, Container, Grid, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Checkbox, Slider, Button, FormControl, InputLabel, Select, MenuItem, Divider, Chip, IconButton, useMediaQuery, useTheme, SelectChangeEvent } from "@mui/material"
 import { FilterList, Close } from "@mui/icons-material"
 import ProductCard from "../components/ProductCard"
-import { ProducList } from "../services/MKing.service"
 import { Product, transformApiProduct } from "../interfaces/Product"
+import { ProducList, getColors, getCategories } from "../services/MKing.service"
 
 interface CategoryType {
-    id: string
+    id: number
     name: string
 }
 
 interface ColorType {
-    id: string
+    id: number
     name: string
-    hex: string
+    hex_code?: string
 }
-
-const categories: CategoryType[] = [
-    { id: "alta-visibilidad", name: "Alta Visibilidad" },
-    { id: "multibolsillos", name: "Multibolsillos" },
-    { id: "ignifugos", name: "Ignífugos" },
-    { id: "sencillo", name: "Sencillo" },
-    { id: "formales", name: "Formales" },
-    { id: "ejecutivo", name: "Ejecutivo" }
-]
-
-const colors: ColorType[] = [
-    { id: "negro", name: "Negro", hex: "#000000" },
-    { id: "rojo", name: "Rojo", hex: "#ff0000" },
-    { id: "verde", name: "Verde", hex: "#00ff00" },
-    { id: "azul", name: "Azul", hex: "#0000ff" },
-    { id: "amarillo", name: "Amarillo", hex: "#ffff00" },
-    { id: "blanco", name: "Blanco", hex: "#ffffff" }
-]
 
 const ProductList = () => {
     const theme = useTheme()
@@ -45,28 +27,47 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [priceRange, setPriceRange] = useState([0, 500])
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-    const [selectedColors, setSelectedColors] = useState<string[]>([])
+    const [selectedCategories, setSelectedCategories] = useState<number[]>([])
+    const [selectedColors, setSelectedColors] = useState<number[]>([])
     const [sortBy, setSortBy] = useState("featured")
+    const [categories, setCategories] = useState<CategoryType[]>([])
+    const [colors, setColors] = useState<ColorType[]>([])
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const response = await ProducList()
-                if (response.data.products) {
-                    const transformedProducts = response.data.products.map(transformApiProduct)
+                setLoading(true)
+                
+                // Obtener productos, categorías y colores en paralelo
+                const [productsResponse, colorsResponse, categoriesResponse] = await Promise.all([
+                    ProducList(),
+                    getColors(),
+                    getCategories()
+                ])
+
+                if (productsResponse.data.products) {
+                    const transformedProducts = productsResponse.data.products.map(transformApiProduct)
                     setProducts(transformedProducts)
                     setFilteredProducts(transformedProducts)
                 }
+
+                if (colorsResponse.data) {
+                    setColors(colorsResponse.data)
+                }
+
+                if (categoriesResponse.data) {
+                    setCategories(categoriesResponse.data)
+                }
+
                 setLoading(false)
             } catch (err) {
-                setError("Error al cargar los productos")
+                setError("Error al cargar los datos")
                 setLoading(false)
                 console.error(err)
             }
         }
 
-        fetchProducts()
+        fetchData()
     }, [])
 
     const toggleDrawer = () => {
@@ -79,7 +80,7 @@ const ProductList = () => {
         }
     }
 
-    const handleCategoryToggle = (categoryId: string) => {
+    const handleCategoryToggle = (categoryId: number) => {
         const currentIndex = selectedCategories.indexOf(categoryId)
         const newSelectedCategories = [...selectedCategories]
 
@@ -92,7 +93,7 @@ const ProductList = () => {
         setSelectedCategories(newSelectedCategories)
     }
 
-    const handleColorToggle = (colorId: string) => {
+    const handleColorToggle = (colorId: number) => {
         const currentIndex = selectedColors.indexOf(colorId)
         const newSelectedColors = [...selectedColors]
 
@@ -115,11 +116,11 @@ const ProductList = () => {
         setPriceRange([0, 500])
     }
 
-    const removeCategory = (categoryId: string) => {
+    const removeCategory = (categoryId: number) => {
         setSelectedCategories(selectedCategories.filter((id) => id !== categoryId))
     }
 
-    const removeColor = (colorId: string) => {
+    const removeColor = (colorId: number) => {
         setSelectedColors(selectedColors.filter((id) => id !== colorId))
     }
 
@@ -134,12 +135,26 @@ const ProductList = () => {
 
         // Filter by category
         if (selectedCategories.length > 0) {
-            result = result.filter((product) => product.categories.some((category) => selectedCategories.includes(category)))
+            result = result.filter((product) => {
+                // Buscar si el producto tiene alguna de las categorías seleccionadas
+                return product.categories.some((category) => 
+                    selectedCategories.some(selectedId => 
+                        category.toLowerCase().includes(categories.find(c => c.id === selectedId)?.name.toLowerCase() || '')
+                    )
+                )
+            })
         }
 
         // Filter by color
         if (selectedColors.length > 0) {
-            result = result.filter((product) => product.colors.some((color) => selectedColors.includes(color)))
+            result = result.filter((product) => {
+                // Buscar si el producto tiene alguno de los colores seleccionados
+                return product.colors.some((color) => 
+                    selectedColors.some(selectedId => 
+                        color.toLowerCase().includes(colors.find(c => c.id === selectedId)?.name.toLowerCase() || '')
+                    )
+                )
+            })
         }
 
         // Sort products
@@ -158,7 +173,7 @@ const ProductList = () => {
         }
 
         setFilteredProducts(result)
-    }, [products, priceRange, selectedCategories, selectedColors, sortBy])
+    }, [products, priceRange, selectedCategories, selectedColors, sortBy, categories, colors])
 
     const filterDrawerContent = (
         <Box
@@ -231,7 +246,7 @@ const ProductList = () => {
                             width: 36,
                             height: 36,
                             borderRadius: "50%",
-                            backgroundColor: color.hex,
+                            backgroundColor: color.hex_code,
                             cursor: "pointer",
                             border: selectedColors.includes(color.id) ? "2px solid #ff0000" : "1px solid rgba(255,255,255,0.2)",
                             position: "relative",
@@ -328,7 +343,7 @@ const ProductList = () => {
                                         variant="outlined"
                                         sx={{
                                             "& .MuiChip-avatar": {
-                                                backgroundColor: color?.hex,
+                                                backgroundColor: color?.hex_code,
                                             },
                                         }}
                                     />

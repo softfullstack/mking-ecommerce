@@ -73,3 +73,13 @@ export const obtenerComentarios = (id: any) =>
 
 export const guardarComentarios = (body: any) =>
     axios.post(`${apiUrl}/guarda_comentario`, body);
+
+// Obtener colores disponibles
+export const getColors = async () => {
+    return axios.get(`${apiUrl}/colors`)
+}
+
+// Obtener categorías disponibles
+export const getCategories = async () => {
+    return axios.get(`${apiUrl}/categories`)
+}

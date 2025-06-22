@@ -1,7 +1,9 @@
 export interface ApiImage {
     id: number
     image_path: string
+    url: string | null
     product_id: number
+    is_primary: boolean
 }
 
 export interface ApiCategory {
@@ -42,7 +44,7 @@ export interface Product {
     discount: number
     description: string
     details: string
-    images: string[]
+    images: ApiImage[]
     colors: string[]
     sizes: string[]
     categories: string[]
@@ -74,7 +76,9 @@ const colorNameToHex: Record<string, string> = {
 };
 
 export function transformApiProduct(apiProduct: ApiProduct): Product {
-    const colorHex = colorNameToHex[apiProduct.colors.name] || '#cccccc'; // Color gris por defecto si no se encuentra
+    // Obtener el primer color o usar uno por defecto
+    const firstColor = apiProduct.colors && apiProduct.colors.length > 0 ? apiProduct.colors[0] : null;
+    const colorHex = firstColor ? colorNameToHex[firstColor.name.toLowerCase()] || '#cccccc' : '#cccccc';
 
     return {
         id: apiProduct.id,
@@ -83,8 +87,8 @@ export function transformApiProduct(apiProduct: ApiProduct): Product {
         discount: 0, // Por defecto no hay descuento
         description: apiProduct.description,
         details: apiProduct.description, // Usando la misma descripción para details
-        images: apiProduct.images.map(img => `http://tu-api-url.com/${img.image_path}`), // Ajusta la URL base según tu API
-        colors: [colorHex],
+        images: apiProduct.images,
+        colors: apiProduct.colors.map(color => colorNameToHex[color.name.toLowerCase()] || '#cccccc'),
         sizes: ["s", "m", "l", "xl"], // Tamaños por defecto
         categories: [apiProduct.category.name.toLowerCase()],
         isNew: new Date(apiProduct.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Producto nuevo si tiene menos de 7 días
@@ -94,7 +98,7 @@ export function transformApiProduct(apiProduct: ApiProduct): Product {
         specifications: [
             { name: "SKU", value: apiProduct.sku },
             { name: "Categoría", value: apiProduct.category.name },
-            { name: "Color", value: apiProduct.colors.name }
+            { name: "Color", value: firstColor ? firstColor.name : "Sin color" }
         ]
     }
 }
