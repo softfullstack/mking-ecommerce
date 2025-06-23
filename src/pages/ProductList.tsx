@@ -6,6 +6,7 @@ import { FilterList, Close } from "@mui/icons-material"
 import ProductCard from "../components/ProductCard"
 import { Product, transformApiProduct } from "../interfaces/Product"
 import { ProducList, getColors, getCategories } from "../services/MKing.service"
+import useFiltersStore from "../store/FiltersStore"
 
 interface CategoryType {
     id: number
@@ -26,18 +27,19 @@ const ProductList = () => {
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const [priceRange, setPriceRange] = useState([0, 500])
+    const [priceRange, setPriceRange] = useState([0, 1000])
     const [selectedCategories, setSelectedCategories] = useState<number[]>([])
     const [selectedColors, setSelectedColors] = useState<number[]>([])
     const [sortBy, setSortBy] = useState("featured")
-    const [categories, setCategories] = useState<CategoryType[]>([])
-    const [colors, setColors] = useState<ColorType[]>([])
+
+    // Zustand store
+    const { colors, setColors, categories, setCategories, sizes, setSizes } = useFiltersStore()
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true)
-                
+
                 // Obtener productos, categorías y colores en paralelo
                 const [productsResponse, colorsResponse, categoriesResponse] = await Promise.all([
                     ProducList(),
@@ -59,6 +61,9 @@ const ProductList = () => {
                     setCategories(categoriesResponse.data)
                 }
 
+                // Si la API devuelve tallas, puedes hacer setSizes aquí
+                // setSizes(sizesResponse.data)
+
                 setLoading(false)
             } catch (err) {
                 setError("Error al cargar los datos")
@@ -68,7 +73,7 @@ const ProductList = () => {
         }
 
         fetchData()
-    }, [])
+    }, [setColors, setCategories])
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen)
@@ -113,7 +118,7 @@ const ProductList = () => {
     const clearFilters = () => {
         setSelectedCategories([])
         setSelectedColors([])
-        setPriceRange([0, 500])
+        setPriceRange([0, 1000])
     }
 
     const removeCategory = (categoryId: number) => {
@@ -137,8 +142,8 @@ const ProductList = () => {
         if (selectedCategories.length > 0) {
             result = result.filter((product) => {
                 // Buscar si el producto tiene alguna de las categorías seleccionadas
-                return product.categories.some((category) => 
-                    selectedCategories.some(selectedId => 
+                return product.categories.some((category) =>
+                    selectedCategories.some(selectedId =>
                         category.toLowerCase().includes(categories.find(c => c.id === selectedId)?.name.toLowerCase() || '')
                     )
                 )
@@ -147,14 +152,9 @@ const ProductList = () => {
 
         // Filter by color
         if (selectedColors.length > 0) {
-            result = result.filter((product) => {
-                // Buscar si el producto tiene alguno de los colores seleccionados
-                return product.colors.some((color) => 
-                    selectedColors.some(selectedId => 
-                        color.toLowerCase().includes(colors.find(c => c.id === selectedId)?.name.toLowerCase() || '')
-                    )
-                )
-            })
+            result = result.filter((product) =>
+                product.colorIds.some((colorId) => selectedColors.includes(colorId))
+            )
         }
 
         // Sort products
@@ -205,7 +205,7 @@ const ProductList = () => {
                     onChange={handlePriceChange}
                     valueLabelDisplay="auto"
                     min={0}
-                    max={500}
+                    max={1000}
                     color="primary"
                 />
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>

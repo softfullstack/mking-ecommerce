@@ -2,9 +2,7 @@ export interface Product {
     id: number
     name: string
     price: number
-    discount: number
     description: string
-    details: string
     images: {
         id?: number
         image_path?: string
@@ -15,16 +13,17 @@ export interface Product {
     sizes: string[]
     categories: string[]
     isNew: boolean
-    rating: number
-    reviewCount: number
-    reviews: {
-        author: string
-        rating: number
-        date: string
-        comment: string
+    rating?: number
+    reviewCount?: number
+    discount?: number
+    reviews?: {
+        author?: string
+        rating?: number
+        date?: string
+        comment?: string
     }[]
-    specifications: {
-        name: string
-        value: string
+    specifications?: {
+        name?: string
+        value?: string
     }[]
 }

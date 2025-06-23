@@ -10,10 +10,10 @@ export const products = [
         details:
             "Nuestro chaleco de alta visibilidad Pro está diseñado para ofrecer la máxima visibilidad en condiciones de poca luz. Fabricado con materiales de alta calidad que garantizan durabilidad y comodidad durante largas jornadas de trabajo. Las bandas reflectantes cumplen con los estándares internacionales de seguridad.",
         images: [
-            "/images/product-1-1.jpg",
-            "/images/product-1-2.jpg",
-            "/images/product-1-3.jpg",
-            "/images/product-1-4.jpg",
+            { id: 1, url: "/images/product-1-1.jpg" },
+            { id: 2, url: "/images/product-1-2.jpg" },
+            { id: 3, url: "/images/product-1-3.jpg" },
+            { id: 4, url: "/images/product-1-4.jpg" },
         ],
         colorIds: ["amarillo", "naranja"],
         colors: ["#ffff00", "#ff9800"],
@@ -59,7 +59,11 @@ export const products = [
             "Chaleco ignífugo de alta resistencia para entornos con riesgo de incendio. Protección certificada y comodidad garantizada.",
         details:
             "El Chaleco Ignífugo Premium está diseñado para ofrecer la máxima protección contra el fuego y el calor. Fabricado con materiales ignífugos de alta calidad que cumplen con las normativas internacionales más exigentes. Su diseño ergonómico garantiza comodidad incluso durante largas jornadas de trabajo.",
-        images: ["/images/product-2-1.jpg", "/images/product-2-2.jpg", "/images/product-2-3.jpg"],
+        images: [
+            { id: 1, url: "/images/product-2-1.jpg" },
+            { id: 2, url: "/images/product-2-2.jpg" },
+            { id: 3, url: "/images/product-2-3.jpg" },
+        ],
         colorIds: ["rojo", "negro"],
         colors: ["#ff0000", "#000000"],
         sizes: ["m", "l", "xl"],
@@ -103,7 +107,11 @@ export const products = [
             "Chaleco con múltiples bolsillos para herramientas y accesorios. Ideal para técnicos, electricistas y profesionales de mantenimiento.",
         details:
             "El Chaleco Multibolsillos Utility está diseñado para profesionales que necesitan tener sus herramientas y accesorios siempre a mano. Con 12 bolsillos de diferentes tamaños, ofrece espacio suficiente para organizar todo lo necesario. Fabricado con materiales resistentes que garantizan durabilidad incluso en las condiciones más exigentes.",
-        images: ["/images/product-3-1.jpg", "/images/product-3-2.jpg", "/images/product-3-3.jpg"],
+        images: [
+            { id: 1, url: "/images/product-3-1.jpg" },
+            { id: 2, url: "/images/product-3-2.jpg" },
+            { id: 3, url: "/images/product-3-3.jpg" },
+        ],
         colorIds: ["negro", "azul", "verde"],
         colors: ["#000000", "#0000ff", "#00ff00"],
         sizes: ["s", "m", "l", "xl", "xxl"],
@@ -146,7 +154,11 @@ export const products = [
         description: "Chaleco térmico para entornos fríos. Proporciona aislamiento térmico sin comprometer la movilidad.",
         details:
             "El Chaleco Térmico Industrial está diseñado para mantener el calor corporal en entornos de trabajo con bajas temperaturas. Su relleno de fibra sintética de alta calidad proporciona un excelente aislamiento térmico sin añadir peso excesivo. El exterior resistente al agua protege contra la humedad, mientras que el forro interior suave garantiza comodidad durante todo el día.",
-        images: ["/images/product-4-1.jpg", "/images/product-4-2.jpg", "/images/product-4-3.jpg"],
+        images: [
+            { id: 1, url: "/images/product-4-1.jpg" },
+            { id: 2, url: "/images/product-4-2.jpg" },
+            { id: 3, url: "/images/product-4-3.jpg" },
+        ],
         colorIds: ["negro", "azul"],
         colors: ["#000000", "#0000ff"],
         sizes: ["s", "m", "l", "xl"],
@@ -191,7 +203,7 @@ export const products = [
             "Chaleco reflectante ultraligero con bandas de alta visibilidad. Perfecto para ciclistas, corredores y trabajadores que necesitan visibilidad.",
         details:
             "El Chaleco Reflectante Ligero está diseñado para ofrecer máxima visibilidad con mínimo peso. Ideal para actividades deportivas o trabajos que requieren movilidad. Las bandas reflectantes de alta calidad garantizan visibilidad a más de 300 metros en condiciones de poca luz. Su tejido transpirable permite una excelente ventilación, evitando la acumulación de sudor incluso durante actividades intensas.",
-        images: ["/images/product-5-1.jpg", "/images/product-5-2.jpg"],
+        images: [{ id: 1, url: "/images/product-5-1.jpg" }, { id: 2, url: "/images/product-5-2.jpg" }],
         colorIds: ["amarillo", "naranja"],
         colors: ["#ffff00", "#ff9800"],
         sizes: ["s", "m", "l", "xl"],
@@ -234,7 +246,11 @@ export const products = [
             "Chaleco táctico con múltiples compartimentos modulares. Diseñado para fuerzas de seguridad y profesionales que requieren organización y resistencia.",
         details:
             "El Chaleco Táctico Profesional está fabricado con los materiales más resistentes del mercado para garantizar durabilidad en las condiciones más exigentes. Su sistema MOLLE permite personalizar la configuración de bolsillos y accesorios según las necesidades específicas de cada misión. Los refuerzos en hombros y espalda proporcionan comodidad incluso con cargas pesadas durante periodos prolongados.",
-        images: ["/images/product-6-1.jpg", "/images/product-6-2.jpg", "/images/product-6-3.jpg"],
+        images: [
+            { id: 1, url: "/images/product-6-1.jpg" },
+            { id: 2, url: "/images/product-6-2.jpg" },
+            { id: 3, url: "/images/product-6-3.jpg" },
+        ],
         colorIds: ["negro", "verde"],
         colors: ["#000000", "#00ff00"],
         sizes: ["m", "l", "xl"],

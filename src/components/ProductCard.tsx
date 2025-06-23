@@ -24,7 +24,7 @@ const ProductCard = ({ product }: { product: Product }) => {
             }
         }
     }, [isHovered, images])
-    
+
     // Verificar si hay imágenes y si la imagen actual tiene una URL válida
     const hasImages = images && images.length > 0
     const imageUrl = hasImages && images[currentImageIndex] && images[currentImageIndex].url
@@ -87,12 +87,12 @@ const ProductCard = ({ product }: { product: Product }) => {
                 to={`/producto/${id}`}
                 sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "stretch" }}
             >
-                <CardMedia 
-                    component="img" 
-                    height="200" 
-                    image={imageUrl} 
-                    alt={name} 
-                    sx={{ 
+                <CardMedia
+                    component="img"
+                    height="200"
+                    image={imageUrl}
+                    alt={name}
+                    sx={{
                         objectFit: "cover",
                         transition: 'opacity 0.3s ease-in-out', // Transición suave para el cambio de imagen
                     }}
@@ -129,7 +129,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                             </Box>
                         ) : (
                             <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
-                                {/* ${price.toFixed(2)} */}
+                                ${price.toFixed(2)}
                             </Typography>
                         )}
                     </Box>

@@ -15,7 +15,7 @@ const ProductDetail = () => {
     const { id } = useParams()
     const [product, setProduct] = useState<Product | null>(null)
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
-    const [selectedColor, setSelectedColor] = useState("")
+    const [selectedColor, setSelectedColor] = useState<number | null>(null)
     const [selectedSize, setSelectedSize] = useState("")
     const [quantity, setQuantity] = useState(1)
     const [tabValue, setTabValue] = useState(0)
@@ -30,12 +30,13 @@ const ProductDetail = () => {
         const fetchProduct = async () => {
             if (id) {
                 try {
-                    const foundProduct = await getProductById(Number.parseInt(id))
+                    const response = await getProductById(Number.parseInt(id))
+                    const foundProduct = response.data
                     setProduct(foundProduct)
-                    if (foundProduct.colors.length > 0) {
-                        setSelectedColor(foundProduct.colors[0])
+                    if (foundProduct.colors && foundProduct.colors.length > 0) {
+                        setSelectedColor(foundProduct.colors[0].id)
                     }
-                    if (foundProduct.sizes.length > 0) {
+                    if (foundProduct.sizes && foundProduct.sizes.length > 0) {
                         setSelectedSize(foundProduct.sizes[0])
                     }
                     // TODO: Implement fetching related products from the API
@@ -45,7 +46,6 @@ const ProductDetail = () => {
                 }
             }
         }
-
         fetchProduct()
     }, [id])
 
@@ -62,7 +62,7 @@ const ProductDetail = () => {
     }
 
     const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedColor(event.target.value)
+        setSelectedColor(Number(event.target.value))
     }
 
     const handleSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,15 +76,15 @@ const ProductDetail = () => {
     }
 
     const handleAddToCart = () => {
-        if (!selectedColor || !selectedSize) {
+        if (selectedColor === null || !selectedSize) {
             setSnackbarMessage("Por favor selecciona color y talla")
             setSnackbarSeverity("error")
             setSnackbarOpen(true)
             return
         }
-
-        addToCart(product, quantity, selectedSize, selectedColor)
-
+        // Buscar el color seleccionado como objeto para pasarlo al carrito si es necesario
+        const colorObj = product.colors.find((c: any) => c.id === selectedColor)
+        addToCart(product, quantity, selectedSize, colorObj ? colorObj.name : "")
         setSnackbarMessage("Producto añadido al carrito")
         setSnackbarSeverity("success")
         setSnackbarOpen(true)
@@ -118,6 +118,7 @@ const ProductDetail = () => {
     }
 
     const getColorHex = (colorId: string) => {
+        if (typeof colorId !== "string") return "#cccccc";
         const colorMap: Record<string, string> = {
             negro: "#000000",
             rojo: "#ff0000",
@@ -178,26 +179,27 @@ const ProductDetail = () => {
                         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                             <Rating value={product.rating} precision={0.5} readOnly />
                             <Typography variant="body2" sx={{ ml: 1 }}>
-                                ({product.reviewCount} reseñas)
+                                {/* ({product.reviewCount} reseñas) */}
                             </Typography>
                         </Box>
 
                         <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                            {product.discount > 0 ? (
-                                <>
-                                    <Typography variant="h4" color="primary" sx={{ fontWeight: "bold", mr: 2 }}>
-                                        ${(product.price * (1 - product.discount / 100)).toFixed(2)}
+                            {
+                                product.discount && product.discount > 0 ? (
+                                    <>
+                                        <Typography variant="h4" color="primary" sx={{ fontWeight: "bold", mr: 2 }}>
+                                            ${(Number(product.price) * (1 - (product.discount || 0) / 100)).toFixed(2)}
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
+                                            ${Number(product.price).toFixed(2)}
+                                        </Typography>
+                                        <Chip label={`-${product.discount}%`} color="error" size="small" sx={{ ml: 2 }} />
+                                    </>
+                                ) : (
+                                    <Typography variant="h4" color="primary" sx={{ fontWeight: "bold" }}>
+                                        ${Number(product.price).toFixed(2)}
                                     </Typography>
-                                    <Typography variant="h6" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
-                                        ${product.price.toFixed(2)}
-                                    </Typography>
-                                    <Chip label={`-${product.discount}%`} color="error" size="small" sx={{ ml: 2 }} />
-                                </>
-                            ) : (
-                                <Typography variant="h4" color="primary" sx={{ fontWeight: "bold" }}>
-                                    ${product.price.toFixed(2)}
-                                </Typography>
-                            )}
+                                )}
                         </Box>
 
                         <Typography variant="body1" sx={{ mb: 3 }}>
@@ -211,22 +213,22 @@ const ProductDetail = () => {
                             <FormLabel component="legend" sx={{ fontWeight: "bold", color: "text.primary" }}>
                                 Color
                             </FormLabel>
-                            <RadioGroup row aria-label="color" name="color" value={selectedColor} onChange={handleColorChange}>
-                                {product.colors.map((color) => (
+                            <RadioGroup row aria-label="color" name="color" value={selectedColor ?? ''} onChange={handleColorChange}>
+                                {product.colors.filter(Boolean).map((color: any) => (
                                     <FormControlLabel
-                                        key={color}
-                                        value={color}
+                                        key={color.id}
+                                        value={color.id}
                                         control={
                                             <Radio
                                                 sx={{
-                                                    color: getColorHex(color),
+                                                    color: getColorHex(color.name),
                                                     "&.Mui-checked": {
-                                                        color: getColorHex(color),
+                                                        color: getColorHex(color.name),
                                                     },
                                                 }}
                                             />
                                         }
-                                        label={getColorName(color)}
+                                        label={color.name}
                                     />
                                 ))}
                             </RadioGroup>
@@ -336,18 +338,18 @@ const ProductDetail = () => {
                             </Tabs>
 
                             <Box role="tabpanel" hidden={tabValue !== 0} id="tabpanel-0" aria-labelledby="tab-0" sx={{ py: 3 }}>
-                                <Typography variant="body2">{product.details}</Typography>
+                                <Typography variant="body2">{product.details || ""}</Typography>
                             </Box>
 
                             <Box role="tabpanel" hidden={tabValue !== 1} id="tabpanel-1" aria-labelledby="tab-1" sx={{ py: 3 }}>
                                 <List disablePadding>
-                                    {product.specifications.map((spec, index) => (
+                                    {(product.specifications || []).map((spec, index) => (
                                         <ListItem
                                             key={index}
                                             disablePadding
                                             sx={{
                                                 py: 1,
-                                                borderBottom: index < product.specifications.length - 1 ? 1 : 0,
+                                                borderBottom: index < (product.specifications?.length || 0) - 1 ? 1 : 0,
                                                 borderColor: "divider",
                                             }}
                                         >
@@ -362,14 +364,14 @@ const ProductDetail = () => {
                             </Box>
 
                             <Box role="tabpanel" hidden={tabValue !== 2} id="tabpanel-2" aria-labelledby="tab-2" sx={{ py: 3 }}>
-                                {product.reviews.length > 0 ? (
-                                    product.reviews.map((review, index) => (
+                                {(product.reviews?.length || 0) > 0 ? (
+                                    (product.reviews || []).map((review, index) => (
                                         <Box
                                             key={index}
                                             sx={{
                                                 mb: 3,
                                                 pb: 3,
-                                                borderBottom: index < product.reviews.length - 1 ? 1 : 0,
+                                                borderBottom: index < (product.reviews?.length || 0) - 1 ? 1 : 0,
                                                 borderColor: "divider",
                                             }}
                                         >
