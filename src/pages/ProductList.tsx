@@ -5,7 +5,7 @@ import { Box, Container, Grid, Typography, Drawer, List, ListItem, ListItemButto
 import { FilterList, Close } from "@mui/icons-material"
 import ProductCard from "../components/ProductCard"
 import { Product, transformApiProduct } from "../interfaces/Product"
-import { ProducList, getColors, getCategories } from "../services/MKing.service"
+import { ProducList } from "../services/MKing.service"
 import useFiltersStore from "../store/FiltersStore"
 
 interface CategoryType {
@@ -17,6 +17,11 @@ interface ColorType {
     id: number
     name: string
     hex_code?: string
+}
+
+interface SizeType {
+    id: number
+    name: string
 }
 
 const ProductList = () => {
@@ -39,31 +44,27 @@ const ProductList = () => {
         const fetchData = async () => {
             try {
                 setLoading(true)
-
-                // Obtener productos, categorías y colores en paralelo
-                const [productsResponse, colorsResponse, categoriesResponse] = await Promise.all([
-                    ProducList(),
-                    getColors(),
-                    getCategories()
-                ])
-
+                const productsResponse = await ProducList()
                 if (productsResponse.data.products) {
                     const transformedProducts = productsResponse.data.products.map(transformApiProduct)
                     setProducts(transformedProducts)
                     setFilteredProducts(transformedProducts)
+
+                    // Extraer colores únicos
+                    const allColors = productsResponse.data.products.flatMap((p: any) => p.colors || [])
+                    const uniqueColors = Array.from(new Map(allColors.map((c: any) => [c.id, c])).values())
+                    setColors(uniqueColors as ColorType[])
+
+                    // Extraer categorías únicas
+                    const allCategories = productsResponse.data.products.map((p: any) => p.category).filter(Boolean)
+                    const uniqueCategories = Array.from(new Map(allCategories.map((c: any) => [c.id, c])).values())
+                    setCategories(uniqueCategories as CategoryType[])
+
+                    // Extraer tallas únicas
+                    const allSizes = productsResponse.data.products.flatMap((p: any) => p.sizes || [])
+                    const uniqueSizes = Array.from(new Map(allSizes.map((s: any) => [s.name, s])).values())
+                    setSizes(uniqueSizes.map((s: any) => s.name))
                 }
-
-                if (colorsResponse.data) {
-                    setColors(colorsResponse.data)
-                }
-
-                if (categoriesResponse.data) {
-                    setCategories(categoriesResponse.data)
-                }
-
-                // Si la API devuelve tallas, puedes hacer setSizes aquí
-                // setSizes(sizesResponse.data)
-
                 setLoading(false)
             } catch (err) {
                 setError("Error al cargar los datos")
@@ -71,9 +72,8 @@ const ProductList = () => {
                 console.error(err)
             }
         }
-
         fetchData()
-    }, [setColors, setCategories])
+    }, [setColors, setCategories, setSizes])
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen)

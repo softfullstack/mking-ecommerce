@@ -57,6 +57,13 @@ const ProductDetail = () => {
         )
     }
 
+    // Normalizar tallas y colores para el render
+    const normalizedSizes = Array.isArray(product.sizes)
+        ? product.sizes.map((s: any) => typeof s === 'object' && s.name ? s.name : s)
+        : (typeof (product.sizes as string) === 'string'
+            ? (product.sizes as string).split(',').map((s: string) => s.trim()).filter(Boolean)
+            : []);
+
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue)
     }
@@ -83,8 +90,8 @@ const ProductDetail = () => {
             return
         }
         // Buscar el color seleccionado como objeto para pasarlo al carrito si es necesario
-        const colorObj = product.colors.find((c: any) => c.id === selectedColor)
-        addToCart(product, quantity, selectedSize, colorObj ? colorObj.name : "")
+        const colorObj = product.colors.find((c: any) => typeof c === "object" && c.id === selectedColor)
+        addToCart(product, quantity, selectedSize, colorObj && typeof colorObj === "object" && "name" in colorObj ? colorObj.name : (typeof selectedColor === "string" ? selectedColor : ""))
         setSnackbarMessage("Producto añadido al carrito")
         setSnackbarSeverity("success")
         setSnackbarOpen(true)
@@ -113,9 +120,6 @@ const ProductDetail = () => {
         setSnackbarOpen(false)
     }
 
-    const getColorName = (colorId: string) => {
-        return colorId;
-    }
 
     const getColorHex = (colorId: string) => {
         if (typeof colorId !== "string") return "#cccccc";
@@ -214,23 +218,25 @@ const ProductDetail = () => {
                                 Color
                             </FormLabel>
                             <RadioGroup row aria-label="color" name="color" value={selectedColor ?? ''} onChange={handleColorChange}>
-                                {product.colors.filter(Boolean).map((color: any) => (
-                                    <FormControlLabel
-                                        key={color.id}
-                                        value={color.id}
-                                        control={
-                                            <Radio
-                                                sx={{
-                                                    color: getColorHex(color.name),
-                                                    "&.Mui-checked": {
-                                                        color: getColorHex(color.name),
-                                                    },
-                                                }}
-                                            />
-                                        }
-                                        label={color.name}
-                                    />
-                                ))}
+                                {Array.isArray(product.colors) && product.colors.length > 0
+                                    ? product.colors.map((color: any, idx: number) => (
+                                        <FormControlLabel
+                                            key={color.id || color.name || idx}
+                                            value={color.id || color.name}
+                                            control={
+                                                <Radio
+                                                    sx={{
+                                                        color: color.hex_code || getColorHex(color.name || color),
+                                                        "&.Mui-checked": {
+                                                            color: color.hex_code || getColorHex(color.name || color),
+                                                        },
+                                                    }}
+                                                />
+                                            }
+                                            label={color.name || color}
+                                        />
+                                    ))
+                                    : null}
                             </RadioGroup>
                         </FormControl>
 
@@ -240,7 +246,7 @@ const ProductDetail = () => {
                                 Talla
                             </FormLabel>
                             <RadioGroup row aria-label="size" name="size" value={selectedSize} onChange={handleSizeChange}>
-                                {product.sizes.map((sizeId) => (
+                                {normalizedSizes.map((sizeId: string) => (
                                     <FormControlLabel key={sizeId} value={sizeId} control={<Radio />} label={getSizeName(sizeId)} />
                                 ))}
                             </RadioGroup>
@@ -338,7 +344,7 @@ const ProductDetail = () => {
                             </Tabs>
 
                             <Box role="tabpanel" hidden={tabValue !== 0} id="tabpanel-0" aria-labelledby="tab-0" sx={{ py: 3 }}>
-                                <Typography variant="body2">{product.details || ""}</Typography>
+                                <Typography variant="body2">{product.description || ""}</Typography>
                             </Box>
 
                             <Box role="tabpanel" hidden={tabValue !== 1} id="tabpanel-1" aria-labelledby="tab-1" sx={{ py: 3 }}>

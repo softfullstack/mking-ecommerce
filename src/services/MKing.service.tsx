@@ -75,16 +75,11 @@ export const obtenerComentarios = (id: any) =>
 export const guardarComentarios = (body: any) =>
     axios.post(`${apiUrl}/guarda_comentario`, body);
 
+export const getProductById = (id: number) => axios.get(`${apiUrl}/products/${id}`);
+
 // Obtener colores disponibles
-export const getColors = () => axios.get(`${apiUrl}/colors`)
-
-
-export const getProductById = (id:number) => axios.get(`${apiUrl}/products/${id}`);
-
-export const getCategories = ()  => axios.get(`${apiUrl}/categories`)
-
-
-
+// export const getColors = () => axios.get(`${apiUrl}/colors`)
+// export const getCategories = ()  => axios.get(`${apiUrl}/categories`)
 // export const getProductById = async (id: number): Promise<Product> => {
 //     try {
 //         // Assuming apiUrl is http://localhost:3333/api

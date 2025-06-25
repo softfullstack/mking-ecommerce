@@ -23,7 +23,7 @@ interface FiltersState {
 const useFiltersStore = create<FiltersState>((set) => ({
     colors: [],
     categories: [],
-    sizes: ['s', 'm', 'l', 'xl', 'xxl'],
+    sizes: [],
     setColors: (colors) => set({ colors }),
     setCategories: (categories) => set({ categories }),
     setSizes: (sizes) => set({ sizes })
