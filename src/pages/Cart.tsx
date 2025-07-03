@@ -121,10 +121,10 @@ const Cart = () => {
             {items.length === 0 ? (
                 <Box sx={{ textAlign: "center", py: 8 }}>
                     <Typography variant="h5" sx={{ mb: 3 }}>
-                        Tu carrito está vacío
+                        Tu bolsa está vacia
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 4 }}>
-                        Parece que aún no has añadido ningún producto a tu carrito.
+                        Parece que aún no has añadido ningún producto a tu bolsa.
                     </Typography>
                     <Button component={RouterLink} to="/productos" variant="contained" color="primary" size="large">
                         Explorar Productos
@@ -135,7 +135,7 @@ const Cart = () => {
                     {/* Cart items */}
                     <Grid item xs={12} lg={8}>
                         <Typography variant="h5" sx={{ mb: 3, fontWeight: "bold" }}>
-                            Carrito de Compras ({totalItems} {totalItems === 1 ? "producto" : "productos"})
+                            Bolsa de Compras ({totalItems} {totalItems === 1 ? "producto" : "productos"})
                         </Typography>
 
                         {items.map((item:any, index) => (
@@ -145,7 +145,11 @@ const Cart = () => {
                                         <Grid item xs={3} sm={2}>
                                             <Box
                                                 component="img"
-                                                src={item.images[0]}
+                                                src={
+                                                    Array.isArray(item.images) && item.images.length > 0
+                                                        ? (item.images.find((img:any) => img.is_primary)?.url || item.images[0].url)
+                                                        : undefined
+                                                }
                                                 alt={item.name}
                                                 sx={{
                                                     width: "100%",
@@ -172,10 +176,10 @@ const Cart = () => {
                                                 {item.name}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Color: {getColorName(item.color)}
+                                                Color: {typeof item.color === 'object' && item.color !== null ? item.color.name : getColorName(item.color)}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Talla: {getSizeName(item.size)}
+                                                Talla: {typeof item.size === 'object' && item.size !== null ? item.size.name : getSizeName(item.size)}
                                             </Typography>
                                         </Grid>
                                         <Grid item xs={6} sm={3}>
@@ -227,7 +231,7 @@ const Cart = () => {
                                 Continuar Comprando
                             </Button>
                             <Button variant="outlined" color="error" onClick={() => clearCart()}>
-                                Vaciar Carrito
+                                Vaciar Bolsa
                             </Button>
                         </Box>
                     </Grid>
@@ -300,7 +304,7 @@ const Cart = () => {
                                 </Box>
 
                                 <Button variant="contained" color="primary" size="large" fullWidth onClick={handleNext}>
-                                    Proceder al Pago
+                                    Cotizar
                                 </Button>
 
                                 <Box sx={{ mt: 3, display: "flex", alignItems: "center", justifyContent: "center" }}>

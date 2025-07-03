@@ -36,9 +36,10 @@ const ProductDetail = () => {
                     if (foundProduct.colors && foundProduct.colors.length > 0) {
                         setSelectedColor(foundProduct.colors[0].id)
                     }
-                    if (foundProduct.sizes && foundProduct.sizes.length > 0) {
-                        setSelectedSize(foundProduct.sizes[0])
-                    }
+                    // No seleccionar talla por defecto
+                    // if (foundProduct.sizes && foundProduct.sizes.length > 0) {
+                    //     setSelectedSize(foundProduct.sizes[0])
+                    // }
                     // TODO: Implement fetching related products from the API
                 } catch (error) {
                     console.error("Failed to fetch product", error)
@@ -89,7 +90,7 @@ const ProductDetail = () => {
             setSnackbarOpen(true)
             return
         }
-        // Buscar el color seleccionado como objeto para pasarlo al carrito si es necesario
+        // Buscar el color seleccionado como objeto para pasarlo al si es necesario
         const colorObj = product.colors.find((c: any) => typeof c === "object" && c.id === selectedColor)
         addToCart(product, quantity, selectedSize, colorObj && typeof colorObj === "object" && "name" in colorObj ? colorObj.name : (typeof selectedColor === "string" ? selectedColor : ""))
         setSnackbarMessage("Producto añadido al carrito")

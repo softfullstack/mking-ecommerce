@@ -4,7 +4,20 @@ import { Product } from "../interfaces/ProductInterface"
 import { useState, useEffect } from "react"
 
 const ProductCard = ({ product }: { product: Product }) => {
-    const { id, name, price, images, colors, isNew, discount } = product
+    const { id, name, price, images: originalImages, colors, isNew, discount } = product
+    // Reordenar imágenes para que la principal esté primero
+    const images = originalImages && Array.isArray(originalImages)
+        ? [...originalImages].sort((a, b) => {
+            // Si ambos tienen is_primary, o ambos no lo tienen, no cambiar el orden
+            if ((a as any).is_primary === (b as any).is_primary) return 0;
+            // Si a es principal, va antes
+            if ((a as any).is_primary) return -1;
+            // Si b es principal, va antes
+            if ((b as any).is_primary) return 1;
+            // Si ninguno es principal, no cambiar el orden
+            return 0;
+        })
+        : [];
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [isHovered, setIsHovered] = useState(false)
 
@@ -67,7 +80,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                 />
             )}
 
-            {discount > 0 && (
+            {typeof discount === "number" && discount > 0 && (
                 <Chip
                     label={`-${discount}%`}
                     color="error"
@@ -118,7 +131,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                     </Box>
 
                     <Box sx={{ mt: "auto" }}>
-                        {discount > 0 ? (
+                        {typeof discount === "number" &&  discount > 0 ? (
                             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                 <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
                                     ${(price * (1 - discount / 100)).toFixed(2)}
