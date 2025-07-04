@@ -5,7 +5,7 @@ import { Box, Container, Grid, Typography, Drawer, List, ListItem, ListItemButto
 import { FilterList, Close } from "@mui/icons-material"
 import ProductCard from "../components/ProductCard"
 import { Product, transformApiProduct } from "../interfaces/Product"
-import { ProducList } from "../services/MKing.service"
+import { ProdutcList } from "../services/MKing.service"
 import useFiltersStore from "../store/FiltersStore"
 
 interface CategoryType {
@@ -17,11 +17,6 @@ interface ColorType {
     id: number
     name: string
     hex_code?: string
-}
-
-interface SizeType {
-    id: number
-    name: string
 }
 
 const ProductList = () => {
@@ -38,13 +33,13 @@ const ProductList = () => {
     const [sortBy, setSortBy] = useState("featured")
 
     // Zustand store
-    const { colors, setColors, categories, setCategories, sizes, setSizes } = useFiltersStore()
+    const { colors, setColors, categories, setCategories} = useFiltersStore()
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true)
-                const productsResponse = await ProducList()
+                const productsResponse = await ProdutcList()
                 if (productsResponse.data.products) {
                     const transformedProducts = productsResponse.data.products.map(transformApiProduct)
                     setProducts(transformedProducts)
@@ -61,9 +56,9 @@ const ProductList = () => {
                     setCategories(uniqueCategories as CategoryType[])
 
                     // Extraer tallas únicas
-                    const allSizes = productsResponse.data.products.flatMap((p: any) => p.sizes || [])
-                    const uniqueSizes = Array.from(new Map(allSizes.map((s: any) => [s.name, s])).values())
-                    setSizes(uniqueSizes.map((s: any) => s.name))
+                    // const allSizes = productsResponse.data.products.flatMap((p: any) => p.sizes || [])
+                    // const uniqueSizes = Array.from(new Map(allSizes.map((s: any) => [s.name, s])).values())
+                    // setSizes(uniqueSizes.map((s: any) => s.name))
                 }
                 setLoading(false)
             } catch (err) {
@@ -73,13 +68,13 @@ const ProductList = () => {
             }
         }
         fetchData()
-    }, [setColors, setCategories, setSizes])
+        }, [setColors, setCategories])
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen)
     }
 
-    const handlePriceChange = (event: Event, value: number | number[], activeThumb: number) => {
+    const handlePriceChange = (_event: Event, value: number | number[], _activeThumb: number) => {
         if (Array.isArray(value)) {
             setPriceRange(value)
         }
@@ -379,7 +374,18 @@ const ProductList = () => {
                     <Grid container spacing={3}>
                         {filteredProducts.map((product) => (
                             <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
-                                <ProductCard product={product} />
+                                <ProductCard
+                                    product={{
+                                        ...product,
+                                        colorIds: product.colorIds.map(String),
+                                        images: (product.images || []).map((img: any) => ({
+                                            id: img.id,
+                                            image_path: img.image_path,
+                                            url: img.url ?? undefined,
+                                            is_primary: img.is_primary,
+                                        })),
+                                    }}
+                                />
                             </Grid>
                         ))}
                     </Grid>

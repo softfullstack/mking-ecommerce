@@ -34,7 +34,7 @@ const Login = () => {
         formState: { errors },
     } = useForm()
 
-    const onSubmit = (data) => {
+    const onSubmit = (data:any) => {
         // In a real app, this would call an API
         if (data.email === "demo@example.com" && data.password === "password") {
             login({
@@ -85,7 +85,7 @@ const Login = () => {
                             },
                         })}
                         error={!!errors.email}
-                        helperText={errors.email?.message}
+                        helperText={typeof errors.email?.message === "string" ? errors.email.message : ""}
                         defaultValue="demo@example.com"
                     />
 
@@ -103,7 +103,7 @@ const Login = () => {
                             },
                         })}
                         error={!!errors.password}
-                        helperText={errors.password?.message}
+                        helperText={typeof errors.password?.message === "string" ? errors.password.message : ""}
                         defaultValue="password"
                         InputProps={{
                             endAdornment: (

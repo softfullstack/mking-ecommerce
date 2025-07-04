@@ -14,7 +14,7 @@ import { getProductById } from "../services/MKing.service"
 const ProductDetail = () => {
     const { id } = useParams()
     const [product, setProduct] = useState<Product | null>(null)
-    const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+    const [relatedProducts] = useState<Product[]>([])
     const [selectedColor, setSelectedColor] = useState<number | null>(null)
     const [selectedSize, setSelectedSize] = useState("")
     const [quantity, setQuantity] = useState(1)
@@ -91,8 +91,16 @@ const ProductDetail = () => {
             return
         }
         // Buscar el color seleccionado como objeto para pasarlo al si es necesario
-        const colorObj = product.colors.find((c: any) => typeof c === "object" && c.id === selectedColor)
-        addToCart(product, quantity, selectedSize, colorObj && typeof colorObj === "object" && "name" in colorObj ? colorObj.name : (typeof selectedColor === "string" ? selectedColor : ""))
+        const colorObj = product.colors.find(
+            (c: any) => typeof c === "object" && c.id === selectedColor
+        )
+        // Usar el nombre del color si existe, de lo contrario usar el id o string
+        const colorName =
+            colorObj && typeof colorObj === "object" && (colorObj as { name?: string }).name
+                ? (colorObj as { name: string }).name
+                : (typeof selectedColor === "string" ? selectedColor : "")
+
+        addToCart(product, quantity, selectedSize, colorName)
         setSnackbarMessage("Producto añadido al carrito")
         setSnackbarSeverity("success")
         setSnackbarOpen(true)

@@ -80,7 +80,14 @@ const Home = () => {
                 <Grid container spacing={3}>
                     {featuredProducts.map((product) => (
                         <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
-                            <ProductCard product={product} />
+                            <ProductCard product={{
+                                ...product,
+                                images: (product.images || []).map((img: any) =>
+                                    typeof img === "string"
+                                        ? { url: img }
+                                        : img
+                                ),
+                            }} />
                         </Grid>
                     ))}
                 </Grid>

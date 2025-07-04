@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { getColors, getCategories, ProducList } from '../services/MKing.service'
+import { ProdutcList } from '../services/MKing.service'
 
 // Ejemplo de cómo usar las nuevas funciones del servicio
 const DataFetchingExample = () => {
-    const [colors, setColors] = useState([])
-    const [categories, setCategories] = useState([])
+    // const [colors, setColors] = useState([])
+    // const [categories, setCategories] = useState([])
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
 
@@ -14,14 +14,14 @@ const DataFetchingExample = () => {
                 setLoading(true)
                 
                 // Obtener todos los datos en paralelo
-                const [colorsResponse, categoriesResponse, productsResponse] = await Promise.all([
-                    getColors(),
-                    getCategories(),
-                    ProducList()
+                const [productsResponse] = await Promise.all([
+                    // getColors(),
+                    // getCategories(),
+                    ProdutcList()
                 ])
 
-                setColors(colorsResponse.data)
-                setCategories(categoriesResponse.data)
+                // setColors(colorsResponse.data)
+                // setCategories(categoriesResponse.data)
                 setProducts(productsResponse.data.products || [])
                 
                 setLoading(false)
@@ -42,18 +42,18 @@ const DataFetchingExample = () => {
         <div>
             <h2>Datos obtenidos del backend</h2>
             
-            <h3>Colores ({colors.length})</h3>
+            <h3>Colores ({products.length})</h3>
             <ul>
-                {colors.map((color: any) => (
+                {products.map((color: any) => (
                     <li key={color.id}>
                         {color.name} - {color.hex_code}
                     </li>
                 ))}
             </ul>
 
-            <h3>Categorías ({categories.length})</h3>
+            <h3>Categorías ({products.length})</h3>
             <ul>
-                {categories.map((category: any) => (
+                {products.map((category: any) => (
                     <li key={category.id}>
                         {category.name}
                     </li>

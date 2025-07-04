@@ -1,6 +1,5 @@
 import axios from "axios";
 import { Response } from "../utils/Response";
-import { Product } from "../interfaces/ProductInterface";
 
 const apiUrl = import.meta.env.VITE_BASE_URL;
 let cancelToken: any;
@@ -47,7 +46,7 @@ axios.interceptors.response.use(
 export const LoginService = (body: any) => axios.post(`${apiUrl}/login`, body);
 
 
-export const ProducList = async () => {
+export const ProdutcList = async () => {
     return axios.get(`${apiUrl}/products`)
 }
 
@@ -76,37 +75,3 @@ export const guardarComentarios = (body: any) =>
     axios.post(`${apiUrl}/guarda_comentario`, body);
 
 export const getProductById = (id: number) => axios.get(`${apiUrl}/products/${id}`);
-
-// Obtener colores disponibles
-// export const getColors = () => axios.get(`${apiUrl}/colors`)
-// export const getCategories = ()  => axios.get(`${apiUrl}/categories`)
-// export const getProductById = async (id: number): Promise<Product> => {
-//     try {
-//         // Assuming apiUrl is http://localhost:3333/api
-//         const { data } = await axios.get(`${apiUrl}/products/${id}`);
-
-//         // Adapt the API response to the Product interface
-//         const adaptedProduct: Product = {
-//             id: data.id,
-//             name: data.name,
-//             price: parseFloat(data.price),
-//             description: data.description,
-//             images: data.images ? data.images.map((img: any) => ({
-//                 id: img.id,
-//                 url: img.url,
-//                 image_path: img.image_path,
-//             })) : [],
-//             colorIds: data.colors ? data.colors.map((color: any) => color.name.toLowerCase()) : [],
-//             colors: data.colors ? data.colors.map((color: any) => color.name) : [],
-//             sizes: data.sizes ? data.sizes.map((size: any) => size.name) : [],
-//             categories: data.category ? [data.category.name] : [],
-//             isNew: false, // Logic to determine if it's new can be added here
-//         };
-//         return adaptedProduct;
-//     } catch (error) {
-//         console.error(`Error fetching product with id ${id}:`, error);
-//         throw error;
-//     }
-// };
-
-// Obtener categorías disponibles
