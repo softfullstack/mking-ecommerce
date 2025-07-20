@@ -17,6 +17,7 @@ interface ColorType {
     id: number
     name: string
     hex_code?: string
+    hex_code_1?: string | null
 }
 
 const ProductList = () => {
@@ -173,7 +174,7 @@ const ProductList = () => {
     const filterDrawerContent = (
         <Box
             sx={{
-                width: isMobile ? "100vw" : 300,
+                width: isMobile ? "100vw" : 250,
                 p: 3,
                 height: "100%",
                 overflow: "auto",
@@ -233,39 +234,44 @@ const ProductList = () => {
                 Colores
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
-                {colors.map((color) => (
-                    <Box
-                        key={color.id}
-                        onClick={() => handleColorToggle(color.id)}
-                        sx={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: "50%",
-                            backgroundColor: color.hex_code,
-                            cursor: "pointer",
-                            border: selectedColors.includes(color.id) ? "2px solid #ff0000" : "1px solid rgba(255,255,255,0.2)",
-                            position: "relative",
-                            "&:hover": {
-                                opacity: 0.8,
-                            },
-                        }}
-                    >
-                        {selectedColors.includes(color.id) && (
-                            <Box
-                                sx={{
-                                    position: "absolute",
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                    width: 16,
-                                    height: 16,
-                                    borderRadius: "50%",
-                                    backgroundColor: "white",
-                                }}
-                            />
-                        )}
-                    </Box>
-                ))}
+                {colors.map((color) => {
+                    // Usar la estructura real: hex_code y hex_code_1
+                    const hasSecondColor = (color as any).hex_code_1 && (color as any).hex_code_1 !== null;
+                    return (
+                        <Box
+                            key={color.id}
+                            onClick={() => handleColorToggle(color.id)}
+                            sx={{
+                                width: 36,
+                                height: 36,
+                                borderRadius: "50%",
+                                cursor: "pointer",
+                                position: "relative",
+                                background: hasSecondColor
+                                    ? `linear-gradient(130deg, ${color.hex_code} 50%, ${(color as any).hex_code_1} 50%)`
+                                    : color.hex_code,
+                                "&:hover": {
+                                    opacity: 0.8,
+                                },
+                            }}
+                        >
+                            {selectedColors.includes(color.id) && (
+                                <Box
+                                    sx={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "50%",
+                                        transform: "translate(-50%, -50%)",
+                                        width: 16,
+                                        height: 16,
+                                        borderRadius: "50%",
+                                        backgroundColor: "white",
+                                    }}
+                                />
+                            )}
+                        </Box>
+                    );
+                })}
             </Box>
 
             <Button variant="outlined" color="primary" fullWidth onClick={clearFilters} sx={{ mt: 2 }}>

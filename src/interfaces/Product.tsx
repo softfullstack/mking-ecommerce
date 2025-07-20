@@ -14,6 +14,8 @@ export interface ApiCategory {
 export interface ApiColor {
     id: number
     name: string
+    hex_code?: string
+    hex_code_1?: string | null
 }
 
 export interface ApiProduct {
@@ -61,19 +63,19 @@ export interface Product {
     }[]
 }
 
-// Función para transformar un ApiProduct en Product
-// Mapeo de colores a valores hexadecimales
-const colorNameToHex: Record<string, string> = {
-    negro: '#000000',
-    rojo: '#ff0000',
-    verde: '#00ff00',
-    azul: '#0000ff',
-    amarillo: '#ffff00',
-    blanco: '#ffffff',
-    naranja: '#ff9800'
-};
-
 export function transformApiProduct(apiProduct: ApiProduct): Product {
+    // Transformar colores usando la nueva estructura con hex_code y hex_code_1
+    const transformedColors: string[] = [];
+    apiProduct.colors.forEach(color => {
+        if (color.hex_code) {
+            transformedColors.push(color.hex_code);
+            // Si hay un segundo color, agregarlo también
+            if (color.hex_code_1 && color.hex_code_1 !== null) {
+                transformedColors.push(color.hex_code_1);
+            }
+        }
+    });
+
     return {
         id: apiProduct.id,
         name: apiProduct.name,
@@ -82,7 +84,7 @@ export function transformApiProduct(apiProduct: ApiProduct): Product {
         description: apiProduct.description,
         details: apiProduct.description, // Usando la misma descripción para details
         images: apiProduct.images,
-        colors: apiProduct.colors.map(color => colorNameToHex[color.name.toLowerCase()] || '#cccccc'),
+        colors: transformedColors,
         colorIds: apiProduct.colors.map(color => color.id),
         sizes: ["s", "m", "l", "xl"], // Tamaños por defecto
         categories: [apiProduct.category.name.toLowerCase()],

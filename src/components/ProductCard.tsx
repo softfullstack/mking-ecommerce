@@ -116,18 +116,28 @@ const ProductCard = ({ product }: { product: Product }) => {
                     </Typography>
 
                     <Box sx={{ display: "flex", gap: 0.5, mb: 1 }}>
-                        {hasColors && colors.map((color, index) => (
-                            <Box
-                                key={index}
-                                sx={{
-                                    width: 16,
-                                    height: 16,
-                                    borderRadius: "50%",
-                                    backgroundColor: color,
-                                    border: "1px solid rgba(255,255,255,0.2)",
-                                }}
-                            />
-                        ))}
+                        {hasColors && (() => {
+                            // Agrupar colores de a dos para mostrar combinaciones
+                            const colorGroups = [];
+                            for (let i = 0; i < colors.length; i += 2) {
+                                colorGroups.push(colors.slice(i, i + 2));
+                            }
+                            
+                            return colorGroups.map((group, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        width: 16,
+                                        height: 16,
+                                        borderRadius: "50%",
+                                        border: "0.5px solid gray",
+                                        background: group.length === 1
+                                            ? group[0]
+                                            : `linear-gradient(130deg, ${group[0]} 50%, ${group[1]} 50%)`,
+                                    }}
+                                />
+                            ));
+                        })()}
                     </Box>
 
                     <Box sx={{ mt: "auto" }}>
