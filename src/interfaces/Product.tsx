@@ -20,6 +20,7 @@ export interface ApiColor {
 
 export interface ApiProduct {
     id: number
+    uuid: string
     name: string
     description: string
     sku: string
@@ -38,6 +39,7 @@ export interface ApiProduct {
 
 export interface Product {
     id: number
+    uuid: string
     name: string
     price: number
     discount: number
@@ -78,6 +80,7 @@ export function transformApiProduct(apiProduct: ApiProduct): Product {
 
     return {
         id: apiProduct.id,
+        uuid: apiProduct.uuid,
         name: apiProduct.name,
         price: parseFloat(apiProduct.price),
         discount: 0,

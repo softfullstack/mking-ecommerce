@@ -75,3 +75,8 @@ export const guardarComentarios = (body: any) =>
     axios.post(`${apiUrl}/guarda_comentario`, body);
 
 export const getProductById = (id: number) => axios.get(`${apiUrl}/products/${id}`);
+
+// Nuevos métodos para trabajar con UUID
+export const getProductByUuid = (uuid: string) => axios.get(`${apiUrl}/products/uuid/${uuid}`);
+
+export const getProductsByCategory = (categoryId: number) => axios.get(`${apiUrl}/product/category/${categoryId}`);

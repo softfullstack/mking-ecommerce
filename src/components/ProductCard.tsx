@@ -2,9 +2,10 @@ import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip } f
 import { Link } from "react-router-dom"
 import { Product } from "../interfaces/ProductInterface"
 import { useState, useEffect } from "react"
+import { getPreferredIdentifier } from "../utils/uuidUtils"
 
 const ProductCard = ({ product }: { product: Product }) => {
-    const { id, name, price, images: originalImages, colors, isNew, discount } = product
+    const { id, uuid, name, price, images: originalImages, colors, isNew, discount } = product
     // Reordenar imágenes para que la principal esté primero
     const images = originalImages && Array.isArray(originalImages)
         ? [...originalImages].sort((a, b) => {
@@ -40,30 +41,27 @@ const ProductCard = ({ product }: { product: Product }) => {
 
     // Verificar si hay imágenes y si la imagen actual tiene una URL válida
     const hasImages = images && images.length > 0
-    const imageUrl = hasImages && images[currentImageIndex] && images[currentImageIndex].url
-        ? images[currentImageIndex].url
-        : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQ1IiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzMzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIGltYWdlbjwvdGV4dD48L3N2Zz4=';
+    const currentImage = hasImages ? images[currentImageIndex] : null
+    const imageUrl = currentImage?.url || currentImage?.image_path || "/images/placeholder.jpg"
 
-    // Verificar si hay colores
-    const hasColors = colors && colors.length > 0;
+    // Obtener el identificador preferido (UUID o ID como fallback)
+    const productIdentifier = getPreferredIdentifier({ uuid, id })
 
     return (
         <Card
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
             sx={{
-                maxWidth: 345,
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",
-                backgroundColor: "#1e1e1e",
-                transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
                 "&:hover": {
-                    transform: "translateY(-5px)",
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
                 },
             }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             {isNew && (
                 <Chip
@@ -97,7 +95,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
             <CardActionArea
                 component={Link}
-                to={`/producto/${id}`}
+                to={`/producto/${productIdentifier}`}
                 sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "stretch" }}
             >
                 <CardMedia
@@ -110,52 +108,75 @@ const ProductCard = ({ product }: { product: Product }) => {
                         transition: 'opacity 0.3s ease-in-out', // Transición suave para el cambio de imagen
                     }}
                 />
+
                 <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                    <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: "bold" }}>
+                    <Typography
+                        variant="h6"
+                        component="h3"
+                        sx={{
+                            fontWeight: "bold",
+                            mb: 1,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                        }}
+                    >
                         {name}
                     </Typography>
 
-                    <Box sx={{ display: "flex", gap: 0.5, mb: 1 }}>
-                        {hasColors && (() => {
-                            // Agrupar colores de a dos para mostrar combinaciones
-                            const colorGroups = [];
-                            for (let i = 0; i < colors.length; i += 2) {
-                                colorGroups.push(colors.slice(i, i + 2));
-                            }
-                            
-                            return colorGroups.map((group, index) => (
-                                <Box
-                                    key={index}
-                                    sx={{
-                                        width: 16,
-                                        height: 16,
-                                        borderRadius: "50%",
-                                        border: "0.5px solid gray",
-                                        background: group.length === 1
-                                            ? group[0]
-                                            : `linear-gradient(130deg, ${group[0]} 50%, ${group[1]} 50%)`,
-                                    }}
-                                />
-                            ));
-                        })()}
-                    </Box>
-
-                    <Box sx={{ mt: "auto" }}>
-                        {typeof discount === "number" &&  discount > 0 ? (
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                        {discount && discount > 0 ? (
+                            <>
+                                <Typography
+                                    variant="h6"
+                                    color="primary"
+                                    sx={{ fontWeight: "bold", mr: 1 }}
+                                >
                                     ${(price * (1 - discount / 100)).toFixed(2)}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ textDecoration: "line-through" }}>
+                                <Typography
+                                    variant="body2"
+                                    sx={{ textDecoration: "line-through", color: "text.secondary" }}
+                                >
                                     ${price.toFixed(2)}
                                 </Typography>
-                            </Box>
+                            </>
                         ) : (
-                            <Typography variant="h6" color="primary" sx={{ fontWeight: "bold" }}>
+                            <Typography
+                                variant="h6"
+                                color="primary"
+                                sx={{ fontWeight: "bold" }}
+                            >
                                 ${price.toFixed(2)}
                             </Typography>
                         )}
                     </Box>
+
+                    {/* Color chips */}
+                    {colors && colors.length > 0 && (
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
+                            {colors.slice(0, 4).map((color, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        width: 20,
+                                        height: 20,
+                                        borderRadius: "50%",
+                                        backgroundColor: color,
+                                        border: "2px solid #fff",
+                                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                                    }}
+                                />
+                            ))}
+                            {colors.length > 4 && (
+                                <Typography variant="caption" color="text.secondary">
+                                    +{colors.length - 4} más
+                                </Typography>
+                            )}
+                        </Box>
+                    )}
                 </CardContent>
             </CardActionArea>
         </Card>

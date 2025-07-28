@@ -21,6 +21,7 @@ import {
 import { Add, Remove, Delete, ArrowBack, LocalShipping, CheckCircle } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
 import useAuthStore from "../store/AuthStore"
+import { getPreferredIdentifier } from "../utils/uuidUtils"
 
 const Cart = () => {
     const navigate = useNavigate()
@@ -163,7 +164,7 @@ const Cart = () => {
                                             <Typography
                                                 variant="subtitle1"
                                                 component={RouterLink}
-                                                to={`/producto/${item.id}`}
+                                                to={`/producto/${getPreferredIdentifier({ uuid: item.uuid, id: item.id })}`}
                                                 sx={{
                                                     fontWeight: "bold",
                                                     textDecoration: "none",

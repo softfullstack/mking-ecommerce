@@ -1,20 +1,22 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, Link as RouterLink } from "react-router-dom"
+import { useParams, Link as RouterLink, useNavigate } from "react-router-dom"
 import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, List, ListItem, ListItemText, Chip, IconButton, Snackbar, Alert, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Breadcrumbs, Link, AlertColor } from "@mui/material"
 import { Favorite, FavoriteBorder, Share, LocalShipping, Verified, ArrowBack } from "@mui/icons-material"
 import { SnackbarCloseReason } from "@mui/material/Snackbar"
 import ProductCarousel from "../components/ProductCarousel"
-import ProductCard from "../components/ProductCard"
+import RelatedProductsCarousel from "../components/RelatedProductsCarousel"
 import useCartStore from "../store/CartStore"
 import { Product } from "../interfaces/ProductInterface"
-import { getProductById } from "../services/MKing.service"
+import { getProductByUuid, getProductById, getProductsByCategory } from "../services/MKing.service"
+import { isValidUuid, getPreferredIdentifier } from "../utils/uuidUtils"
 
 const ProductDetail = () => {
-    const { id } = useParams()
+    const { uuid } = useParams()
+    const navigate = useNavigate()
     const [product, setProduct] = useState<Product | null>(null)
-    const [relatedProducts] = useState<Product[]>([])
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
     const [selectedColor, setSelectedColor] = useState<number | null>(null)
     const [selectedSize, setSelectedSize] = useState("")
     const [quantity, setQuantity] = useState(1)
@@ -28,27 +30,68 @@ const ProductDetail = () => {
     // Fetch product data
     useEffect(() => {
         const fetchProduct = async () => {
-            if (id) {
+            if (uuid) {
                 try {
-                    const response = await getProductById(Number.parseInt(id))
+                    let response;
+                    
+                    // Intentar usar UUID primero, si no es válido usar ID como fallback
+                    if (isValidUuid(uuid)) {
+                        response = await getProductByUuid(uuid)
+                    } else {
+                        // Si no es un UUID válido, intentar como ID numérico
+                        const numericId = parseInt(uuid)
+                        if (!isNaN(numericId)) {
+                            response = await getProductById(numericId)
+                        } else {
+                            throw new Error('Invalid product identifier')
+                        }
+                    }
+                    
                     const foundProduct = response.data
                     setProduct(foundProduct)
                     if (foundProduct.colors && foundProduct.colors.length > 0) {
                         setSelectedColor(foundProduct.colors[0].id)
                     }
-                    // No seleccionar talla por defecto
-                    // if (foundProduct.sizes && foundProduct.sizes.length > 0) {
-                    //     setSelectedSize(foundProduct.sizes[0])
-                    // }
-                    // TODO: Implement fetching related products from the API
+                    
+                    // Cargar productos relacionados de la misma categoría
+                    if (foundProduct.category_id) {
+                        try {
+                            const relatedResponse = await getProductsByCategory(foundProduct.category_id)
+                            const relatedProductsData = relatedResponse.data.products || []
+                            // Filtrar el producto actual y transformar los datos
+                            const filteredRelated = relatedProductsData
+                                .filter((p: any) => p.uuid !== foundProduct.uuid)
+                                .map((p: any) => ({
+                                    id: p.id,
+                                    uuid: p.uuid,
+                                    name: p.name,
+                                    price: parseFloat(p.price),
+                                    discount: 0,
+                                    description: p.description,
+                                    details: p.description,
+                                    images: p.images || [],
+                                    colors: p.colors || [],
+                                    colorIds: p.colors?.map((c: any) => c.id) || [],
+                                    sizes: ["s", "m", "l", "xl"],
+                                    categories: [p.category?.name?.toLowerCase() || ""],
+                                    isNew: new Date(p.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                                    rating: 5,
+                                    reviewCount: 0,
+                                    reviews: [],
+                                    specifications: []
+                                }))
+                            setRelatedProducts(filteredRelated)
+                        } catch (error) {
+                            console.error("Failed to fetch related products", error)
+                        }
+                    }
                 } catch (error) {
                     console.error("Failed to fetch product", error)
-                    // Optionally, set an error state to show a message to the user
                 }
             }
         }
         fetchProduct()
-    }, [id])
+    }, [uuid])
 
     if (!product) {
         return (
@@ -127,6 +170,18 @@ const ProductDetail = () => {
             return
         }
         setSnackbarOpen(false)
+    }
+
+    const handleColorClick = (colorId: number) => {
+        // Buscar el producto que tenga este color
+        const productWithColor = relatedProducts.find(p => 
+            p.colors && p.colors.some((c: any) => c.id === colorId)
+        )
+        
+        if (productWithColor) {
+            const productIdentifier = getPreferredIdentifier({ uuid: productWithColor.uuid, id: productWithColor.id })
+            navigate(`/producto/${productIdentifier}`)
+        }
     }
 
 
@@ -248,6 +303,43 @@ const ProductDetail = () => {
                                     : null}
                             </RadioGroup>
                         </FormControl>
+
+                        {/* Otros colores disponibles */}
+                        {relatedProducts.length > 0 && (
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 2 }}>
+                                    Otros colores disponibles
+                                </Typography>
+                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                                    {relatedProducts.map((relatedProduct) => 
+                                        relatedProduct.colors?.map((color: any) => {
+                                            const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
+                                            return (
+                                                <Box
+                                                    key={`${relatedProduct.id}-${color.id}`}
+                                                    onClick={() => handleColorClick(color.id)}
+                                                    sx={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        borderRadius: "50%",
+                                                        cursor: "pointer",
+                                                        border: "0.1px solid rgba(255,255,255,0.2)",
+                                                        background: hasSecondColor
+                                                            ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
+                                                            : color.hex_code,
+                                                        "&:hover": {
+                                                            opacity: 0.8,
+                                                            border: "0.5px solidrgb(90, 90, 90)",
+                                                        },
+                                                    }}
+                                                    title={`${color.name} - ${relatedProduct.name}`}
+                                                />
+                                            );
+                                        })
+                                    )}
+                                </Box>
+                            </Box>
+                        )}
 
                         {/* Size selection */}
                         <FormControl component="fieldset" sx={{ mb: 3 }}>
@@ -411,21 +503,20 @@ const ProductDetail = () => {
                 </Grid>
             </Grid>
 
-            {/* Related products */}
-            {relatedProducts.length > 0 && (
-                <Box sx={{ mt: 8 }}>
-                    <Typography variant="h5" component="h2" sx={{ mb: 3, fontWeight: "bold" }}>
-                        Productos Relacionados
-                    </Typography>
-                    <Grid container spacing={3}>
-                        {relatedProducts.map((product) => (
-                            <Grid item key={product.id} xs={12} sm={6} md={3}>
-                                <ProductCard product={product} />
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Box>
-            )}
+            {/* Related products carousel */}
+            <RelatedProductsCarousel 
+                products={relatedProducts.map((relatedProduct) => ({
+                    ...relatedProduct,
+                    // Asegurar que los colores se pasen correctamente
+                    colors: relatedProduct.colors?.map((color: any) => {
+                        if (color.hex_code_1 && color.hex_code_1 !== null) {
+                            return [color.hex_code, color.hex_code_1];
+                        }
+                        return [color.hex_code];
+                    }).flat() || [],
+                }))}
+                title="Productos Relacionados"
+            />
 
             {/* Snackbar for notifications */}
             <Snackbar
