@@ -17,6 +17,7 @@ const ProductDetail = () => {
     const navigate = useNavigate()
     const [product, setProduct] = useState<Product | null>(null)
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+    const [relatedProductsForCarousel, setRelatedProductsForCarousel] = useState<Product[]>([])
     const [selectedColor, setSelectedColor] = useState<number | null>(null)
     const [selectedSize, setSelectedSize] = useState("")
     const [quantity, setQuantity] = useState(1)
@@ -49,6 +50,9 @@ const ProductDetail = () => {
                     
                     const foundProduct = response.data
                     setProduct(foundProduct)
+                    console.log('Producto cargado:', foundProduct.name)
+                    console.log('Colores del producto:', foundProduct.colors)
+                    
                     if (foundProduct.colors && foundProduct.colors.length > 0) {
                         setSelectedColor(foundProduct.colors[0].id)
                     }
@@ -58,29 +62,41 @@ const ProductDetail = () => {
                         try {
                             const relatedResponse = await getProductsByCategory(foundProduct.category_id)
                             const relatedProductsData = relatedResponse.data.products || []
-                            // Filtrar el producto actual y transformar los datos
-                            const filteredRelated = relatedProductsData
-                                .filter((p: any) => p.uuid !== foundProduct.uuid)
-                                .map((p: any) => ({
-                                    id: p.id,
-                                    uuid: p.uuid,
-                                    name: p.name,
-                                    price: parseFloat(p.price),
-                                    discount: 0,
-                                    description: p.description,
-                                    details: p.description,
-                                    images: p.images || [],
-                                    colors: p.colors || [],
-                                    colorIds: p.colors?.map((c: any) => c.id) || [],
-                                    sizes: ["s", "m", "l", "xl"],
-                                    categories: [p.category?.name?.toLowerCase() || ""],
-                                    isNew: new Date(p.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                                    rating: 5,
-                                    reviewCount: 0,
-                                    reviews: [],
-                                    specifications: []
-                                }))
-                            setRelatedProducts(filteredRelated)
+                            console.log('Productos relacionados encontrados:', relatedProductsData.length)
+                            
+                            // Transformar los datos de productos relacionados
+                            const transformedRelated = relatedProductsData.map((p: any) => ({
+                                id: p.id,
+                                uuid: p.uuid,
+                                name: p.name,
+                                price: parseFloat(p.price),
+                                discount: 0,
+                                description: p.description,
+                                details: p.description,
+                                images: p.images || [],
+                                colors: p.colors || [],
+                                colorIds: p.colors?.map((c: any) => c.id) || [],
+                                sizes: ["s", "m", "l", "xl"],
+                                categories: [p.category?.name?.toLowerCase() || ""],
+                                isNew: new Date(p.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                                rating: 5,
+                                reviewCount: 0,
+                                reviews: [],
+                                specifications: []
+                            }))
+                            
+                            // Filtrar el producto actual solo para el carrusel de productos relacionados
+                            const filteredForCarousel = transformedRelated.filter((p: any) => p.uuid !== foundProduct.uuid)
+                            
+                            // Para los colores disponibles, incluir TODOS los productos de la categoría
+                            setRelatedProducts(transformedRelated)
+                            
+                            console.log('Productos para colores disponibles:', transformedRelated.length)
+                            console.log('Productos para carrusel:', filteredForCarousel.length)
+                            console.log('Colores disponibles en productos relacionados:', transformedRelated.map((p: any) => ({ name: p.name, colors: p.colors?.length || 0 })))
+                            
+                            // También guardar los productos filtrados para el carrusel
+                            setRelatedProductsForCarousel(filteredForCarousel)
                         } catch (error) {
                             console.error("Failed to fetch related products", error)
                         }
@@ -283,61 +299,192 @@ const ProductDetail = () => {
                             </FormLabel>
                             <RadioGroup row aria-label="color" name="color" value={selectedColor ?? ''} onChange={handleColorChange}>
                                 {Array.isArray(product.colors) && product.colors.length > 0
-                                    ? product.colors.map((color: any, idx: number) => (
-                                        <FormControlLabel
-                                            key={color.id || color.name || idx}
-                                            value={color.id || color.name}
-                                            control={
-                                                <Radio
-                                                    sx={{
-                                                        color: color.hex_code || getColorHex(color.name || color),
-                                                        "&.Mui-checked": {
-                                                            color: color.hex_code || getColorHex(color.name || color),
-                                                        },
-                                                    }}
-                                                />
-                                            }
-                                            label={color.name || color}
-                                        />
-                                    ))
+                                    ? product.colors.map((color: any, idx: number) => {
+                                        const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
+                                        const isSelected = selectedColor === color.id;
+                                        
+                                        return (
+                                            <FormControlLabel
+                                                key={color.id || color.name || idx}
+                                                value={color.id || color.name}
+                                                control={
+                                                    <Radio
+                                                        sx={{
+                                                            color: "transparent",
+                                                            "&.Mui-checked": {
+                                                                color: "transparent",
+                                                            },
+                                                        }}
+                                                    />
+                                                }
+                                                label={
+                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                                                        {/* Indicador de color combinado */}
+                                                        <Box
+                                                            sx={{
+                                                                width: 36,
+                                                                height: 36,
+                                                                borderRadius: "50%",
+                                                                border: isSelected ? "3px solid #1976d2" : "2px solid #e0e0e0",
+                                                                background: hasSecondColor
+                                                                    ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
+                                                                    : color.hex_code,
+                                                                boxShadow: isSelected 
+                                                                    ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)" 
+                                                                    : "0 2px 8px rgba(0,0,0,0.1)",
+                                                                transition: "all 0.3s ease-in-out",
+                                                                cursor: "pointer",
+                                                                "&:hover": {
+                                                                    transform: "scale(1.08)",
+                                                                    boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+                                                                    border: isSelected ? "3px solid #1976d2" : "2px solid #bdbdbd",
+                                                                },
+                                                                position: "relative",
+                                                                overflow: "hidden",
+                                                            }}
+                                                        >
+                                                            {/* Indicador de selección interno */}
+                                                            {isSelected && (
+                                                                <Box
+                                                                    sx={{
+                                                                        position: "absolute",
+                                                                        top: "50%",
+                                                                        left: "50%",
+                                                                        transform: "translate(-50%, -50%)",
+                                                                        width: 12,
+                                                                        height: 12,
+                                                                        borderRadius: "50%",
+                                                                        backgroundColor: "white",
+                                                                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </Box>
+                                                        <Typography 
+                                                            variant="body2" 
+                                                            sx={{ 
+                                                                color: "text.primary",
+                                                                fontWeight: isSelected ? "bold" : "normal",
+                                                                fontSize: "0.95rem",
+                                                            }}
+                                                        >
+                                                            {color.name}
+                                                        </Typography>
+                                                    </Box>
+                                                }
+                                                sx={{
+                                                    margin: 0,
+                                                    marginRight: 2,
+                                                    marginBottom: 1,
+                                                }}
+                                            />
+                                        );
+                                    })
                                     : null}
                             </RadioGroup>
                         </FormControl>
 
                         {/* Otros colores disponibles */}
-                        {relatedProducts.length > 0 && (
+                        {(relatedProducts.length > 0 || (product.colors && product.colors.length > 1)) && (
                             <Box sx={{ mb: 3 }}>
                                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 2 }}>
                                     Otros colores disponibles
                                 </Typography>
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                                    {relatedProducts.map((relatedProduct) => 
-                                        relatedProduct.colors?.map((color: any) => {
+                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                                    {relatedProducts.length > 0 ? (
+                                        // Mostrar colores de productos relacionados
+                                        relatedProducts.map((relatedProduct) => 
+                                            relatedProduct.colors?.map((color: any) => {
+                                                // Evitar mostrar colores que ya están seleccionados en el producto actual
+                                                const isCurrentProductColor = product.colors?.some((c: any) => c.id === color.id)
+                                                if (isCurrentProductColor) return null
+                                                
+                                                const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
+                                                return (
+                                                    <Box
+                                                        key={`${relatedProduct.id}-${color.id}`}
+                                                        onClick={() => handleColorClick(color.id)}
+                                                        sx={{
+                                                            width: 44,
+                                                            height: 44,
+                                                            borderRadius: "50%",
+                                                            cursor: "pointer",
+                                                            border: "2px solid #e0e0e0",
+                                                            background: hasSecondColor
+                                                                ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
+                                                                : color.hex_code,
+                                                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                                            transition: "all 0.3s ease-in-out",
+                                                            "&:hover": {
+                                                                transform: "scale(1.1)",
+                                                                boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+                                                                border: "2px solid #bdbdbd",
+                                                            },
+                                                            position: "relative",
+                                                            overflow: "hidden",
+                                                        }}
+                                                        title={`${color.name} - ${relatedProduct.name}`}
+                                                    />
+                                                );
+                                            }).filter(Boolean) // Filtrar los null
+                                        )
+                                    ) : (
+                                        // Mostrar todos los colores del producto actual
+                                        product.colors?.map((color: any) => {
                                             const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
+                                            const isSelected = selectedColor === color.id;
                                             return (
                                                 <Box
-                                                    key={`${relatedProduct.id}-${color.id}`}
-                                                    onClick={() => handleColorClick(color.id)}
+                                                    key={color.id}
+                                                    onClick={() => setSelectedColor(color.id)}
                                                     sx={{
-                                                        width: 40,
-                                                        height: 40,
+                                                        width: 44,
+                                                        height: 44,
                                                         borderRadius: "50%",
                                                         cursor: "pointer",
-                                                        border: "0.1px solid rgba(255,255,255,0.2)",
+                                                        border: isSelected ? "3px solid #1976d2" : "2px solid #e0e0e0",
                                                         background: hasSecondColor
                                                             ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
                                                             : color.hex_code,
+                                                        boxShadow: isSelected 
+                                                            ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)" 
+                                                            : "0 2px 8px rgba(0,0,0,0.1)",
+                                                        transition: "all 0.3s ease-in-out",
                                                         "&:hover": {
-                                                            opacity: 0.8,
-                                                            border: "0.5px solidrgb(90, 90, 90)",
+                                                            transform: "scale(1.1)",
+                                                            boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+                                                            border: isSelected ? "3px solid #1976d2" : "2px solid #bdbdbd",
                                                         },
+                                                        position: "relative",
+                                                        overflow: "hidden",
                                                     }}
-                                                    title={`${color.name} - ${relatedProduct.name}`}
-                                                />
+                                                >
+                                                    {/* Indicador de selección interno */}
+                                                    {isSelected && (
+                                                        <Box
+                                                            sx={{
+                                                                position: "absolute",
+                                                                top: "50%",
+                                                                left: "50%",
+                                                                transform: "translate(-50%, -50%)",
+                                                                width: 14,
+                                                                height: 14,
+                                                                borderRadius: "50%",
+                                                                backgroundColor: "white",
+                                                                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Box>
                                             );
                                         })
                                     )}
                                 </Box>
+                                {relatedProducts.every(p => !p.colors || p.colors.length === 0) && product.colors && product.colors.length <= 1 && (
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                        No hay otros colores disponibles en esta categoría.
+                                    </Typography>
+                                )}
                             </Box>
                         )}
 
@@ -505,7 +652,7 @@ const ProductDetail = () => {
 
             {/* Related products carousel */}
             <RelatedProductsCarousel 
-                products={relatedProducts.map((relatedProduct) => ({
+                products={relatedProductsForCarousel.map((relatedProduct) => ({
                     ...relatedProduct,
                     // Asegurar que los colores se pasen correctamente
                     colors: relatedProduct.colors?.map((color: any) => {

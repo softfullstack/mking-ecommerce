@@ -156,25 +156,76 @@ const ProductCard = ({ product }: { product: Product }) => {
 
                     {/* Color chips */}
                     {colors && colors.length > 0 && (
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
-                            {colors.slice(0, 4).map((color, index) => (
-                                <Box
-                                    key={index}
-                                    sx={{
-                                        width: 20,
-                                        height: 20,
-                                        borderRadius: "50%",
-                                        backgroundColor: color,
-                                        border: "2px solid #fff",
-                                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                                    }}
-                                />
-                            ))}
-                            {colors.length > 4 && (
-                                <Typography variant="caption" color="text.secondary">
-                                    +{colors.length - 4} más
-                                </Typography>
-                            )}
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+                            {/* Indicador principal de colores combinados */}
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                {colors.length === 1 ? (
+                                    // Si solo hay un color, mostrar un círculo simple
+                                    <Box
+                                        sx={{
+                                            width: 28,
+                                            height: 28,
+                                            borderRadius: "50%",
+                                            backgroundColor: colors[0],
+                                            border: "2px solid #fff",
+                                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                        }}
+                                    />
+                                ) : (
+                                    // Si hay múltiples colores, mostrar un indicador con superposición
+                                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                                        {colors.slice(0, 3).map((color, index) => (
+                                            <Box
+                                                key={index}
+                                                sx={{
+                                                    width: 24,
+                                                    height: 24,
+                                                    borderRadius: "50%",
+                                                    backgroundColor: color,
+                                                    border: "2px solid #fff",
+                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    marginLeft: index > 0 ? "-8px" : 0,
+                                                    zIndex: colors.length - index,
+                                                    position: "relative",
+                                                    "&:hover": {
+                                                        transform: "scale(1.1)",
+                                                        zIndex: 10,
+                                                    },
+                                                    transition: "transform 0.2s ease-in-out",
+                                                }}
+                                            />
+                                        ))}
+                                        {colors.length > 3 && (
+                                            <Box
+                                                sx={{
+                                                    width: 24,
+                                                    height: 24,
+                                                    borderRadius: "50%",
+                                                    backgroundColor: "#f0f0f0",
+                                                    border: "2px solid #fff",
+                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                                                    marginLeft: "-8px",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    zIndex: 1,
+                                                }}
+                                            >
+                                                <Typography 
+                                                    variant="caption" 
+                                                    sx={{ 
+                                                        fontSize: "0.6rem", 
+                                                        fontWeight: "bold",
+                                                        color: "#666"
+                                                    }}
+                                                >
+                                                    +{colors.length - 3}
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                )}
+                            </Box>
                         </Box>
                     )}
                 </CardContent>
