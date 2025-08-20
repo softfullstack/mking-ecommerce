@@ -18,19 +18,23 @@ import {
     StepLabel,
     Paper,
 } from "@mui/material"
-import { Add, Remove, Delete, ArrowBack, LocalShipping, CheckCircle } from "@mui/icons-material"
+import { Add, Remove, Delete, ArrowBack, LocalShipping, CheckCircle, Edit as EditIcon } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
 import useAuthStore from "../store/AuthStore"
 import { getPreferredIdentifier } from "../utils/uuidUtils"
+import ProductCustomizer from "../components/ProductCustomizer"
+import { LogoCustomization } from "../interfaces/CustomizationInterface"
 
 const Cart = () => {
     const navigate = useNavigate()
-    const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart } = useCartStore()
+    const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart, updateCustomizations } = useCartStore()
     const { isAuthenticated } = useAuthStore()
     const [couponCode, setCouponCode] = useState("")
     const [couponError, setCouponError] = useState("")
     const [couponDiscount, setCouponDiscount] = useState(0)
     const [activeStep, setActiveStep] = useState(0)
+    const [customizerOpen, setCustomizerOpen] = useState(false)
+    const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null)
 
     const steps = ["Carrito", "Envío", "Pago", "Confirmación"]
 
@@ -42,6 +46,24 @@ const Cart = () => {
 
     const handleRemoveItem = (index:number) => {
         removeFromCart(index)
+    }
+
+    const handleCustomizeItem = (index: number) => {
+        setSelectedItemIndex(index)
+        setCustomizerOpen(true)
+    }
+
+    const handleSaveCustomization = (customizations: LogoCustomization[]) => {
+        if (selectedItemIndex !== null) {
+            updateCustomizations(selectedItemIndex, customizations)
+        }
+        setCustomizerOpen(false)
+        setSelectedItemIndex(null)
+    }
+
+    const handleCancelCustomization = () => {
+        setCustomizerOpen(false)
+        setSelectedItemIndex(null)
     }
 
     const handleCouponApply = () => {
@@ -139,7 +161,7 @@ const Cart = () => {
                             Bolsa de Compras ({totalItems} {totalItems === 1 ? "producto" : "productos"})
                         </Typography>
 
-                        {items.map((item:any, index) => (
+                        {items.map((item, index) => (
                             <Card key={index} sx={{ mb: 2, backgroundColor: "#1e1e1e" }}>
                                 <CardContent sx={{ p: 2 }}>
                                     <Grid container spacing={2} alignItems="center">
@@ -148,7 +170,9 @@ const Cart = () => {
                                                 component="img"
                                                 src={
                                                     Array.isArray(item.images) && item.images.length > 0
-                                                        ? (item.images.find((img:any) => img.is_primary)?.url || item.images[0].url)
+                                                        ? (item.images.find((img: any) => img.is_primary)?.url || 
+                                                           item.images[0].url || 
+                                                           item.images[0].image_path)
                                                         : undefined
                                                 }
                                                 alt={item.name}
@@ -177,11 +201,20 @@ const Cart = () => {
                                                 {item.name}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Color: {typeof item.color === 'object' && item.color !== null ? item.color.name : getColorName(item.color)}
+                                                Color: {typeof item.color === 'object' && item.color !== null ? (item.color as any).name : getColorName(item.color || '')}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
-                                                Talla: {typeof item.size === 'object' && item.size !== null ? item.size.name : getSizeName(item.size)}
+                                                Talla: {typeof item.size === 'object' && item.size !== null ? (item.size as any).name : getSizeName(item.size || '')}
                                             </Typography>
+                                            
+                                            {/* Mostrar personalizaciones existentes */}
+                                            {item.customizations && item.customizations.length > 0 && (
+                                                <Box sx={{ mt: 1 }}>
+                                                    <Typography variant="body2" color="primary.main" sx={{ fontWeight: 'bold' }}>
+                                                        Personalizado con {item.customizations.length} logo{item.customizations.length > 1 ? 's' : ''}
+                                                    </Typography>
+                                                </Box>
+                                            )}
                                         </Grid>
                                         <Grid item xs={6} sm={3}>
                                             <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -218,9 +251,19 @@ const Cart = () => {
                                             </Typography>
                                         </Grid>
                                         <Grid item xs={2} sm={1} sx={{ textAlign: "right" }}>
-                                            <IconButton color="error" size="small" onClick={() => handleRemoveItem(index)}>
-                                                <Delete fontSize="small" />
-                                            </IconButton>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                <IconButton 
+                                                    color="primary" 
+                                                    size="small" 
+                                                    onClick={() => handleCustomizeItem(index)}
+                                                    title="Personalizar producto"
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                                <IconButton color="error" size="small" onClick={() => handleRemoveItem(index)}>
+                                                    <Delete fontSize="small" />
+                                                </IconButton>
+                                            </Box>
                                         </Grid>
                                     </Grid>
                                 </CardContent>
@@ -461,6 +504,17 @@ const Cart = () => {
             {activeStep === 1 && renderShippingContent()}
             {activeStep === 2 && renderPaymentContent()}
             {activeStep === 3 && renderConfirmationContent()}
+
+            {/* Product Customizer Dialog */}
+            {selectedItemIndex !== null && items[selectedItemIndex] && (
+                <ProductCustomizer
+                    product={items[selectedItemIndex]}
+                    isOpen={customizerOpen}
+                    onSave={handleSaveCustomization}
+                    onCancel={handleCancelCustomization}
+                    initialCustomizations={items[selectedItemIndex].customizations || []}
+                />
+            )}
         </Container>
     )
 }

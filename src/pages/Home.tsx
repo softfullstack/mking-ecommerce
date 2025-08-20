@@ -82,6 +82,7 @@ const Home = () => {
                         <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
                             <ProductCard product={{
                                 ...product,
+                                uuid: `product-${product.id}`,
                                 images: (product.images || []).map((img: any) =>
                                     typeof img === "string"
                                         ? { url: img }

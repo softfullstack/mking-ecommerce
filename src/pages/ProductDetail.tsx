@@ -201,18 +201,7 @@ const ProductDetail = () => {
     }
 
 
-    const getColorHex = (colorId: string) => {
-        if (typeof colorId !== "string") return "#cccccc";
-        const colorMap: Record<string, string> = {
-            negro: "#000000",
-            rojo: "#ff0000",
-            amarillo: "#ffff00",
-            naranja: "#ff9800",
-            azul: "#0000ff",
-            verde: "#00ff00",
-        }
-        return colorMap[colorId.toLowerCase()] || "#cccccc"
-    }
+
 
     const getSizeName = (sizeId: string) => {
         const sizeMap: Record<string, string> = {
@@ -360,16 +349,6 @@ const ProductDetail = () => {
                                                                 />
                                                             )}
                                                         </Box>
-                                                        <Typography 
-                                                            variant="body2" 
-                                                            sx={{ 
-                                                                color: "text.primary",
-                                                                fontWeight: isSelected ? "bold" : "normal",
-                                                                fontSize: "0.95rem",
-                                                            }}
-                                                        >
-                                                            {color.name}
-                                                        </Typography>
                                                     </Box>
                                                 }
                                                 sx={{
