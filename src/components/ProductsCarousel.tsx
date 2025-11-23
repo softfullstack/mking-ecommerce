@@ -108,7 +108,7 @@ const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
                         <IconButton
                             onClick={handlePrevious}
                             disabled={!canGoPrevious}
-                            size="large"
+                            size="small"
                             sx={{
                                 position: 'absolute',
                                 left: -20,
@@ -135,7 +135,7 @@ const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
                         <IconButton
                             onClick={handleNext}
                             disabled={!canGoNext}
-                            size="large"
+                            size="small"
                             sx={{
                                 position: 'absolute',
                                 right: -20,
@@ -169,7 +169,7 @@ const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
                             gap: { xs: 1, sm: 2 },
                             transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
                             transition: 'transform 0.3s ease-in-out',
-                            width: `${(products.length / itemsPerView) * 100}%`,
+                            width: `${(products.length / itemsPerView) * 25}%`,
                         }}
                     >
                         {products.map((product) => {

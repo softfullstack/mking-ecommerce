@@ -549,7 +549,7 @@ const ProductDetail = () => {
                         {/* Guarantee */}
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                             <Verified />
-                            <Typography variant="body2">Garantía de 2 años en todos nuestros productos</Typography>
+                            <Typography variant="body2">Garantía en todos nuestros productos</Typography>
                         </Box>
 
                         <Divider sx={{ my: 3 }} />

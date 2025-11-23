@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link as RouterLink } from "react-router-dom"
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem, Badge, InputBase, Drawer, List, ListItem, ListItemText, ListItemButton, Divider } from "@mui/material"
 import { styled, alpha } from "@mui/material/styles"
-import { Menu as MenuIcon, Search as SearchIcon, ShoppingCart, Close } from "@mui/icons-material"
+import { Menu as MenuIcon, Search as SearchIcon, ShoppingBag as ShoppingBagIcon, Close } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
 import useAuthStore from "../store/AuthStore"
 
@@ -99,7 +99,7 @@ const Navbar = () => {
                             textDecoration: "none",
                         }}
                     >
-                        <Logo src="images/logo.png" alt="SafetyVest" sx={{borderRadius: 1}} />
+                        <Logo src="images/logo.png" alt="MKing" sx={{borderRadius: 1}} />
                         MKing
                     </Typography>
 
@@ -162,7 +162,7 @@ const Navbar = () => {
                     <Box sx={{ flexGrow: 0, mr: 2 }}>
                         <IconButton component={RouterLink} to="/carrito" aria-label="cart" color="inherit">
                             <Badge badgeContent={totalItems} color="primary">
-                                <ShoppingCart />
+                                <ShoppingBagIcon />
                             </Badge>
                         </IconButton>
                     </Box>

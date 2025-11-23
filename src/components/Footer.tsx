@@ -61,7 +61,7 @@ const Footer = () => {
                             VENTAJAS
                         </Typography>
                         <Link component={RouterLink} to="/ventajas/app" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            App SafetyVest
+                            MKing
                         </Link>
                         <Link component={RouterLink} to="/ventajas/email" color="inherit" sx={{ display: "block", mb: 1 }}>
                             Registrarse para emails
