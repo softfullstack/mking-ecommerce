@@ -17,13 +17,15 @@ import {
     Step,
     StepLabel,
     Paper,
+    Chip,
+    Stack
 } from "@mui/material"
 import { Add, Remove, Delete, ArrowBack, LocalShipping, CheckCircle, Edit as EditIcon } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
 import useAuthStore from "../store/AuthStore"
 import { getPreferredIdentifier } from "../utils/uuidUtils"
 import ProductCustomizer from "../components/ProductCustomizer"
-import { LogoCustomization } from "../interfaces/CustomizationInterface"
+import { ItemCustomization } from "../interfaces/CustomizationInterface"
 
 const Cart = () => {
     const navigate = useNavigate()
@@ -44,7 +46,7 @@ const Cart = () => {
         }
     }
 
-    const handleRemoveItem = (index:number) => {
+    const handleRemoveItem = (index: number) => {
         removeFromCart(index)
     }
 
@@ -53,7 +55,7 @@ const Cart = () => {
         setCustomizerOpen(true)
     }
 
-    const handleSaveCustomization = (customizations: LogoCustomization[]) => {
+    const handleSaveCustomization = (customizations: ItemCustomization[]) => {
         if (selectedItemIndex !== null) {
             updateCustomizations(selectedItemIndex, customizations)
         }
@@ -110,7 +112,7 @@ const Cart = () => {
         return colorMap[colorId] || colorId
     }
 
-    const getSizeName = (sizeId:string) => {
+    const getSizeName = (sizeId: string) => {
         const sizeMap: { [key: string]: string } = {
             xs: "XS",
             s: "S",
@@ -170,9 +172,9 @@ const Cart = () => {
                                                 component="img"
                                                 src={
                                                     Array.isArray(item.images) && item.images.length > 0
-                                                        ? (item.images.find((img: any) => img.is_primary)?.url || 
-                                                           item.images[0].url || 
-                                                           item.images[0].image_path)
+                                                        ? (item.images.find((img: any) => img.is_primary)?.url ||
+                                                            item.images[0].url ||
+                                                            item.images[0].image_path)
                                                         : undefined
                                                 }
                                                 alt={item.name}
@@ -206,13 +208,34 @@ const Cart = () => {
                                             <Typography variant="body2" color="text.secondary">
                                                 Talla: {typeof item.size === 'object' && item.size !== null ? (item.size as any).name : getSizeName(item.size || '')}
                                             </Typography>
-                                            
+
                                             {/* Mostrar personalizaciones existentes */}
                                             {item.customizations && item.customizations.length > 0 && (
                                                 <Box sx={{ mt: 1 }}>
-                                                    <Typography variant="body2" color="primary.main" sx={{ fontWeight: 'bold' }}>
-                                                        Personalizado con {item.customizations.length} logo{item.customizations.length > 1 ? 's' : ''}
+                                                    <Typography variant="caption" color="primary.main" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>
+                                                        Personalizado:
                                                     </Typography>
+                                                    <Stack direction="column" spacing={0.5}>
+                                                        {item.customizations.map((cust, i) => {
+                                                            // Only show if it has name or logos
+                                                            if (!cust.name && (!cust.logos || cust.logos.length === 0)) return null;
+
+                                                            return (
+                                                                <Typography key={i} variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                    <span style={{ fontWeight: 'bold' }}>#{i + 1}:</span>
+                                                                    {cust.name && <span>{cust.name}</span>}
+                                                                    {cust.logos && cust.logos.length > 0 && (
+                                                                        <Chip
+                                                                            label={`${cust.logos.length} logo(s)`}
+                                                                            size="small"
+                                                                            variant="outlined"
+                                                                            sx={{ height: 20, fontSize: '0.7rem' }}
+                                                                        />
+                                                                    )}
+                                                                </Typography>
+                                                            );
+                                                        })}
+                                                    </Stack>
                                                 </Box>
                                             )}
                                         </Grid>
@@ -252,9 +275,9 @@ const Cart = () => {
                                         </Grid>
                                         <Grid item xs={2} sm={1} sx={{ textAlign: "right" }}>
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                                <IconButton 
-                                                    color="primary" 
-                                                    size="small" 
+                                                <IconButton
+                                                    color="primary"
+                                                    size="small"
                                                     onClick={() => handleCustomizeItem(index)}
                                                     title="Personalizar producto"
                                                 >
@@ -509,6 +532,7 @@ const Cart = () => {
             {selectedItemIndex !== null && items[selectedItemIndex] && (
                 <ProductCustomizer
                     product={items[selectedItemIndex]}
+                    quantity={items[selectedItemIndex].quantity}
                     isOpen={customizerOpen}
                     onSave={handleSaveCustomization}
                     onCancel={handleCancelCustomization}

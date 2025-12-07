@@ -9,6 +9,12 @@ export interface LogoCustomization {
     opacity: number;
 }
 
+export interface ItemCustomization {
+    id: string; // Unique ID for this specific item instance (e.g., "item-1", "item-2")
+    name?: string; // Personalization name
+    logos: LogoCustomization[];
+}
+
 export interface ProductCustomization {
     productId: string | number;
     logos: LogoCustomization[];

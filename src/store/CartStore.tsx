@@ -1,13 +1,13 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { Product } from "../interfaces/ProductInterface"
-import { LogoCustomization } from "../interfaces/CustomizationInterface"
+import { ItemCustomization } from "../interfaces/CustomizationInterface"
 
 interface CartItem extends Product {
     quantity: number
     size?: string
     color?: string
-    customizations?: LogoCustomization[]
+    customizations?: ItemCustomization[]
 }
 
 interface CartStore {
@@ -17,7 +17,7 @@ interface CartStore {
     addToCart: (product: Product, quantity: number, size?: string, color?: string) => void
     removeFromCart: (itemIndex: number) => void
     updateQuantity: (itemIndex: number, newQuantity: number) => void
-    updateCustomizations: (itemIndex: number, customizations: LogoCustomization[]) => void
+    updateCustomizations: (itemIndex: number, customizations: ItemCustomization[]) => void
     clearCart: () => void
 }
 
@@ -87,7 +87,7 @@ const useCartStore = create<CartStore>()(
                 }))
             },
 
-            updateCustomizations: (itemIndex: number, customizations: LogoCustomization[]) => {
+            updateCustomizations: (itemIndex: number, customizations: ItemCustomization[]) => {
                 const { items } = get()
                 const updatedItems = [...items]
                 updatedItems[itemIndex].customizations = customizations
