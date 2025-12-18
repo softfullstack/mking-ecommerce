@@ -18,6 +18,7 @@ import {
 import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
 import useAuthStore from "../store/AuthStore"
+import { LoginService } from "../services/MKing.service"
 
 const Login = () => {
     const navigate = useNavigate()
@@ -31,21 +32,30 @@ const Login = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isSubmitting },
     } = useForm()
 
-    const onSubmit = (data:any) => {
-        // In a real app, this would call an API
-        if (data.email === "demo@example.com" && data.password === "password") {
+    const onSubmit = async (data: any) => {
+        setLoginError("")
+        try {
+            const response = await LoginService(data)
+            const { token, user } = response.data
+
+            // Store token
+            localStorage.setItem("token", token)
+
+            // Update store
             login({
-                id: 1,
-                name: "Usuario Demo",
-                email: data.email,
+                id: user.id,
+                name: user.name,
+                email: user.email,
             })
 
-            navigate(from)
-        } else {
-            setLoginError("Email o contraseña incorrectos")
+            navigate("/", { replace: true })
+        } catch (error: any) {
+            console.error(error)
+            const message = error.response?.data?.message || "Error al iniciar sesión. Por favor verifica tus credenciales."
+            setLoginError(message)
         }
     }
 
@@ -122,8 +132,8 @@ const Login = () => {
                         </Link>
                     </Box>
 
-                    <Button type="submit" fullWidth variant="contained" color="primary" size="large" sx={{ mb: 3 }}>
-                        Iniciar Sesión
+                    <Button type="submit" fullWidth variant="contained" color="primary" size="large" sx={{ mb: 3 }} disabled={isSubmitting}>
+                        {isSubmitting ? "Iniciando sesión..." : "Iniciar Sesión"}
                     </Button>
                 </form>
 

@@ -11,7 +11,31 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ScrollToTop from "./components/ScrollToTop"
+import { useEffect } from 'react'
+import { GetMeService } from './services/MKing.service'
+import useAuthStore from './store/AuthStore'
+
 function App() {
+  const { login, logout } = useAuthStore()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      try {
+        const response = await GetMeService()
+        login(response.data)
+      } catch (error) {
+        console.error('Session expired or invalid')
+        localStorage.removeItem('token')
+        logout()
+      }
+    }
+
+    checkAuth()
+  }, [login, logout])
+
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />

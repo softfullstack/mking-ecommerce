@@ -171,11 +171,16 @@ const Navbar = () => {
                     <Box sx={{ flexGrow: 0 }}>
                         {isAuthenticated ? (
                             <>
-                                <Tooltip title="Abrir opciones">
-                                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar alt={user?.name || "Usuario"} src={user?.avatar} />
-                                    </IconButton>
-                                </Tooltip>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <Typography variant="body2" sx={{ display: { xs: "none", sm: "block" }, color: "white" }}>
+                                        Hola, {user?.name}
+                                    </Typography>
+                                    <Tooltip title="Abrir opciones">
+                                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                            <Avatar alt={user?.name || "Usuario"} src={user?.avatar} />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
                                 <Menu
                                     sx={{ mt: "45px" }}
                                     id="menu-appbar"

@@ -3,22 +3,31 @@ import { useNavigate, Link as RouterLink } from "react-router-dom"
 import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Checkbox, FormControlLabel, Alert } from "@mui/material"
 import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
 import { useForm, FieldValues } from "react-hook-form"
-import useAuthStore from "../store/AuthStore"
+import { RegisterService } from "../services/MKing.service"
+import { Grid } from "@mui/material"
 
 interface RegisterFormData extends FieldValues {
     name: string
     email: string
     password: string
     confirmPassword: string
+    phone?: string
+    street?: string
+    exteriorNumber?: string
+    interiorNumber?: string
+    neighborhood?: string
+    municipality?: string
+    state?: string
+    postalCode?: string
     terms: boolean
 }
 
 const Register = () => {
     const navigate = useNavigate()
-    const { login } = useAuthStore()
     const [showPassword, setShowPassword] = React.useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
     const [registerSuccess, setRegisterSuccess] = React.useState(false)
+    const [registerError, setRegisterError] = React.useState("")
 
     const {
         register,
@@ -27,23 +36,27 @@ const Register = () => {
         formState: { errors },
     } = useForm<RegisterFormData>()
 
-    const password = React.useRef("")
-    password.current = watch("password", "")
+    const passwordValue = watch("password", "")
 
-    const onSubmit = (data: RegisterFormData) => {
-        // In a real app, this would call an API
-        setRegisterSuccess(true)
+    const onSubmit = async (data: RegisterFormData) => {
+        setRegisterError("")
+        try {
+            await RegisterService(data)
+            setRegisterSuccess(true)
 
-        // Auto login after registration
-        setTimeout(() => {
-            login({
-                id: 1,
-                name: data.name,
-                email: data.email,
-            })
-
-            navigate("/")
-        }, 1500)
+            // Auto login logic - usually registration returns same as login or we ask user to login
+            // If backend returns token/user on registration, we can use it.
+            // My backend currently returns { message, data: client } without token.
+            // So I'll redirect to login or just show success.
+            
+            setTimeout(() => {
+                navigate("/login")
+            }, 3000)
+        } catch (error: any) {
+            console.error(error)
+            const message = error.response?.data?.message || "Error al registrarse. Por favor intenta de nuevo."
+            setRegisterError(message)
+        }
     }
 
     const handleClickShowPassword = () => {
@@ -86,6 +99,12 @@ const Register = () => {
                         Regístrate para acceder a todas las funcionalidades
                     </Typography>
                 </Box>
+
+                {registerError && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                        {registerError}
+                    </Alert>
+                )}
 
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <TextField
@@ -150,7 +169,7 @@ const Register = () => {
                         type={showConfirmPassword ? "text" : "password"}
                         {...register("confirmPassword", {
                             required: "Por favor confirma tu contraseña",
-                            validate: (value) => value === password.current || "Las contraseñas no coinciden",
+                            validate: (value) => value === passwordValue || "Las contraseñas no coinciden",
                         })}
                         error={!!errors.confirmPassword}
                         helperText={errors.confirmPassword?.message as string}
@@ -168,6 +187,85 @@ const Register = () => {
                             ),
                         }}
                     />
+
+                    <Typography variant="h6" sx={{ mt: 3, mb: 1, color: "primary.main" }}>
+                        Datos de Envío (Opcional)
+                    </Typography>
+
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Teléfono"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("phone")}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Código Postal"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("postalCode")}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Calle"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("street")}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Núm. Exterior"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("exteriorNumber")}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Núm. Interior"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("interiorNumber")}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Colonia"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("neighborhood")}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Municipio"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("municipality")}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Estado"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("state")}
+                            />
+                        </Grid>
+                    </Grid>
 
                     <FormControlLabel
                         control={
