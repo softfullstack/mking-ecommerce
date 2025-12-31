@@ -1,20 +1,6 @@
-"use client"
-
 import React from "react"
 import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom"
-import {
-    Box,
-    Container,
-    Typography,
-    TextField,
-    Button,
-    Divider,
-    Link,
-    InputAdornment,
-    IconButton,
-    Paper,
-    Alert,
-} from "@mui/material"
+import {Box,Container,Typography,TextField,Button,Divider,Link,InputAdornment,IconButton,Paper,Alert} from "@mui/material"
 import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
 import useAuthStore from "../store/AuthStore"
@@ -40,7 +26,8 @@ const Login = () => {
         try {
             const response = await LoginService(data)
             const { token, user } = response.data
-
+            console.log('%c este es el usuer y el token', 'color: green', user, token);
+            // otambien mostrar la imagen del cliente 
             // Store token
             localStorage.setItem("token", token)
 
@@ -49,9 +36,10 @@ const Login = () => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                image: user.image,
             })
 
-            navigate("/", { replace: true })
+            navigate(from, { replace: true })
         } catch (error: any) {
             console.error(error)
             const message = error.response?.data?.message || "Error al iniciar sesión. Por favor verifica tus credenciales."
