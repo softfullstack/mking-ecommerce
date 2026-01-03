@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useParams, Link as RouterLink, useNavigate } from "react-router-dom"
-import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, List, ListItem, ListItemText, Chip, IconButton, Snackbar, Alert, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Breadcrumbs, Link, AlertColor } from "@mui/material"
-import { Favorite, FavoriteBorder, Share, LocalShipping, Verified, ArrowBack } from "@mui/icons-material"
+import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, List, ListItem, ListItemText, Chip, IconButton, Snackbar, Alert, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Breadcrumbs, Link, AlertColor, Dialog } from "@mui/material"
+import { Favorite, FavoriteBorder, Share, LocalShipping, Verified, ArrowBack, Close } from "@mui/icons-material"
 import { SnackbarCloseReason } from "@mui/material/Snackbar"
 import ProductCarousel from "../components/ProductCarousel"
 import RelatedProductsCarousel from "../components/RelatedProductsCarousel"
@@ -26,6 +26,8 @@ const ProductDetail = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState("")
     const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("success")
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+    const [modalActiveStep, setModalActiveStep] = useState(0)
     const { addToCart } = useCartStore()
 
     // Fetch product data
@@ -34,7 +36,7 @@ const ProductDetail = () => {
             if (uuid) {
                 try {
                     let response;
-                    
+
                     // Intentar usar UUID primero, si no es válido usar ID como fallback
                     if (isValidUuid(uuid)) {
                         response = await getProductByUuid(uuid)
@@ -47,23 +49,23 @@ const ProductDetail = () => {
                             throw new Error('Invalid product identifier')
                         }
                     }
-                    
+
                     const foundProduct = response.data
                     setProduct(foundProduct)
                     console.log('Producto cargado:', foundProduct.name)
                     console.log('Colores del producto:', foundProduct.colors)
-                    
+
                     if (foundProduct.colors && foundProduct.colors.length > 0) {
                         setSelectedColor(foundProduct.colors[0].id)
                     }
-                    
+
                     // Cargar productos relacionados de la misma categoría
                     if (foundProduct.category_id) {
                         try {
                             const relatedResponse = await getProductsByCategory(foundProduct.category_id)
                             const relatedProductsData = relatedResponse.data.products || []
                             console.log('Productos relacionados encontrados:', relatedProductsData.length)
-                            
+
                             // Transformar los datos de productos relacionados
                             const transformedRelated = relatedProductsData.map((p: any) => ({
                                 id: p.id,
@@ -84,17 +86,17 @@ const ProductDetail = () => {
                                 reviews: [],
                                 specifications: []
                             }))
-                            
+
                             // Filtrar el producto actual solo para el carrusel de productos relacionados
                             const filteredForCarousel = transformedRelated.filter((p: any) => p.uuid !== foundProduct.uuid)
-                            
+
                             // Para los colores disponibles, incluir TODOS los productos de la categoría
                             setRelatedProducts(transformedRelated)
-                            
+
                             console.log('Productos para colores disponibles:', transformedRelated.length)
                             console.log('Productos para carrusel:', filteredForCarousel.length)
                             console.log('Colores disponibles en productos relacionados:', transformedRelated.map((p: any) => ({ name: p.name, colors: p.colors?.length || 0 })))
-                            
+
                             // También guardar los productos filtrados para el carrusel
                             setRelatedProductsForCarousel(filteredForCarousel)
                         } catch (error) {
@@ -190,10 +192,10 @@ const ProductDetail = () => {
 
     const handleColorClick = (colorId: number) => {
         // Buscar el producto que tenga este color
-        const productWithColor = relatedProducts.find(p => 
+        const productWithColor = relatedProducts.find(p =>
             p.colors && p.colors.some((c: any) => c.id === colorId)
         )
-        
+
         if (productWithColor) {
             const productIdentifier = getPreferredIdentifier({ uuid: productWithColor.uuid, id: productWithColor.id })
             navigate(`/producto/${productIdentifier}`)
@@ -213,6 +215,15 @@ const ProductDetail = () => {
             xxl: "XXL",
         }
         return sizeMap[sizeId] || sizeId
+    }
+
+    const handleOpenImageModal = (index: number) => {
+        setModalActiveStep(index)
+        setIsImageModalOpen(true)
+    }
+
+    const handleCloseImageModal = () => {
+        setIsImageModalOpen(false)
     }
 
     return (
@@ -235,7 +246,10 @@ const ProductDetail = () => {
             <Grid container spacing={4}>
                 {/* Product Images */}
                 <Grid item xs={12} md={6}>
-                    <ProductCarousel images={product.images.map((img) => img.url || "")} />
+                    <ProductCarousel
+                        images={product.images.map((img) => img.url || "")}
+                        onImageClick={handleOpenImageModal}
+                    />
                 </Grid>
 
                 {/* Product Info */}
@@ -291,7 +305,7 @@ const ProductDetail = () => {
                                     ? product.colors.map((color: any, idx: number) => {
                                         const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
                                         const isSelected = selectedColor === color.id;
-                                        
+
                                         return (
                                             <FormControlLabel
                                                 key={color.id || color.name || idx}
@@ -318,8 +332,8 @@ const ProductDetail = () => {
                                                                 background: hasSecondColor
                                                                     ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
                                                                     : color.hex_code,
-                                                                boxShadow: isSelected 
-                                                                    ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)" 
+                                                                boxShadow: isSelected
+                                                                    ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)"
                                                                     : "0 2px 8px rgba(0,0,0,0.1)",
                                                                 transition: "all 0.3s ease-in-out",
                                                                 cursor: "pointer",
@@ -372,12 +386,12 @@ const ProductDetail = () => {
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
                                     {relatedProducts.length > 0 ? (
                                         // Mostrar colores de productos relacionados
-                                        relatedProducts.map((relatedProduct) => 
+                                        relatedProducts.map((relatedProduct) =>
                                             relatedProduct.colors?.map((color: any) => {
                                                 // Evitar mostrar colores que ya están seleccionados en el producto actual
                                                 const isCurrentProductColor = product.colors?.some((c: any) => c.id === color.id)
                                                 if (isCurrentProductColor) return null
-                                                
+
                                                 const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
                                                 return (
                                                     <Box
@@ -425,8 +439,8 @@ const ProductDetail = () => {
                                                         background: hasSecondColor
                                                             ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
                                                             : color.hex_code,
-                                                        boxShadow: isSelected 
-                                                            ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)" 
+                                                        boxShadow: isSelected
+                                                            ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)"
                                                             : "0 2px 8px rgba(0,0,0,0.1)",
                                                         transition: "all 0.3s ease-in-out",
                                                         "&:hover": {
@@ -630,7 +644,7 @@ const ProductDetail = () => {
             </Grid>
 
             {/* Related products carousel */}
-            <RelatedProductsCarousel 
+            <RelatedProductsCarousel
                 products={relatedProductsForCarousel.map((relatedProduct) => ({
                     ...relatedProduct,
                     // Asegurar que los colores se pasen correctamente
@@ -655,6 +669,50 @@ const ProductDetail = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+
+            {/* Image Detail Modal */}
+            <Dialog
+                fullScreen
+                open={isImageModalOpen}
+                onClose={handleCloseImageModal}
+                PaperProps={{
+                    sx: {
+                        backgroundColor: "black",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }
+                }}
+            >
+                <IconButton
+                    aria-label="close"
+                    onClick={handleCloseImageModal}
+                    sx={{
+                        position: "absolute",
+                        right: 20,
+                        top: 20,
+                        color: "white",
+                        zIndex: 1100,
+                        backgroundColor: "rgba(255,255,255,0.1)",
+                        "&:hover": {
+                            backgroundColor: "rgba(255,255,255,0.2)",
+                        }
+                    }}
+                >
+                    <Close fontSize="large" />
+                </IconButton>
+
+                <Box sx={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Box sx={{ width: "100%", maxWidth: "1200px" }}>
+                        <ProductCarousel
+                            images={product.images.map((img) => img.url || "")}
+                            initialIndex={modalActiveStep}
+                            isModal={true}
+                        />
+                    </Box>
+                </Box>
+            </Dialog>
         </Container>
     )
 }

@@ -6,9 +6,6 @@ export const Response = (code: any, msg?: string) => {
     switch (code) {
         case 0:
             toast.error("Error de red");
-            // setTimeout(() => {
-            //   window.location.href = "/auth/login";
-            // }, 6000);
             break;
         case "ERR_BAD_REQUEST":
             toast.warning("conexión inestable");
@@ -27,9 +24,6 @@ export const Response = (code: any, msg?: string) => {
             break;
         case 401:
             toast.error("Usuario no autorizado");
-            setTimeout(() => {
-                window.location.href = "/login";
-            }, 6000);
             break;
         case 201:
             toast.success(msg ? msg : "Se guardaron los datos");

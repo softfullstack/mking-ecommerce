@@ -1,6 +1,6 @@
 import React from "react"
 import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom"
-import {Box,Container,Typography,TextField,Button,Divider,Link,InputAdornment,IconButton,Paper,Alert} from "@mui/material"
+import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Alert } from "@mui/material"
 import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
 import useAuthStore from "../store/AuthStore"
@@ -149,15 +149,6 @@ const Login = () => {
                     </Typography>
                 </Box>
             </Paper>
-
-            <Box sx={{ mt: 3, textAlign: "center" }}>
-                <Typography variant="body2" color="text.secondary">
-                    Para fines de demostración, usa:
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    Email: demo@example.com | Contraseña: password
-                </Typography>
-            </Box>
         </Container>
     )
 }
