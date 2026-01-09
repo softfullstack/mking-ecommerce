@@ -99,7 +99,7 @@ const Navbar = () => {
                             textDecoration: "none",
                         }}
                     >
-                        <Logo src="images/logo.png" alt="MKing" sx={{borderRadius: 1}} />
+                        <Logo src="images/logo.png" alt="MKing" sx={{ borderRadius: 1 }} />
                         MKing
                     </Typography>
 
@@ -132,7 +132,7 @@ const Navbar = () => {
                             textDecoration: "none",
                         }}
                     >
-                        <Logo src="images/logo.png" alt="SafetyVest" sx={{borderRadius: 1}}     />
+                        <Logo src="images/logo.png" alt="SafetyVest" sx={{ borderRadius: 1 }} />
                         MKing
                     </Typography>
 
@@ -177,7 +177,7 @@ const Navbar = () => {
                                     </Typography>
                                     <Tooltip title="Abrir opciones">
                                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                            <Avatar alt={user?.name || "Usuario"} src={user?.avatar} />
+                                            <Avatar alt={user?.name || "Usuario"} src={user?.image} />
                                         </IconButton>
                                     </Tooltip>
                                 </Box>
@@ -198,13 +198,7 @@ const Navbar = () => {
                                     onClose={handleCloseUserMenu}
                                 >
                                     <MenuItem component={RouterLink} to="/perfil" onClick={handleCloseUserMenu}>
-                                        <Typography textAlign="center">Mi Perfil</Typography>
-                                    </MenuItem>
-                                    <MenuItem component={RouterLink} to="/pedidos" onClick={handleCloseUserMenu}>
-                                        <Typography textAlign="center">Mis Pedidos</Typography>
-                                    </MenuItem>
-                                    <MenuItem onClick={handleLogout}>
-                                        <Typography textAlign="center">Cerrar Sesión</Typography>
+                                        <Typography textAlign="center">Mi Cuenta</Typography>
                                     </MenuItem>
                                 </Menu>
                             </>

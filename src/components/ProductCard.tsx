@@ -1,8 +1,13 @@
-import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip } from "@mui/material"
+import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton } from "@mui/material"
 import { Link } from "react-router-dom"
 import { Product } from "../interfaces/ProductInterface"
 import { useState, useEffect } from "react"
 import { getPreferredIdentifier } from "../utils/uuidUtils"
+import FavoriteIcon from "@mui/icons-material/Favorite"
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"
+import useAuthStore from "../store/AuthStore"
+import { ToggleFavoriteService } from "../services/MKing.service"
+import { toast } from "react-toastify"
 
 const ProductCard = ({ product }: { product: Product }) => {
     const { id, uuid, name, price, images: originalImages, colors, isNew, discount } = product
@@ -46,6 +51,26 @@ const ProductCard = ({ product }: { product: Product }) => {
 
     // Obtener el identificador preferido (UUID o ID como fallback)
     const productIdentifier = getPreferredIdentifier({ uuid, id })
+
+    const { user, toggleFavoriteAction, isAuthenticated } = useAuthStore()
+    const isFavorite = user?.favorites?.some((f: any) => f.id === id)
+
+    const handleToggleFavorite = async (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+
+        if (!isAuthenticated) {
+            toast.info("Inicia sesión para guardar tus favoritos")
+            return
+        }
+
+        try {
+            await ToggleFavoriteService(id)
+            toggleFavoriteAction(product)
+        } catch (error) {
+            console.error("Error toggling favorite:", error)
+        }
+    }
 
     return (
         <Card
@@ -108,6 +133,28 @@ const ProductCard = ({ product }: { product: Product }) => {
                         transition: 'opacity 0.3s ease-in-out', // Transición suave para el cambio de imagen
                     }}
                 />
+
+                <IconButton
+                    onClick={handleToggleFavorite}
+                    sx={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        zIndex: 2,
+                        bgcolor: "rgba(255, 255, 255, 0.8)",
+                        "&:hover": {
+                            bgcolor: "rgba(255, 255, 255, 1)",
+                            transform: "scale(1.1)",
+                        },
+                        transition: "all 0.2s ease-in-out",
+                    }}
+                >
+                    {isFavorite ? (
+                        <FavoriteIcon color="error" />
+                    ) : (
+                        <FavoriteBorderIcon />
+                    )}
+                </IconButton>
 
                 <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
                     <Typography
@@ -211,10 +258,10 @@ const ProductCard = ({ product }: { product: Product }) => {
                                                     zIndex: 1,
                                                 }}
                                             >
-                                                <Typography 
-                                                    variant="caption" 
-                                                    sx={{ 
-                                                        fontSize: "0.6rem", 
+                                                <Typography
+                                                    variant="caption"
+                                                    sx={{
+                                                        fontSize: "0.6rem",
                                                         fontWeight: "bold",
                                                         color: "#666"
                                                     }}

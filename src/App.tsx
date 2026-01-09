@@ -26,7 +26,7 @@ function App() {
 
       try {
         const response = await GetMeService()
-        login(response.data)
+        login(response.data.user)
       } catch (error) {
         console.error('Session expired or invalid')
         localStorage.removeItem('token')

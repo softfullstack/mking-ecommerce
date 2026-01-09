@@ -11,6 +11,8 @@ import useCartStore from "../store/CartStore"
 import { Product } from "../interfaces/ProductInterface"
 import { getProductByUuid, getProductById, getProductsByCategory } from "../services/MKing.service"
 import { isValidUuid, getPreferredIdentifier } from "../utils/uuidUtils"
+import useAuthStore from "../store/AuthStore"
+import { ToggleFavoriteService } from "../services/MKing.service"
 
 const ProductDetail = () => {
     const { uuid } = useParams()
@@ -22,13 +24,14 @@ const ProductDetail = () => {
     const [selectedSize, setSelectedSize] = useState("")
     const [quantity, setQuantity] = useState(1)
     const [tabValue, setTabValue] = useState(0)
-    const [isFavorite, setIsFavorite] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState("")
     const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("success")
     const [isImageModalOpen, setIsImageModalOpen] = useState(false)
     const [modalActiveStep, setModalActiveStep] = useState(0)
     const { addToCart } = useCartStore()
+    const { user, toggleFavoriteAction, isAuthenticated } = useAuthStore()
+    const isFavorite = user?.favorites?.some((f: any) => f.id === product?.id)
 
     // Fetch product data
     useEffect(() => {
@@ -167,12 +170,27 @@ const ProductDetail = () => {
         setSnackbarOpen(true)
     }
 
-    const toggleFavorite = () => {
-        setIsFavorite(!isFavorite)
+    const toggleFavorite = async () => {
+        if (!isAuthenticated) {
+            setSnackbarMessage("Inicia sesión para guardar tus favoritos")
+            setSnackbarSeverity("info")
+            setSnackbarOpen(true)
+            return
+        }
 
-        setSnackbarMessage(isFavorite ? "Producto eliminado de favoritos" : "Producto añadido a favoritos")
-        setSnackbarSeverity("success")
-        setSnackbarOpen(true)
+        try {
+            await ToggleFavoriteService(product.id)
+            toggleFavoriteAction(product)
+
+            setSnackbarMessage(!isFavorite ? "Producto añadido a favoritos" : "Producto eliminado de favoritos")
+            setSnackbarSeverity("success")
+            setSnackbarOpen(true)
+        } catch (error) {
+            console.error("Error toggling favorite:", error)
+            setSnackbarMessage("Error al actualizar favoritos")
+            setSnackbarSeverity("error")
+            setSnackbarOpen(true)
+        }
     }
 
     const handleShare = () => {

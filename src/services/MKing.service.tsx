@@ -82,3 +82,5 @@ export const getProductById = (id: number) => axios.get(`${apiUrl}/products/${id
 export const getProductByUuid = (uuid: string) => axios.get(`${apiUrl}/products/uuid/${uuid}`);
 
 export const getProductsByCategory = (categoryId: number) => axios.get(`${apiUrl}/product/category/${categoryId}`);
+
+export const ToggleFavoriteService = (id: number) => axios.post(`${apiUrl}/favorites/${id}`);
