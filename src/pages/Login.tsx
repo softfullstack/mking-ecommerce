@@ -4,12 +4,14 @@ import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdor
 import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
 import useAuthStore from "../store/AuthStore"
+import useCartStore from "../store/CartStore"
 import { LoginService } from "../services/MKing.service"
 
 const Login = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const { login } = useAuthStore()
+    const { fetchCart } = useCartStore()
     const [showPassword, setShowPassword] = React.useState(false)
     const [loginError, setLoginError] = React.useState("")
 
@@ -32,12 +34,9 @@ const Login = () => {
             localStorage.setItem("token", token)
 
             // Update store
-            login({
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                image: user.image,
-            })
+            login(user)
+
+            await fetchCart()
 
             navigate(from, { replace: true })
         } catch (error: any) {

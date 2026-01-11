@@ -9,9 +9,12 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import useAuthStore from '../store/AuthStore';
-import { GetMeService } from '../services/MKing.service';
+import useCartStore from '../store/CartStore';
+import { GetMeService, DeleteFavoriteService } from '../services/MKing.service';
+import { toast } from 'react-toastify';
+import { showCartToast } from '../utils/toastUtils';
 
 // --- DATOS DE EJEMPLO (MOCK DATA) ---
 const MOCK_ORDERS = [
@@ -112,8 +115,25 @@ const OrdersSection = () => (
 );
 
 const FavoritesSection = () => {
-  const { user } = useAuthStore();
+  const { user, toggleFavoriteAction } = useAuthStore();
+  const { addToCart } = useCartStore();
   const favorites = user?.favorites || [];
+
+  const handleRemoveFavorite = async (productId: number, product: any) => {
+    try {
+      await DeleteFavoriteService(productId);
+      toggleFavoriteAction(product);
+      toast.success('Eliminado de favoritos');
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+      toast.error('Error al eliminar de favoritos');
+    }
+  };
+
+  const handleAddToCart = (product: any) => {
+    addToCart(product, 1);
+    showCartToast(product);
+  };
 
   return (
     <Box>
@@ -125,11 +145,11 @@ const FavoritesSection = () => {
       ) : (
         <Grid container spacing={3}>
           {favorites.map((fav: any) => (
-            <Grid item key={fav.id} xs={12} sm={6} md={4}>
-              <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Grid item key={fav.id} xs={12} sm={6} md={3}>
+              <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', '&:hover': { transform: 'scale(1.02)' } }}>
                 <CardMedia
                   component="img"
-                  height="180"
+                  height="140"
                   image={(() => {
                     if (fav.images && fav.images.length > 0) {
                       const primaryImage = fav.images.find((img: any) => img.is_primary);
@@ -139,21 +159,32 @@ const FavoritesSection = () => {
                     return fav.img_product || 'https://via.placeholder.com/300';
                   })()}
                   alt={fav.name}
+                  sx={{ objectFit: 'cover' }}
                 />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="subtitle1" component="div" noWrap title={fav.name}>
+                <CardContent sx={{ flexGrow: 1, p: 1.5, '&:last-child': { pb: 1.5 } }}>
+                  <Typography variant="subtitle2" component="div" noWrap title={fav.name} sx={{ fontWeight: '600', mb: 0.5 }}>
                     {fav.name}
                   </Typography>
-                  <Typography variant="h6" color="primary">
+                  <Typography variant="body1" color="primary" sx={{ fontWeight: '700' }}>
                     ${fav.price}
                   </Typography>
                 </CardContent>
-                <CardActions>
-                  <Button size="small" variant="contained" fullWidth startIcon={<ShoppingBagIcon />}>
+                <CardActions sx={{ p: 1, pt: 0, justifyContent: 'space-between' }}>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    sx={{ flexGrow: 1, mr: 1, fontSize: '0.75rem', py: 0.5 }}
+                    onClick={() => handleAddToCart(fav)}
+                  >
                     Agregar
                   </Button>
-                  <IconButton size="small" color="error">
-                    <DeleteIcon />
+                  <IconButton
+                    size="small"
+                    color="error"
+                    sx={{ bgcolor: 'rgba(211, 47, 47, 0.05)' }}
+                    onClick={() => handleRemoveFavorite(fav.id, fav)}
+                  >
+                    <DeleteIcon fontSize="small" />
                   </IconButton>
                 </CardActions>
               </Card>
@@ -208,8 +239,30 @@ const AddressesSection = () => (
 // --- COMPONENTE PRINCIPAL ---
 
 export default function Profile() {
-  const [activeTab, setActiveTab] = useState('perfil');
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'perfil';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const { user, login, logout } = useAuthStore();
+
+  // Sync activeTab state with URL search param
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams, activeTab]);
+
+  const handleTabChange = (id: string) => {
+    setActiveTab(id);
+    setSearchParams({ tab: id });
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    toast.info('Sesión cerrada correctamente');
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -254,7 +307,7 @@ export default function Profile() {
         <Grid container spacing={4}>
 
           {/* Sidebar de Navegación */}
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={3} >
             <Paper elevation={0} sx={{ p: 3, mb: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
               <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
                 <Box position="relative">
@@ -278,15 +331,14 @@ export default function Profile() {
                   </IconButton>
                 </Box>
                 <Typography variant="h6" color="text.primary">{user?.name || 'Usuario'}</Typography>
-                <Typography variant="body2" color="text.secondary">Cliente</Typography>
               </Box>
 
-              <List component="nav" disablePadding>
+              <List component="nav" disablePadding sx={{ display: { xs: 'none', md: 'block' } }}>
                 {menuItems.map((item) => (
                   <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
                     <ListItemButton
                       selected={activeTab === item.id}
-                      onClick={() => setActiveTab(item.id)}
+                      onClick={() => handleTabChange(item.id)}
                       sx={{
                         borderRadius: 2,
                         '&.Mui-selected': {
@@ -305,7 +357,7 @@ export default function Profile() {
                 ))}
                 <Divider sx={{ my: 1 }} />
                 <ListItem disablePadding>
-                  <ListItemButton onClick={logout} sx={{ borderRadius: 2, color: 'error.main' }}>
+                  <ListItemButton onClick={handleLogout} sx={{ borderRadius: 2, color: 'error.main' }}>
                     <ListItemIcon sx={{ minWidth: 40, color: 'error.main' }}>
                       <LogoutIcon />
                     </ListItemIcon>

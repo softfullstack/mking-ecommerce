@@ -1,10 +1,12 @@
 import { useState } from "react"
 import { Link as RouterLink } from "react-router-dom"
-import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem, Badge, InputBase, Drawer, List, ListItem, ListItemText, ListItemButton, Divider } from "@mui/material"
+import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem, Badge, InputBase, Drawer, List, ListItem, ListItemText, ListItemButton, Divider, ListItemIcon } from "@mui/material"
 import { styled, alpha } from "@mui/material/styles"
-import { Menu as MenuIcon, Search as SearchIcon, ShoppingBag as ShoppingBagIcon, Close } from "@mui/icons-material"
+import { Menu as MenuIcon, Search as SearchIcon, ShoppingBag as ShoppingBagIcon, Close, Person as PersonIcon, Favorite as FavoriteIcon, LocationOn as LocationOnIcon, Logout as LogoutIcon } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
 import useAuthStore from "../store/AuthStore"
+import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
 
 const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -65,9 +67,13 @@ const Navbar = () => {
         setAnchorElUser(null)
     }
 
+    const navigate = useNavigate()
+
     const handleLogout = () => {
         logout()
         handleCloseUserMenu()
+        toast.info("Sesión cerrada")
+        navigate("/")
     }
 
     const toggleMobileMenu = () => {
@@ -171,11 +177,11 @@ const Navbar = () => {
                     <Box sx={{ flexGrow: 0 }}>
                         {isAuthenticated ? (
                             <>
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1, cursor: "pointer" }} onClick={handleOpenUserMenu}>
                                     <Typography variant="body2" sx={{ display: { xs: "none", sm: "block" }, color: "white" }}>
-                                        Hola, {user?.name}
+                                        {user?.name}
                                     </Typography>
-                                    <Tooltip title="Abrir opciones">
+                                    <Tooltip title="Opciones">
                                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                             <Avatar alt={user?.name || "Usuario"} src={user?.image} />
                                         </IconButton>
@@ -200,6 +206,9 @@ const Navbar = () => {
                                     <MenuItem component={RouterLink} to="/perfil" onClick={handleCloseUserMenu}>
                                         <Typography textAlign="center">Mi Cuenta</Typography>
                                     </MenuItem>
+                                    {/* <MenuItem onClick={handleLogout}>
+                                        <Typography textAlign="center" color="error">Cerrar Sesión</Typography>
+                                    </MenuItem> */}
                                 </Menu>
                             </>
                         ) : (
@@ -219,8 +228,8 @@ const Navbar = () => {
                 sx={{
                     "& .MuiDrawer-paper": {
                         boxSizing: "border-box",
-                        width: 280,
-                        backgroundColor: "black",
+                        width: 300,
+                        backgroundColor: "#1e1e1e",
                         color: "white",
                     },
                 }}
@@ -230,15 +239,109 @@ const Navbar = () => {
                         <Close />
                     </IconButton>
                 </Box>
-                <Divider sx={{ backgroundColor: "rgba(255,255,255,0.12)" }} />
-                <List>
+
+                {isAuthenticated && (
+                    <Box sx={{ px: 3, py: 2, textAlign: "center", mb: 2 }}>
+                        <Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
+                            <Avatar
+                                src={user?.image}
+                                alt={user?.name}
+                                sx={{ width: 100, height: 100, mx: "auto", border: "3px solid #333" }}
+                            />
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    bottom: 0,
+                                    right: 0,
+                                    bgcolor: "primary.main",
+                                    borderRadius: "50%",
+                                    width: 32,
+                                    height: 32,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    border: "2px solid #1e1e1e"
+                                }}
+                            >
+                                <PersonIcon sx={{ fontSize: 18 }} />
+                            </Box>
+                        </Box>
+                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                            {user?.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Cliente
+                        </Typography>
+                    </Box>
+                )}
+
+                <Divider sx={{ backgroundColor: "rgba(255,255,255,0.1)" }} />
+
+                <List sx={{ px: 1 }}>
                     {menuItems.map((item) => (
                         <ListItem key={item.text} disablePadding>
-                            <ListItemButton component={RouterLink} to={item.path} onClick={toggleMobileMenu}>
+                            <ListItemButton component={RouterLink} to={item.path} onClick={toggleMobileMenu} sx={{ borderRadius: 2 }}>
                                 <ListItemText primary={item.text} />
                             </ListItemButton>
                         </ListItem>
                     ))}
+
+                    {isAuthenticated && (
+                        <>
+                            <Divider sx={{ my: 2, backgroundColor: "rgba(255,255,255,0.1)" }} />
+                            <Typography variant="caption" sx={{ px: 2, mb: 1, display: "block", color: "text.secondary", textTransform: "uppercase" }}>
+                                Mi Cuenta
+                            </Typography>
+                            <ListItem disablePadding>
+                                <ListItemButton component={RouterLink} to="/perfil?tab=perfil" onClick={toggleMobileMenu} sx={{ borderRadius: 2 }}>
+                                    <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>
+                                        <PersonIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Mi Perfil" />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton component={RouterLink} to="/perfil?tab=pedidos" onClick={toggleMobileMenu} sx={{ borderRadius: 2 }}>
+                                    <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>
+                                        <ShoppingBagIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Mis Pedidos" />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton component={RouterLink} to="/perfil?tab=favoritos" onClick={toggleMobileMenu} sx={{ borderRadius: 2 }}>
+                                    <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>
+                                        <FavoriteIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Favoritos" />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton component={RouterLink} to="/perfil?tab=direcciones" onClick={toggleMobileMenu} sx={{ borderRadius: 2 }}>
+                                    <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>
+                                        <LocationOnIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Direcciones" />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    onClick={() => { handleLogout(); toggleMobileMenu(); }}
+                                    sx={{
+                                        borderRadius: 2,
+                                        mt: 1,
+                                        color: "#ff4d4d",
+                                        "&:hover": { bgcolor: "rgba(255, 77, 77, 0.1)" }
+                                    }}
+                                >
+                                    <ListItemIcon sx={{ minWidth: 40, color: "#ff4d4d" }}>
+                                        <LogoutIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Cerrar Sesión" />
+                                </ListItemButton>
+                            </ListItem>
+                        </>
+                    )}
                 </List>
             </Drawer>
         </AppBar>

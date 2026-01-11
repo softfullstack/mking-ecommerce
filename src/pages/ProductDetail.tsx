@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useParams, Link as RouterLink, useNavigate } from "react-router-dom"
-import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, List, ListItem, ListItemText, Chip, IconButton, Snackbar, Alert, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Breadcrumbs, Link, AlertColor, Dialog } from "@mui/material"
+import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, List, ListItem, ListItemText, Chip, IconButton, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Breadcrumbs, Link, Dialog } from "@mui/material"
 import { Favorite, FavoriteBorder, Share, LocalShipping, Verified, ArrowBack, Close } from "@mui/icons-material"
-import { SnackbarCloseReason } from "@mui/material/Snackbar"
 import ProductCarousel from "../components/ProductCarousel"
 import RelatedProductsCarousel from "../components/RelatedProductsCarousel"
 import useCartStore from "../store/CartStore"
@@ -13,6 +12,8 @@ import { getProductByUuid, getProductById, getProductsByCategory } from "../serv
 import { isValidUuid, getPreferredIdentifier } from "../utils/uuidUtils"
 import useAuthStore from "../store/AuthStore"
 import { ToggleFavoriteService } from "../services/MKing.service"
+import { showCartToast } from "../utils/toastUtils"
+import { toast } from "react-toastify"
 
 const ProductDetail = () => {
     const { uuid } = useParams()
@@ -24,9 +25,6 @@ const ProductDetail = () => {
     const [selectedSize, setSelectedSize] = useState("")
     const [quantity, setQuantity] = useState(1)
     const [tabValue, setTabValue] = useState(0)
-    const [snackbarOpen, setSnackbarOpen] = useState(false)
-    const [snackbarMessage, setSnackbarMessage] = useState("")
-    const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("success")
     const [isImageModalOpen, setIsImageModalOpen] = useState(false)
     const [modalActiveStep, setModalActiveStep] = useState(0)
     const { addToCart } = useCartStore()
@@ -54,9 +52,20 @@ const ProductDetail = () => {
                     }
 
                     const foundProduct = response.data
-                    setProduct(foundProduct)
-                    console.log('Producto cargado:', foundProduct.name)
-                    console.log('Colores del producto:', foundProduct.colors)
+
+                    // Transformar el producto principal para incluir isNew
+                    const transformedProduct = {
+                        ...foundProduct,
+                        price: parseFloat(foundProduct.price),
+                        isNew: foundProduct.created_at
+                            ? new Date(foundProduct.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                            : false,
+                        rating: foundProduct.rating || 5, // Fallback si no viene del back
+                        reviewCount: foundProduct.reviewCount || 0,
+                    }
+
+                    setProduct(transformedProduct)
+                    console.log('Producto cargado:', transformedProduct.name)
 
                     if (foundProduct.colors && foundProduct.colors.length > 0) {
                         setSelectedColor(foundProduct.colors[0].id)
@@ -149,9 +158,7 @@ const ProductDetail = () => {
 
     const handleAddToCart = () => {
         if (selectedColor === null || !selectedSize) {
-            setSnackbarMessage("Por favor selecciona color y talla")
-            setSnackbarSeverity("error")
-            setSnackbarOpen(true)
+            toast.warning("Por favor selecciona color y talla")
             return
         }
         // Buscar el color seleccionado como objeto para pasarlo al si es necesario
@@ -165,16 +172,12 @@ const ProductDetail = () => {
                 : (typeof selectedColor === "string" ? selectedColor : "")
 
         addToCart(product, quantity, selectedSize, colorName)
-        setSnackbarMessage("Producto añadido al carrito")
-        setSnackbarSeverity("success")
-        setSnackbarOpen(true)
+        showCartToast(product)
     }
 
     const toggleFavorite = async () => {
         if (!isAuthenticated) {
-            setSnackbarMessage("Inicia sesión para guardar tus favoritos")
-            setSnackbarSeverity("info")
-            setSnackbarOpen(true)
+            toast.info("Inicia sesión para guardar tus favoritos")
             return
         }
 
@@ -182,31 +185,18 @@ const ProductDetail = () => {
             await ToggleFavoriteService(product.id)
             toggleFavoriteAction(product)
 
-            setSnackbarMessage(!isFavorite ? "Producto añadido a favoritos" : "Producto eliminado de favoritos")
-            setSnackbarSeverity("success")
-            setSnackbarOpen(true)
+            toast.success(!isFavorite ? "Producto añadido a favoritos" : "Producto eliminado de favoritos")
         } catch (error) {
             console.error("Error toggling favorite:", error)
-            setSnackbarMessage("Error al actualizar favoritos")
-            setSnackbarSeverity("error")
-            setSnackbarOpen(true)
+            toast.error("Error al actualizar favoritos")
         }
     }
 
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href)
-
-        setSnackbarMessage("Enlace copiado al portapapeles")
-        setSnackbarSeverity("info")
-        setSnackbarOpen(true)
+        toast.info("Enlace copiado al portapapeles")
     }
 
-    const handleCloseSnackbar = (_event: Event | React.SyntheticEvent<any, Event>, reason: SnackbarCloseReason) => {
-        if (reason === "clickaway") {
-            return
-        }
-        setSnackbarOpen(false)
-    }
 
     const handleColorClick = (colorId: number) => {
         // Buscar el producto que tenga este color
@@ -274,7 +264,7 @@ const ProductDetail = () => {
                 <Grid item xs={12} md={6}>
                     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
                         {product.isNew && (
-                            <Chip label="NUEVO" color="primary" size="small" sx={{ alignSelf: "flex-start", mb: 2 }} />
+                            <Chip label="Nuevo" color="primary" size="small" sx={{ alignSelf: "flex-start", mb: 2 }} />
                         )}
 
                         <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -676,17 +666,6 @@ const ProductDetail = () => {
                 title="Productos Relacionados"
             />
 
-            {/* Snackbar for notifications */}
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            >
-                <Alert onClose={(event) => handleCloseSnackbar(event, "timeout")} severity={snackbarSeverity} sx={{ width: "100%" }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
 
             {/* Image Detail Modal */}
             <Dialog

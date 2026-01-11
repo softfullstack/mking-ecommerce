@@ -8,6 +8,7 @@ import { Grid } from "@mui/material"
 
 interface RegisterFormData extends FieldValues {
     name: string
+    lastName: string
     email: string
     password: string
     confirmPassword: string
@@ -48,7 +49,7 @@ const Register = () => {
             // If backend returns token/user on registration, we can use it.
             // My backend currently returns { message, data: client } without token.
             // So I'll redirect to login or just show success.
-            
+
             setTimeout(() => {
                 navigate("/login")
             }, 3000)
@@ -107,17 +108,34 @@ const Register = () => {
                 )}
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <TextField
-                        fullWidth
-                        label="Nombre Completo"
-                        variant="outlined"
-                        margin="normal"
-                        {...register("name", {
-                            required: "El nombre es requerido",
-                        })}
-                        error={!!errors.name}
-                        helperText={errors.name?.message as string}
-                    />
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Nombre"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("name", {
+                                    required: "El nombre es requerido",
+                                })}
+                                error={!!errors.name}
+                                helperText={errors.name?.message as string}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Apellidos"
+                                variant="outlined"
+                                margin="normal"
+                                {...register("lastName", {
+                                    required: "Los apellidos son requeridos",
+                                })}
+                                error={!!errors.lastName}
+                                helperText={errors.lastName?.message as string}
+                            />
+                        </Grid>
+                    </Grid>
 
                     <TextField
                         fullWidth

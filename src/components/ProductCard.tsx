@@ -90,7 +90,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         >
             {isNew && (
                 <Chip
-                    label="NUEVO"
+                    label="Nuevo"
                     color="primary"
                     size="small"
                     sx={{
