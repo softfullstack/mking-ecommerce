@@ -9,6 +9,7 @@ import ProductDetail from "./pages/ProductDetail"
 import Cart from "./pages/Cart"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
+import ConfirmEmail from "./pages/ConfirmEmail"
 import Profile from "./pages/Profile"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ScrollToTop from "./components/ScrollToTop"
@@ -56,6 +57,7 @@ function App() {
           <Route path="/carrito" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Register />} />
+          <Route path="/confirmar-correo" element={<ConfirmEmail />} />
           <Route path="/perfil" element={<Profile />} />
         </Routes>
         <Footer />

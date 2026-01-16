@@ -45,13 +45,9 @@ const Register = () => {
             await RegisterService(data)
             setRegisterSuccess(true)
 
-            // Auto login logic - usually registration returns same as login or we ask user to login
-            // If backend returns token/user on registration, we can use it.
-            // My backend currently returns { message, data: client } without token.
-            // So I'll redirect to login or just show success.
-
+            // Redirigir a la página de confirmación pasando el email
             setTimeout(() => {
-                navigate("/login")
+                navigate("/confirmar-correo", { state: { email: data.email } })
             }, 3000)
         } catch (error: any) {
             console.error(error)
@@ -73,7 +69,7 @@ const Register = () => {
             <Container maxWidth="sm" sx={{ py: 8 }}>
                 <Paper sx={{ p: 4, textAlign: "center", backgroundColor: "#1e1e1e" }}>
                     <Alert severity="success" sx={{ mb: 3 }}>
-                        ¡Registro exitoso! Serás redirigido automáticamente...
+                        ¡Registro exitoso! Por favor verifica tu correo electrónico para el código de confirmación. Serás redirigido automáticamente...
                     </Alert>
                     <Typography variant="h5" sx={{ mb: 2 }}>
                         ¡Gracias por registrarte!
