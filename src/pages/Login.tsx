@@ -41,7 +41,14 @@ const Login = () => {
             navigate(from, { replace: true })
         } catch (error: any) {
             console.error(error)
-            const message = error.response?.data?.message || "Error al iniciar sesión. Por favor verifica tus credenciales."
+            const responseData = error.response?.data
+            const message = responseData?.message || "Error al iniciar sesión. Por favor verifica tus credenciales."
+
+            if (error.response?.status === 403 && responseData?.code === 'E_ACCOUNT_INACTIVE') {
+                navigate("/confirmar-correo", { state: { email: data.email } })
+                return
+            }
+
             setLoginError(message)
         }
     }

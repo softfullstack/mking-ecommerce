@@ -1,7 +1,7 @@
 import React from "react"
 import { useNavigate, Link as RouterLink } from "react-router-dom"
-import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Checkbox, FormControlLabel, Alert } from "@mui/material"
-import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
+import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Checkbox, FormControlLabel, Alert, Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
+import { Visibility, VisibilityOff, Google, Facebook, ExpandMore as ExpandMoreIcon } from "@mui/icons-material"
 import { useForm, FieldValues } from "react-hook-form"
 import { RegisterService } from "../services/MKing.service"
 import { Grid } from "@mui/material"
@@ -77,9 +77,6 @@ const Register = () => {
                     <Typography variant="body1" sx={{ mb: 3 }}>
                         Tu cuenta ha sido creada correctamente.
                     </Typography>
-                    <Button component={RouterLink} to="/" variant="contained" color="primary">
-                        Ir a la Tienda
-                    </Button>
                 </Paper>
             </Container>
         )
@@ -202,84 +199,95 @@ const Register = () => {
                         }}
                     />
 
-                    <Typography variant="h6" sx={{ mt: 3, mb: 1, color: "primary.main" }}>
-                        Datos de Envío (Opcional)
-                    </Typography>
 
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Teléfono"
-                                variant="outlined"
-                                margin="normal"
-                                {...register("phone")}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Código Postal"
-                                variant="outlined"
-                                margin="normal"
-                                {...register("postalCode")}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Calle"
-                                variant="outlined"
-                                margin="normal"
-                                {...register("street")}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Núm. Exterior"
-                                variant="outlined"
-                                margin="normal"
-                                {...register("exteriorNumber")}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Núm. Interior"
-                                variant="outlined"
-                                margin="normal"
-                                {...register("interiorNumber")}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Colonia"
-                                variant="outlined"
-                                margin="normal"
-                                {...register("neighborhood")}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Municipio"
-                                variant="outlined"
-                                margin="normal"
-                                {...register("municipality")}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Estado"
-                                variant="outlined"
-                                margin="normal"
-                                {...register("state")}
-                            />
-                        </Grid>
-                    </Grid>
+                    <Accordion sx={{ mt: 3, mb: 1, boxShadow: 'none', '&:before': { display: 'none' }, backgroundColor: 'transparent' }}>
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel1a-content"
+                            id="panel1a-header"
+                            sx={{ px: 0 }}
+                        >
+                            <Typography variant="h6" sx={{ color: "primary.main" }}>
+                                Datos de Envío (Opcional)
+                            </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ px: 0 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Teléfono"
+                                        variant="outlined"
+                                        margin="normal"
+                                        {...register("phone")}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Código Postal"
+                                        variant="outlined"
+                                        margin="normal"
+                                        {...register("postalCode")}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Calle"
+                                        variant="outlined"
+                                        margin="normal"
+                                        {...register("street")}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Núm. Exterior"
+                                        variant="outlined"
+                                        margin="normal"
+                                        {...register("exteriorNumber")}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Núm. Interior"
+                                        variant="outlined"
+                                        margin="normal"
+                                        {...register("interiorNumber")}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Colonia"
+                                        variant="outlined"
+                                        margin="normal"
+                                        {...register("neighborhood")}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Municipio"
+                                        variant="outlined"
+                                        margin="normal"
+                                        {...register("municipality")}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Estado"
+                                        variant="outlined"
+                                        margin="normal"
+                                        {...register("state")}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </AccordionDetails>
+                    </Accordion>
 
                     <FormControlLabel
                         control={
