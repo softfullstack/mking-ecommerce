@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Typography, Container, Grid, Paper, Box, Avatar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button, TextField, Chip, Card, CardContent, CardMedia, CardActions, Divider, IconButton, useMediaQuery, Stack, useTheme } from '@mui/material';
+import { Typography, Container, Grid, Paper, Box, Avatar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button, TextField, Chip, Card, CardContent, CardMedia, CardActions, Divider, IconButton, Stack } from '@mui/material';
+import AddressDialog from '../components/AddressDialog';
+import SizeSelectionDialog from '../components/SizeSelectionDialog';
 import PersonIcon from '@mui/icons-material/Person';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -9,115 +11,468 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionSummary, AccordionDetails, MenuItem } from '@mui/material';
+import { useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useAuthStore from '../store/AuthStore';
 import useCartStore from '../store/CartStore';
-import { GetMeService, DeleteFavoriteService } from '../services/MKing.service';
+import { GetMeService, DeleteFavoriteService, GetOrdersService, UpdateProfileService, GetRegimenFiscalService, GetCfdisService, GetAddressesService, CreateAddressService, UpdateAddressService, DeleteAddressService } from '../services/MKing.service';
 import { toast } from 'react-toastify';
 import { showCartToast } from '../utils/toastUtils';
-
-// --- DATOS DE EJEMPLO (MOCK DATA) ---
-const MOCK_ORDERS = [
-  { id: '#ORD-7829', date: '10 Ene 2024', total: '$1,250.00', status: 'Entregado', color: 'success' as const, items: 3 },
-  { id: '#ORD-8821', date: '15 Feb 2024', total: '$450.50', status: 'En camino', color: 'primary' as const, items: 1 },
-  { id: '#ORD-9002', date: '20 Feb 2024', total: '$2,100.00', status: 'Procesando', color: 'warning' as const, items: 4 },
-];
+import { getPreferredIdentifier } from '../utils/uuidUtils';
 
 
-
-const MOCK_ADDRESSES = [
-  { id: 1, name: 'Casa', address: 'Av. Reforma 123, Depto 4B', city: 'Ciudad de México, CDMX', zip: '06600', default: true },
-  { id: 2, name: 'Oficina', address: 'Blvd. Kukulcán Km 12', city: 'Cancún, QROO', zip: '77500', default: false },
-];
 
 // --- COMPONENTES DE SECCIONES ---
 
 const ProfileSection = () => {
-  const { user } = useAuthStore();
+  const { user, login } = useAuthStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  // Catalogs state
+  const [regimens, setRegimens] = useState<any[]>([]);
+  const [allCfdis, setAllCfdis] = useState<any[]>([]);
+
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    lastName: user?.last_name || '',
+    email: user?.email || '',
+    currentPassword: '',
+    newPassword: '',
+    phone: '',
+    rfc: '',
+    businessName: '',
+    taxRegime: '',
+    cfdiUse: '',
+    personType: 'persona fisica',
+    street: '',
+    exteriorNumber: '',
+    interiorNumber: '',
+    neighborhood: '',
+    municipality: '',
+    state: '',
+    postalCode: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  // Filter Regimens based on CFDI Use
+  const selectedCfdiCode = formData.cfdiUse;
+  const filteredRegimens = regimens.filter(regimen => {
+    if (!selectedCfdiCode) return true; // If no CFDI use is selected, show all regimens
+    const selectedCfdi = allCfdis.find(c => c.code === selectedCfdiCode);
+    if (!selectedCfdi || !selectedCfdi.regimen_fiscal_receptor) return true; // If CFDI not found or no receptor info, show all
+    const allowedRegimens = selectedCfdi.regimen_fiscal_receptor.split(',').map((r: string) => r.trim());
+    return allowedRegimens.includes(regimen.code);
+  });
+
+  // Fetch Catalogs
+  useEffect(() => {
+    const fetchCatalogs = async () => {
+      try {
+        const [regimenRes, cfdiRes] = await Promise.all([
+          GetRegimenFiscalService(),
+          GetCfdisService()
+        ]);
+        setRegimens(regimenRes.data);
+        setAllCfdis(cfdiRes.data);
+      } catch (error) {
+        console.error("Error loading catalogs", error);
+      }
+    };
+    fetchCatalogs();
+  }, []);
+
+  // Update effect in case user data loads late
+  useEffect(() => {
+    if (user) {
+      // @ts-ignore
+      const detailsArray = user.client_details || user.clientDetails;
+      const details = detailsArray && detailsArray.length > 0 ? detailsArray[0] : {};
+
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || '',
+        lastName: user.last_name || (user as any).lastName || '',
+        email: user.email || '',
+        phone: details.phone || '',
+        rfc: details.rfc || '',
+        businessName: details.businessName || details.business_name || '',
+        taxRegime: details.taxRegime || details.tax_regime || '',
+        cfdiUse: details.cfdiUse || details.cfdi_use || '',
+        personType: details.personType || details.person_type || 'persona fisica',
+        street: details.street || '',
+        exteriorNumber: details.exteriorNumber || details.exterior_number || '',
+        interiorNumber: details.interiorNumber || details.interior_number || '',
+        neighborhood: details.neighborhood || '',
+        municipality: details.municipality || '',
+        state: details.state || '',
+        postalCode: details.postalCode || details.postal_code || ''
+      }));
+
+      if (user.image) {
+        // If image is full URL or needs constructing, handling here.
+        // Assuming backend sends correct URL or path.
+        const imgUrl = user.image.startsWith('http') ? user.image : `${import.meta.env.VITE_AWS_URL || 'https://mking-ecommerce.s3.us-east-2.amazonaws.com/ecommerce'}/${user.image}`;
+        setImagePreview(imgUrl);
+      }
+    }
+  }, [user]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedImage(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleTriggerFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+    const name = e.target.name as string;
+    const value = e.target.value;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const data = new FormData();
+
+      // Append simple fields
+      Object.keys(formData).forEach(key => {
+        // @ts-ignore
+        data.append(key, formData[key]);
+      });
+
+      // Append image if selected
+      if (selectedImage) {
+        data.append('image', selectedImage);
+      }
+
+      if (formData.newPassword) {
+        if (!formData.currentPassword) {
+          toast.error('Debes ingresar tu contraseña actual para cambiarla');
+          setLoading(false);
+          return;
+        }
+      }
+
+      // @ts-ignore - UpdateProfileService likely expects JSON by default if just checking types, but axios handles FormData fine
+      const response = await UpdateProfileService(data);
+
+      toast.success(response.data.message || 'Perfil actualizado correctamente');
+
+      // Update global store
+      if (response.data.user) {
+        login(response.data.user);
+      }
+
+      // Clear passwords
+      setFormData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: ''
+      }));
+
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      const message = error.response?.data?.message || 'Error al actualizar el perfil';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderTextField = (label: string, name: string, type: string = 'text') => (
+    <Grid item xs={12} sm={6} md={6}>
+      <TextField
+        fullWidth
+        label={label}
+        name={name}
+        // @ts-ignore
+        value={formData[name]}
+        onChange={handleChange as any}
+        variant="outlined"
+        size="small"
+        type={type}
+      />
+    </Grid>
+  );
+
   return (
     <Box component="form" noValidate autoComplete="off">
-      <Typography variant="h5" gutterBottom>Información Personal</Typography>
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept="image/*"
+        onChange={handleImageChange}
+      />
+
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h5" gutterBottom>Información Personal</Typography>
+
+        {/* Image Upload Button Trigger */}
+        <Button
+          variant="outlined"
+          startIcon={<PhotoCameraIcon />}
+          onClick={handleTriggerFileSelect}
+          size="small"
+        >
+          Cambiar Foto
+        </Button>
+      </Box>
+
+      {imagePreview && (
+        <Box display="flex" justifyContent="center" mb={2}>
+          <Avatar src={imagePreview} sx={{ width: 100, height: 100 }} />
+        </Box>
+      )}
+
       <Typography variant="body2" color="text.secondary" paragraph>
         Actualiza tu información personal y detalles de contacto.
       </Typography>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
-          <TextField fullWidth label="Nombre" defaultValue={user?.name || ''} variant="outlined" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField fullWidth label="Apellidos" defaultValue={user?.last_name || ''} variant="outlined" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField fullWidth label="Correo Electrónico" defaultValue={user?.email || ''} variant="outlined" />
-        </Grid>
+      <Grid container spacing={2}>
+        {renderTextField("Nombre", "name")}
+        {renderTextField("Apellidos", "lastName")}
+        {renderTextField("Correo Electrónico", "email", "email")}
+        {renderTextField("Teléfono", "phone")}
+
         <Grid item xs={12}>
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="h6" gutterBottom>Cambiar Contraseña</Typography>
+          <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Cambiar Contraseña</Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField fullWidth type="password" label="Contraseña Actual" variant="outlined" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField fullWidth type="password" label="Nueva Contraseña" variant="outlined" />
-        </Grid>
-        <Grid item xs={12}>
-          <Button variant="contained" size="large" sx={{ mt: 2 }}>
-            Guardar Cambios
-          </Button>
-        </Grid>
+        {renderTextField("Contraseña Actual", "currentPassword", "password")}
+        {renderTextField("Nueva Contraseña", "newPassword", "password")}
       </Grid>
+
+      {/* DETALLES FISCALES */}
+      <Accordion sx={{ mt: 3, bgcolor: 'background.paper' }} variant="outlined">
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography sx={{ fontWeight: 'bold' }}>Detalles Fiscales</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                select
+                fullWidth
+                label="Tipo de Persona"
+                name="personType"
+                value={formData.personType}
+                onChange={handleChange as any}
+                size="small"
+              >
+                <MenuItem value="persona fisica">Persona Física</MenuItem>
+                <MenuItem value="persona moral">Persona Moral</MenuItem>
+              </TextField>
+            </Grid>
+            {renderTextField("RFC", "rfc")}
+            {renderTextField("Razón Social / Nombre Fiscal", "businessName")}
+
+            {/* CFDI USE SELECT */}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                select
+                fullWidth
+                label="Uso de CFDI"
+                name="cfdiUse"
+                value={formData.cfdiUse}
+                onChange={handleChange as any}
+                size="small"
+              >
+                {allCfdis.map((item) => (
+                  <MenuItem key={item.id} value={item.code}>
+                    {item.code} - {item.description}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            {/* TAX REGIME SELECT */}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                select
+                fullWidth
+                label="Régimen Fiscal"
+                name="taxRegime"
+                value={formData.taxRegime}
+                onChange={handleChange as any}
+                size="small"
+                disabled={!selectedCfdiCode}
+              >
+                {filteredRegimens.map((item) => (
+                  <MenuItem key={item.id} value={item.code}>
+                    {item.code} - {item.description}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* DIRECCIÓN PRINCIPAL */}
+      <Accordion sx={{ mt: 1, bgcolor: 'background.paper' }} variant="outlined">
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography sx={{ fontWeight: 'bold' }}>Dirección Principal (Facturación)</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Grid container spacing={2}>
+            {renderTextField("Calle", "street")}
+            {renderTextField("No. Exterior", "exteriorNumber")}
+            {renderTextField("No. Interior", "interiorNumber")}
+            {renderTextField("Colonia", "neighborhood")}
+            {renderTextField("Municipio / Alcaldía", "municipality")}
+            {renderTextField("Estado", "state")}
+            {renderTextField("Código Postal", "postalCode")}
+          </Grid>
+        </AccordionDetails>
+      </Accordion>
+
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          variant="contained"
+          size="large"
+          sx={{ bgcolor: 'red', '&:hover': { bgcolor: 'darkred' } }}
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? 'Guardando...' : 'Guardar Cambios'}
+        </Button>
+      </Box>
     </Box>
   );
 };
 
-const OrdersSection = () => (
-  <Box>
-    <Typography variant="h5" gutterBottom>Mis Pedidos</Typography>
-    <Typography variant="body2" color="text.secondary" paragraph>
-      Historial de tus compras recientes.
-    </Typography>
+const OrdersSection = () => {
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    <Stack spacing={2}>
-      {MOCK_ORDERS.map((order) => (
-        <Paper key={order.id} variant="outlined" sx={{ p: 2 }}>
-          <Grid container alignItems="center" spacing={2}>
-            <Grid item xs={12} sm={2}>
-              <Box sx={{ bgcolor: 'background.default', p: 1, borderRadius: 1, textAlign: 'center' }}>
-                <InventoryIcon sx={{ color: 'text.secondary' }} />
-              </Box>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="subtitle2">{order.id}</Typography>
-              <Typography variant="caption" color="text.secondary">{order.date}</Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="subtitle2">Total</Typography>
-              <Typography variant="body2" fontWeight="bold">{order.total}</Typography>
-              <Typography variant="caption" color="text.secondary">{order.items} artículos</Typography>
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <Chip
-                label={order.status}
-                color={order.color}
-                size="small"
-                variant={order.status === 'Entregado' ? 'filled' : 'outlined'}
-              />
-            </Grid>
-            <Grid item xs={12} sm={2} sx={{ textAlign: 'right' }}>
-              <Button size="small" variant="text">Ver Detalles</Button>
-            </Grid>
-          </Grid>
-        </Paper>
-      ))}
-    </Stack>
-  </Box>
-);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await GetOrdersService();
+        setOrders(response.data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" py={5}>
+        <Typography>Cargando pedidos...</Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box>
+      <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>Mis Pedidos</Typography>
+      <Typography variant="body2" color="text.secondary" paragraph>
+        Historial de tus compras recientes.
+      </Typography>
+
+      {orders.length === 0 ? (
+        <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+          Aún no has realizado ningún pedido.
+        </Typography>
+      ) : (
+        <Stack spacing={2}>
+          {orders.map((order) => (
+            <Paper key={order.id} variant="outlined" sx={{ p: 2, bgcolor: 'background.paper', borderColor: 'divider' }}>
+              <Grid container alignItems="center" spacing={2}>
+                <Grid item xs={12} sm={1}>
+                  <Box sx={{
+                    bgcolor: 'rgba(255, 255, 255, 0.05)',
+                    p: 1.5,
+                    borderRadius: 1,
+                    textAlign: 'center',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <InventoryIcon sx={{ color: 'text.secondary' }} />
+                  </Box>
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{order.folio || `#ORD-${order.id}`}</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {new Date(order.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="caption" color="text.secondary" display="block">Total</Typography>
+                  <Typography variant="body2" fontWeight="bold">
+                    ${Number(order.total_price).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {order.quotations?.length || 0} artículos
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={2}>
+                  {/* Placeholder status as backend doesn't have status field yet on Quotation table visible in earlier steps */}
+                  <Chip
+                    label="Procesando"
+                    color="warning"
+                    size="small"
+                    variant="outlined"
+                    sx={{ borderRadius: '4px', height: 24 }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={2} sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+                  <Button
+                    size="small"
+                    color="error"
+                    sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                    onClick={() => console.log('Ver detalles', order.uuid)}
+                  >
+                    Ver Detalles
+                  </Button>
+                </Grid>
+              </Grid>
+            </Paper>
+          ))}
+        </Stack>
+      )}
+    </Box>
+  );
+};
 
 const FavoritesSection = () => {
   const { user, toggleFavoriteAction } = useAuthStore();
   const { addToCart } = useCartStore();
+  const navigate = useNavigate();
   const favorites = user?.favorites || [];
+
+  const handleProductClick = (product: any) => {
+    const identifier = getPreferredIdentifier(product);
+    navigate(`/producto/${identifier}`);
+  };
+
+  const [sizeDialogOpen, setSizeDialogOpen] = useState(false);
+  const [selectedProductForSize, setSelectedProductForSize] = useState<any>(null);
 
   const handleRemoveFavorite = async (productId: number, product: any) => {
     try {
@@ -131,8 +486,49 @@ const FavoritesSection = () => {
   };
 
   const handleAddToCart = (product: any) => {
-    addToCart(product, 1);
-    showCartToast(product);
+    // Normalize sizes logic
+    const normalizedSizes = Array.isArray(product.sizes)
+      ? product.sizes.map((s: any) => typeof s === 'object' && s.name ? s.name : s)
+      : (typeof product.sizes === 'string'
+        ? product.sizes.split(',').map((s: string) => s.trim()).filter(Boolean)
+        : []);
+
+    // Get default color if available
+    let defaultColor = undefined;
+    if (product.colors && product.colors.length > 0) {
+      const color = product.colors[0];
+      defaultColor = typeof color === 'object' ? color.name : color;
+    }
+
+    if (normalizedSizes.length > 1) {
+      // Multiple sizes -> Open dialog
+      setSelectedProductForSize(product);
+      setSizeDialogOpen(true);
+    } else if (normalizedSizes.length === 1) {
+      // Single size -> Add directly
+      addToCart(product, 1, normalizedSizes[0], defaultColor);
+      showCartToast(product);
+    } else {
+      // No sizes -> Add directly
+      addToCart(product, 1, undefined, defaultColor);
+      showCartToast(product);
+    }
+  };
+
+  const handleConfirmAddToCart = (size: string) => {
+    if (selectedProductForSize) {
+      // Get default color if available
+      let defaultColor = undefined;
+      if (selectedProductForSize.colors && selectedProductForSize.colors.length > 0) {
+        const color = selectedProductForSize.colors[0];
+        defaultColor = typeof color === 'object' ? color.name : color;
+      }
+
+      addToCart(selectedProductForSize, 1, size, defaultColor);
+      showCartToast(selectedProductForSize);
+      setSizeDialogOpen(false);
+      setSelectedProductForSize(null);
+    }
   };
 
   return (
@@ -159,9 +555,10 @@ const FavoritesSection = () => {
                     return fav.img_product || 'https://via.placeholder.com/300';
                   })()}
                   alt={fav.name}
-                  sx={{ objectFit: 'cover' }}
+                  sx={{ objectFit: 'cover', cursor: 'pointer' }}
+                  onClick={() => handleProductClick(fav)}
                 />
-                <CardContent sx={{ flexGrow: 1, p: 1.5, '&:last-child': { pb: 1.5 } }}>
+                <CardContent sx={{ flexGrow: 1, p: 1.5, '&:last-child': { pb: 1.5 }, cursor: 'pointer' }} onClick={() => handleProductClick(fav)}>
                   <Typography variant="subtitle2" component="div" noWrap title={fav.name} sx={{ fontWeight: '600', mb: 0.5 }}>
                     {fav.name}
                   </Typography>
@@ -192,49 +589,130 @@ const FavoritesSection = () => {
           ))}
         </Grid>
       )}
+
+      <SizeSelectionDialog
+        open={sizeDialogOpen}
+        onClose={() => setSizeDialogOpen(false)}
+        product={selectedProductForSize}
+        onConfirm={handleConfirmAddToCart}
+      />
     </Box>
   );
 };
 
-const AddressesSection = () => (
-  <Box>
-    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-      <Typography variant="h5">Mis Direcciones</Typography>
-      <Button variant="outlined" startIcon={<LocationOnIcon />}>
-        Nueva Dirección
-      </Button>
-    </Box>
 
-    <Grid container spacing={3}>
-      {MOCK_ADDRESSES.map((addr) => (
-        <Grid item key={addr.id} xs={12} md={6}>
-          <Paper variant="outlined" sx={{ p: 3, position: 'relative', height: '100%' }}>
-            {addr.default && (
-              <Chip
-                label="Predeterminada"
-                color="primary"
-                size="small"
-                sx={{ position: 'absolute', top: 16, right: 16 }}
-              />
-            )}
-            <Box display="flex" alignItems="center" mb={2}>
-              <LocationOnIcon sx={{ mr: 1, color: 'text.secondary' }} />
-              <Typography variant="h6">{addr.name}</Typography>
-            </Box>
-            <Typography variant="body1" paragraph>{addr.address}</Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {addr.city}, CP: {addr.zip}
-            </Typography>
-            <Box mt={2} display="flex" gap={1}>
-              <Button size="small" startIcon={<EditIcon />}>Editar</Button>
-              <Button size="small" color="error" startIcon={<DeleteIcon />}>Eliminar</Button>
-            </Box>
-          </Paper>
+
+const AddressesSection = () => {
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
+  const [_loading, setLoading] = useState(false);
+
+  const fetchAddresses = async () => {
+    try {
+      const res = await GetAddressesService();
+      setAddresses(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const handleOpenNew = () => {
+    setSelectedAddress(null);
+    setOpenDialog(true);
+  };
+
+  const handleOpenEdit = (addr: any) => {
+    setSelectedAddress(addr);
+    setOpenDialog(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('¿Estás seguro de eliminar esta dirección?')) return;
+    try {
+      await DeleteAddressService(id);
+      toast.success('Dirección eliminada');
+      fetchAddresses();
+    } catch (error) {
+      toast.error('Error al eliminar');
+    }
+  };
+
+  const handleSaveAddress = async (formData: any) => {
+    setLoading(true);
+    try {
+      if (selectedAddress) {
+        await UpdateAddressService(selectedAddress.id, formData);
+        toast.success('Dirección actualizada');
+      } else {
+        await CreateAddressService(formData);
+        toast.success('Dirección agregada');
+      }
+      setOpenDialog(false);
+      fetchAddresses();
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al guardar la dirección');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5">Mis Direcciones</Typography>
+        <Button variant="outlined" startIcon={<LocationOnIcon />} color="error" onClick={handleOpenNew}>
+          Nueva Dirección
+        </Button>
+      </Box>
+
+      {addresses.length === 0 ? (
+        <Typography color="text.secondary">No tienes direcciones guardadas.</Typography>
+      ) : (
+        <Grid container spacing={3}>
+          {addresses.map((addr) => (
+            <Grid item xs={12} md={6} key={addr.id}>
+              <Card variant="outlined" sx={{ height: '100%', bgcolor: '#1e1e1e', color: 'white', borderColor: '#333' }}>
+                <CardContent>
+                  <Box display="flex" alignItems="flex-start" mb={2}>
+                    <LocationOnIcon sx={{ color: 'grey.500', mr: 1, mt: 0.5 }} />
+                    <Box>
+                      <Typography variant="h6" sx={{ color: 'white' }}>{addr.municipality || 'Dirección'}</Typography>
+                    </Box>
+                  </Box>
+                  <Typography variant="body1" sx={{ mb: 1, color: '#ddd' }}>
+                    {addr.street} {addr.exteriorNumber} {addr.interiorNumber ? `Int. ${addr.interiorNumber}` : ''}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'grey.400' }}>
+                    {addr.neighborhood}, {addr.municipality}, {addr.state}, CP: {addr.postalCode}
+                  </Typography>
+                  {addr.references && <Typography variant="caption" display="block" sx={{ mt: 1, color: 'grey.500' }}>Ref: {addr.references}</Typography>}
+                  <Typography variant="caption" display="block" sx={{ mt: 1, color: 'grey.500' }}>Recibe: {addr.recipientName} - Tel: {addr.phone}</Typography>
+                </CardContent>
+                <CardActions>
+                  <Button startIcon={<EditIcon />} color="error" size="small" onClick={() => handleOpenEdit(addr)}>Editar</Button>
+                  <Button startIcon={<DeleteIcon />} color="error" size="small" onClick={() => handleDelete(addr.id)}>Eliminar</Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
-      ))}
-    </Grid>
-  </Box>
-);
+      )}
+
+      <AddressDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        address={selectedAddress}
+        onSave={handleSaveAddress}
+      />
+    </Box>
+  );
+};
 
 // --- COMPONENTE PRINCIPAL ---
 
@@ -274,13 +752,8 @@ export default function Profile() {
         login(response.data.user);
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        // If error is 401, maybe logout
-        // logout(); 
-      } finally {
-        // Fin de carga
       }
     };
-
     fetchUser();
   }, [login]);
 
@@ -293,90 +766,84 @@ export default function Profile() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'perfil': return <ProfileSection />;
-      case 'pedidos': return <OrdersSection />;
-      case 'favoritos': return <FavoritesSection />;
-      case 'direcciones': return <AddressesSection />;
-      default: return <ProfileSection />;
+      case 'perfil':
+        return <ProfileSection />;
+      case 'pedidos':
+        return <OrdersSection />;
+      case 'favoritos':
+        return <FavoritesSection />;
+      case 'direcciones':
+        return <AddressesSection />;
+      default:
+        return <ProfileSection />;
     }
   };
 
   return (
-    <Box sx={{ flexGrow: 1, minHeight: '80vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default', py: 4 }}>
-      <Container maxWidth="lg">
-        <Grid container spacing={4}>
-
-          {/* Sidebar de Navegación */}
-          <Grid item xs={12} md={3} >
-            <Paper elevation={0} sx={{ p: 3, mb: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-              <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
-                <Box position="relative">
-                  <Avatar
-                    src={user?.image || ''}
-                    alt={user?.name || 'User'}
-                    sx={{ width: 80, height: 80, mb: 2 }}
-                  />
-                  <IconButton
-                    size="small"
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>Mi Cuenta</Typography>
+      <Grid container spacing={4}>
+        {/* Sidebar */}
+        <Grid item xs={12} md={3}>
+          <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+            {user && (
+              <Box sx={{ p: 3, textAlign: 'center', bgcolor: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
+                <Avatar sx={{ width: 80, height: 80, mx: 'auto', mb: 2, bgcolor: 'primary.main', fontSize: '2rem' }} src={user.image ? (user.image.startsWith('http') ? user.image : `${import.meta.env.VITE_AWS_URL}/${user.image}`) : undefined}>
+                  {!user.image && (user.name ? user.name.charAt(0).toUpperCase() : <PersonIcon />)}
+                </Avatar>
+                <Typography variant="subtitle1" fontWeight="bold">{user.name} {user.last_name}</Typography>
+                <Typography variant="caption" color="text.secondary">{user.email}</Typography>
+              </Box>
+            )}
+            <List disablePadding>
+              {menuItems.map((item) => (
+                <ListItem key={item.id} disablePadding>
+                  <ListItemButton
+                    selected={activeTab === item.id}
+                    onClick={() => handleTabChange(item.id)}
                     sx={{
-                      position: 'absolute',
-                      bottom: 16,
-                      right: -5,
-                      bgcolor: 'primary.main',
-                      color: 'white',
-                      '&:hover': { bgcolor: 'primary.dark' }
+                      py: 1.5,
+                      '&.Mui-selected': {
+                        bgcolor: 'rgba(211, 47, 47, 0.08)',
+                        borderLeft: '4px solid #d32f2f',
+                        '&:hover': { bgcolor: 'rgba(211, 47, 47, 0.12)' },
+                      },
                     }}
                   >
-                    <PhotoCameraIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Box>
-                <Typography variant="h6" color="text.primary">{user?.name || 'Usuario'}</Typography>
-              </Box>
-
-              <List component="nav" disablePadding sx={{ display: { xs: 'none', md: 'block' } }}>
-                {menuItems.map((item) => (
-                  <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
-                    <ListItemButton
-                      selected={activeTab === item.id}
-                      onClick={() => handleTabChange(item.id)}
-                      sx={{
-                        borderRadius: 2,
-                        '&.Mui-selected': {
-                          bgcolor: 'rgba(255, 0, 0, 0.1)', // Primary alpha
-                          color: 'primary.main',
-                          '& .MuiListItemIcon-root': { color: 'primary.main' }
-                        }
-                      }}
-                    >
-                      <ListItemIcon sx={{ minWidth: 40 }}>
-                        {item.icon}
-                      </ListItemIcon>
-                      <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: activeTab === item.id ? 600 : 400 }} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-                <Divider sx={{ my: 1 }} />
-                <ListItem disablePadding>
-                  <ListItemButton onClick={handleLogout} sx={{ borderRadius: 2, color: 'error.main' }}>
-                    <ListItemIcon sx={{ minWidth: 40, color: 'error.main' }}>
-                      <LogoutIcon />
+                    <ListItemIcon sx={{ color: activeTab === item.id ? 'error.main' : 'inherit', minWidth: 40 }}>
+                      {item.icon}
                     </ListItemIcon>
-                    <ListItemText primary="Cerrar Sesión" />
+                    <ListItemText
+                      primary={item.label}
+                      primaryTypographyProps={{
+                        variant: 'body2',
+                        fontWeight: activeTab === item.id ? 'bold' : 'medium',
+                        color: activeTab === item.id ? 'error.main' : 'text.primary'
+                      }}
+                    />
                   </ListItemButton>
                 </ListItem>
-              </List>
-            </Paper>
-          </Grid>
-
-          {/* Área de Contenido Dinámico */}
-          <Grid item xs={12} md={9}>
-            <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, minHeight: 500, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-              {renderContent()}
-            </Paper>
-          </Grid>
-
+              ))}
+              <Divider sx={{ my: 1 }} />
+              <ListItem disablePadding>
+                <ListItemButton onClick={handleLogout} sx={{ py: 1.5 }}>
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    <LogoutIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Cerrar Sesión" primaryTypographyProps={{ variant: 'body2' }} />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </Paper>
         </Grid>
-      </Container>
-    </Box>
+
+        {/* Content */}
+        <Grid item xs={12} md={9}>
+          <Paper variant="outlined" sx={{ p: 3, minHeight: 400 }}>
+            {renderContent()}
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
   );
 }

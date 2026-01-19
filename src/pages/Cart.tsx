@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import {
     Box,
@@ -26,6 +26,9 @@ import useAuthStore from "../store/AuthStore"
 import { getPreferredIdentifier } from "../utils/uuidUtils"
 import ProductCustomizer from "../components/ProductCustomizer"
 import { ItemCustomization } from "../interfaces/CustomizationInterface"
+import { GetAddressesService, CreateAddressService } from "../services/MKing.service"
+import AddressDialog from "../components/AddressDialog"
+import { toast } from "react-toastify"
 
 const Cart = () => {
     const navigate = useNavigate()
@@ -37,6 +40,43 @@ const Cart = () => {
     const [activeStep, setActiveStep] = useState(0)
     const [customizerOpen, setCustomizerOpen] = useState(false)
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null)
+
+    // Address State
+    const [addresses, setAddresses] = useState<any[]>([])
+    const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null)
+    const [loadingAddresses, setLoadingAddresses] = useState(false)
+    const [openAddressDialog, setOpenAddressDialog] = useState(false)
+
+    useEffect(() => {
+        if (activeStep === 1 && isAuthenticated) {
+            fetchAddresses()
+        }
+    }, [activeStep, isAuthenticated])
+
+    const fetchAddresses = async () => {
+        setLoadingAddresses(true)
+        try {
+            const response = await GetAddressesService()
+            setAddresses(response.data)
+        } catch (error) {
+            console.error("Error fetching addresses", error)
+            toast.error("Error al cargar direcciones")
+        } finally {
+            setLoadingAddresses(false)
+        }
+    }
+
+    const handleSaveAddress = async (data: any) => {
+        try {
+            await CreateAddressService(data)
+            toast.success("Dirección agregada correctamente")
+            setOpenAddressDialog(false)
+            fetchAddresses()
+        } catch (error) {
+            console.error("Error creating address", error)
+            toast.error("Error al guardar la dirección")
+        }
+    }
 
     const steps = ["Carrito", "Envío", "Pago", "Confirmación"]
 
@@ -82,6 +122,11 @@ const Cart = () => {
     const handleNext = () => {
         if (activeStep === 0 && !isAuthenticated) {
             navigate("/login", { state: { from: "/carrito" } })
+            return
+        }
+
+        if (activeStep === 1 && selectedAddressId === null) {
+            toast.error("Por favor selecciona una dirección de envío")
             return
         }
 
@@ -391,34 +436,91 @@ const Cart = () => {
     // Shipping step content
     const renderShippingContent = () => (
         <Paper sx={{ p: 3, backgroundColor: "#1e1e1e" }}>
-            <Typography variant="h6" sx={{ mb: 3 }}>
-                Información de Envío
-            </Typography>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="h6">
+                    Información de Envío
+                </Typography>
+                <Button
+                    variant="outlined"
+                    startIcon={<Add />}
+                    onClick={() => setOpenAddressDialog(true)}
+                    size="small"
+                >
+                    Nueva Dirección
+                </Button>
+            </Box>
 
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Nombre" variant="outlined" defaultValue="John" />
+            {loadingAddresses ? (
+                <Typography>Cargando direcciones...</Typography>
+            ) : addresses.length === 0 ? (
+                <Box textAlign="center" py={4}>
+                    <Typography color="text.secondary" paragraph>
+                        No tienes direcciones guardadas.
+                    </Typography>
+                    <Button variant="contained" onClick={() => setOpenAddressDialog(true)}>
+                        Agregar Dirección
+                    </Button>
+                </Box>
+            ) : (
+                <Grid container spacing={2}>
+                    {addresses.map((addr) => (
+                        <Grid item xs={12} md={6} key={addr.id}>
+                            <Card
+                                variant="outlined"
+                                sx={{
+                                    cursor: 'pointer',
+                                    borderColor: selectedAddressId === addr.id ? 'primary.main' : 'divider',
+                                    borderWidth: selectedAddressId === addr.id ? 2 : 1,
+                                    backgroundColor: selectedAddressId === addr.id ? 'rgba(25, 118, 210, 0.08)' : 'background.paper',
+                                    transition: 'all 0.2s',
+                                    '&:hover': {
+                                        borderColor: 'primary.light'
+                                    }
+                                }}
+                                onClick={() => setSelectedAddressId(addr.id)}
+                            >
+                                <CardContent>
+                                    <Box display="flex" justifyContent="space-between" alignItems="start">
+                                        <Typography variant="subtitle1" fontWeight="bold">
+                                            {addr.recipient_name || 'Destinatario'}
+                                        </Typography>
+                                        {selectedAddressId === addr.id && (
+                                            <CheckCircle color="primary" fontSize="small" />
+                                        )}
+                                    </Box>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {addr.street} {addr.exterior_number} {addr.interior_number ? `Int. ${addr.interior_number}` : ''}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {addr.neighborhood}, {addr.municipality}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {addr.state}, CP: {addr.postal_code}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+                                        Tel: {addr.phone}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Apellido" variant="outlined" defaultValue="Doe" />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField fullWidth label="Dirección" variant="outlined" />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Ciudad" variant="outlined" />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Código Postal" variant="outlined" />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField fullWidth label="Teléfono" variant="outlined" />
-                </Grid>
-            </Grid>
+            )}
+
+            <AddressDialog
+                open={openAddressDialog}
+                onClose={() => setOpenAddressDialog(false)}
+                onSave={handleSaveAddress}
+            />
 
             <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
                 <Button onClick={handleBack}>Volver</Button>
-                <Button variant="contained" color="primary" onClick={handleNext}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleNext}
+                    disabled={selectedAddressId === null}
+                >
                     Continuar
                 </Button>
             </Box>

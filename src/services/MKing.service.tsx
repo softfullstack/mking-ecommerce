@@ -88,5 +88,18 @@ export const ToggleFavoriteService = (id: number) => axios.post(`${apiUrl}/favor
 export const DeleteFavoriteService = (id: number) => axios.delete(`${apiUrl}/favorites/${id}`);
 
 export const GetCartService = () => axios.get(`${apiUrl}/cart`);
+// Client Orders
+export const GetOrdersService = () => axios.get(`${apiUrl}/orders`);
+export const UpdateProfileService = (data: any) => axios.put(`${apiUrl}/profile`, data);
+
+// Catalogs
+export const GetRegimenFiscalService = () => axios.get(`${apiUrl}/regimen-fiscal`);
+export const GetCfdisService = () => axios.get(`${apiUrl}/cfdi`);
+// Address Book
+export const GetAddressesService = () => axios.get(`${apiUrl}/addresses`);
+export const CreateAddressService = (data: any) => axios.post(`${apiUrl}/addresses`, data);
+export const UpdateAddressService = (id: number, data: any) => axios.put(`${apiUrl}/addresses/${id}`, data);
+export const DeleteAddressService = (id: number) => axios.delete(`${apiUrl}/addresses/${id}`);
+
 export const UpdateCartService = (items: any[]) => axios.post(`${apiUrl}/cart`, { items });
 export const ClearCartService = () => axios.delete(`${apiUrl}/cart`);
