@@ -84,7 +84,6 @@ const ProductCustomizer: React.FC<ProductCustomizerProps> = ({
 
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
     const [uploadedImage, setUploadedImage] = useState<string>('');
-    const [productImageReady, setProductImageReady] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const productImageRef = useRef<HTMLImageElement>(null);
@@ -400,8 +399,6 @@ const ProductCustomizer: React.FC<ProductCustomizerProps> = ({
                                         objectFit: 'contain',
                                         pointerEvents: 'none'
                                     }}
-                                    onLoad={() => setProductImageReady(true)}
-                                    onError={() => setProductImageReady(false)}
                                 />
 
                                 {/* Customization Zone Indicator */}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Paper, Container } from '@mui/material';
 import ProductCustomizer from '../components/ProductCustomizer';
-import { LogoCustomization } from '../interfaces/CustomizationInterface';
+import { ItemCustomization } from '../interfaces/CustomizationInterface';
 
 // Producto de ejemplo
 const exampleProduct = {
@@ -25,9 +25,9 @@ const exampleProduct = {
 
 const CustomizationExample: React.FC = () => {
     const [customizerOpen, setCustomizerOpen] = useState(false);
-    const [savedCustomizations, setSavedCustomizations] = useState<LogoCustomization[]>([]);
+    const [savedCustomizations, setSavedCustomizations] = useState<ItemCustomization[]>([]);
 
-    const handleSaveCustomization = (customizations: LogoCustomization[]) => {
+    const handleSaveCustomization = (customizations: ItemCustomization[]) => {
         setSavedCustomizations(customizations);
         setCustomizerOpen(false);
         console.log('Personalizaciones guardadas:', customizations);
@@ -84,36 +84,50 @@ const CustomizationExample: React.FC = () => {
                         Personalizaciones Guardadas
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 2 }}>
-                        Se han guardado {savedCustomizations.length} logo{savedCustomizations.length > 1 ? 's' : ''} personalizado{savedCustomizations.length > 1 ? 's' : ''}.
+                        Se han guardado {savedCustomizations.length} artículo{savedCustomizations.length > 1 ? 's' : ''} personalizado{savedCustomizations.length > 1 ? 's' : ''}.
                     </Typography>
-                    
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {savedCustomizations.map((logo, index) => (
-                            <Box
-                                key={logo.id}
-                                sx={{
-                                    p: 2,
-                                    border: '1px solid #ddd',
-                                    borderRadius: 1,
-                                    backgroundColor: '#f5f5f5',
-                                    minWidth: 200
-                                }}
-                            >
-                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                                    Logo {index + 1}
+
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {savedCustomizations.map((item, itemIndex) => (
+                            <Box key={item.id} sx={{ p: 2, border: '1px solid #ddd', borderRadius: 1, backgroundColor: '#f9f9f9' }}>
+                                <Typography variant="h6" sx={{ mb: 1 }}>
+                                    Artículo {itemIndex + 1} {item.name ? `- ${item.name}` : ''}
                                 </Typography>
-                                <Typography variant="body2">
-                                    Posición: ({Math.round(logo.x)}, {Math.round(logo.y)})
-                                </Typography>
-                                <Typography variant="body2">
-                                    Tamaño: {Math.round(logo.width)} × {Math.round(logo.height)}px
-                                </Typography>
-                                <Typography variant="body2">
-                                    Rotación: {logo.rotation}°
-                                </Typography>
-                                <Typography variant="body2">
-                                    Opacidad: {Math.round(logo.opacity * 100)}%
-                                </Typography>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                    {item.logos.map((logo, index) => (
+                                        <Box
+                                            key={logo.id}
+                                            sx={{
+                                                p: 2,
+                                                border: '1px solid #ddd',
+                                                borderRadius: 1,
+                                                backgroundColor: '#fff',
+                                                minWidth: 200
+                                            }}
+                                        >
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                                                Logo {index + 1}
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                Posición: ({Math.round(logo.x)}, {Math.round(logo.y)})
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                Tamaño: {Math.round(logo.width)} × {Math.round(logo.height)}px
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                Rotación: {logo.rotation}°
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                Opacidad: {Math.round(logo.opacity * 100)}%
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                    {item.logos.length === 0 && (
+                                        <Typography variant="body2" color="text.secondary">
+                                            Sin logos
+                                        </Typography>
+                                    )}
+                                </Box>
                             </Box>
                         ))}
                     </Box>
@@ -125,7 +139,7 @@ const CustomizationExample: React.FC = () => {
                 <Typography variant="h5" sx={{ mb: 2 }}>
                     Instrucciones de Uso
                 </Typography>
-                
+
                 <Box component="ol" sx={{ pl: 3 }}>
                     <li>
                         <Typography variant="body1" sx={{ mb: 1 }}>
@@ -165,8 +179,8 @@ const CustomizationExample: React.FC = () => {
                 </Box>
 
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                    <strong>Nota:</strong> Este es un ejemplo de demostración. En una aplicación real, 
-                    las personalizaciones se guardarían en el carrito de compras y se procesarían 
+                    <strong>Nota:</strong> Este es un ejemplo de demostración. En una aplicación real,
+                    las personalizaciones se guardarían en el carrito de compras y se procesarían
                     junto con el pedido.
                 </Typography>
             </Paper>
@@ -174,6 +188,7 @@ const CustomizationExample: React.FC = () => {
             {/* Product Customizer */}
             <ProductCustomizer
                 product={exampleProduct}
+                quantity={1}
                 isOpen={customizerOpen}
                 onSave={handleSaveCustomization}
                 onCancel={handleCancelCustomization}
