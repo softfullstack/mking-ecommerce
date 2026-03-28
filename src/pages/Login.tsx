@@ -90,7 +90,6 @@ const Login = () => {
                         })}
                         error={!!errors.email}
                         helperText={typeof errors.email?.message === "string" ? errors.email.message : ""}
-                        defaultValue="demo@example.com"
                     />
 
                     <TextField
@@ -108,7 +107,6 @@ const Login = () => {
                         })}
                         error={!!errors.password}
                         helperText={typeof errors.password?.message === "string" ? errors.password.message : ""}
-                        defaultValue="password"
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
