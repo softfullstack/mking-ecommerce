@@ -7,6 +7,7 @@ import useCartStore from "../store/CartStore"
 import useAuthStore from "../store/AuthStore"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
+import LogoIcon from "../assets/images/logo-header.png";
 
 const Logo = styled("img")({
     height: 40,
@@ -66,8 +67,7 @@ const Navbar = () => {
                             textDecoration: "none",
                         }}
                     >
-                        <Logo src="images/logo.png" alt="MKing" sx={{ borderRadius: 1 }} />
-                        MKing
+                        <Logo src={LogoIcon} alt="MKing" />
                     </Typography>
 
                     {/* Mobile menu button */}
@@ -94,13 +94,9 @@ const Navbar = () => {
                             mr: 2,
                             display: { xs: "flex", md: "none" },
                             flexGrow: 1,
-                            fontWeight: 700,
-                            color: "white",
-                            textDecoration: "none",
                         }}
                     >
-                        <Logo src="images/logo.png" alt="SafetyVest" sx={{ borderRadius: 1 }} />
-                        MKing
+                        <Logo src={LogoIcon} alt="MKing" />
                     </Typography>
 
                     {/* Desktop menu */}
@@ -167,17 +163,17 @@ const Navbar = () => {
                         ) : (
                             <>
                                 {/* Show icon on mobile, text on desktop */}
-                                <IconButton 
-                                    component={RouterLink} 
-                                    to="/login" 
+                                <IconButton
+                                    component={RouterLink}
+                                    to="/login"
                                     color="inherit"
                                     sx={{ display: { xs: 'flex', sm: 'none' }, p: 0.5 }}
                                 >
                                     <PersonIcon />
                                 </IconButton>
-                                <Button 
-                                    color="inherit" 
-                                    component={RouterLink} 
+                                <Button
+                                    color="inherit"
+                                    component={RouterLink}
                                     to="/login"
                                     sx={{ display: { xs: 'none', sm: 'flex' }, fontSize: { sm: '0.8rem', md: '0.875rem' } }}
                                 >
@@ -197,7 +193,7 @@ const Navbar = () => {
                 sx={{
                     "& .MuiDrawer-paper": {
                         boxSizing: "border-box",
-                        width: 300,
+                        width: 200,
                         backgroundColor: "#1e1e1e",
                         color: "white",
                     },
@@ -210,12 +206,12 @@ const Navbar = () => {
                 </Box>
 
                 {isAuthenticated && (
-                    <Box sx={{ px: 3, py: 2, textAlign: "center", mb: 2 }}>
-                        <Box sx={{ position: "relative", display: "inline-block", mb: 2 }}>
+                    <Box sx={{ textAlign: "center", mb: 1 }}>
+                        <Box sx={{ position: "relative", display: "inline-block", mb: 1 }}>
                             <Avatar
                                 src={user?.image}
                                 alt={user?.name}
-                                sx={{ width: 100, height: 100, mx: "auto", border: "3px solid #333" }}
+                                sx={{ width: 80, height: 80, mx: "auto", border: "2px solid #ab0000ff" }}
                             />
                             <Box
                                 sx={{
@@ -224,8 +220,8 @@ const Navbar = () => {
                                     right: 0,
                                     bgcolor: "primary.main",
                                     borderRadius: "50%",
-                                    width: 32,
-                                    height: 32,
+                                    width: 28,
+                                    height: 28,
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
@@ -244,7 +240,7 @@ const Navbar = () => {
                     </Box>
                 )}
 
-                <Divider sx={{ backgroundColor: "rgba(255,255,255,0.1)" }} />
+                <Divider sx={{ backgroundColor: "#ae35351e" }} />
 
                 <List sx={{ px: 1 }}>
                     {menuItems.map((item) => (
