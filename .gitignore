@@ -24,4 +24,5 @@ dist-ssr
 *.sw?
 .env
 .env.production
-dist
+#ignore dist folder and all its contents
+dist/
