@@ -1,11 +1,16 @@
 import { Box, Button, Container, Grid, Typography, Card, CardContent, CardMedia } from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
+import { Helmet } from "react-helmet-async"
 import ProductCard from "../components/ProductCard"
 import { featuredProducts } from "../data/Products"
 
 const Home = () => {
     return (
         <Box>
+            <Helmet>
+                <title>Inicio | MKing</title>
+                <meta name="description" content="Descubre nuestros chalecos industriales de alta seguridad y diseño. MKing te ofrece la mejor protección con estilo." />
+            </Helmet>
             {/* Hero Section */}
             <Box
                 sx={{
