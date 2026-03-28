@@ -235,7 +235,7 @@ const ProductDetail = () => {
     }
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
             {/* Breadcrumbs */}
             <Breadcrumbs sx={{ mb: 3 }}>
                 <Link component={RouterLink} to="/" color="inherit">
@@ -247,11 +247,11 @@ const ProductDetail = () => {
                 <Typography color="text.primary">{product.name}</Typography>
             </Breadcrumbs>
 
-            <Button component={RouterLink} to="/productos" startIcon={<ArrowBack />} sx={{ mb: 3 }}>
+            <Button component={RouterLink} to="/productos" startIcon={<ArrowBack />} sx={{ mb: { xs: 2, md: 3 }, fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
                 Volver a productos
             </Button>
 
-            <Grid container spacing={4}>
+            <Grid container spacing={{ xs: 2, md: 4 }}>
                 {/* Product Images */}
                 <Grid item xs={12} md={6}>
                     <ProductCarousel
@@ -267,7 +267,7 @@ const ProductDetail = () => {
                             <Chip label="Nuevo" color="primary" size="small" sx={{ alignSelf: "flex-start", mb: 2 }} />
                         )}
 
-                        <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", mb: 1 }}>
+                        <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", mb: 1, fontSize: { xs: "1.3rem", sm: "1.6rem", md: "2.125rem" } }}>
                             {product.name}
                         </Typography>
 
@@ -278,20 +278,20 @@ const ProductDetail = () => {
                             </Typography>
                         </Box>
 
-                        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: { xs: 2, md: 3 }, flexWrap: "wrap", gap: 1 }}>
                             {
                                 product.discount && product.discount > 0 ? (
                                     <>
-                                        <Typography variant="h4" color="primary" sx={{ fontWeight: "bold", mr: 2 }}>
+                                        <Typography variant="h4" color="primary" sx={{ fontWeight: "bold", mr: 2, fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2.125rem" } }}>
                                             ${(Number(product.price) * (1 - (product.discount || 0) / 100)).toFixed(2)}
                                         </Typography>
-                                        <Typography variant="h6" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
+                                        <Typography variant="h6" sx={{ textDecoration: "line-through", color: "text.secondary", fontSize: { xs: "1rem", md: "1.25rem" } }}>
                                             ${Number(product.price).toFixed(2)}
                                         </Typography>
-                                        <Chip label={`-${product.discount}%`} color="error" size="small" sx={{ ml: 2 }} />
+                                        <Chip label={`-${product.discount}%`} color="error" size="small" sx={{ ml: { xs: 0, md: 2 } }} />
                                     </>
                                 ) : (
-                                    <Typography variant="h4" color="primary" sx={{ fontWeight: "bold" }}>
+                                    <Typography variant="h4" color="primary" sx={{ fontWeight: "bold", fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2.125rem" } }}>
                                         ${Number(product.price).toFixed(2)}
                                     </Typography>
                                 )}
@@ -534,8 +534,8 @@ const ProductDetail = () => {
                         </Box>
 
                         {/* Action buttons */}
-                        <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-                            <Button variant="contained" color="primary" size="large" fullWidth onClick={handleAddToCart}>
+                        <Box sx={{ display: "flex", gap: { xs: 1, md: 2 }, mb: 3, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
+                            <Button variant="contained" color="primary" size="large" fullWidth onClick={handleAddToCart} sx={{ fontSize: { xs: '0.85rem', md: '0.95rem' } }}>
                                 Añadir al Carrito
                             </Button>
                             <IconButton
@@ -585,6 +585,11 @@ const ProductDetail = () => {
                                 sx={{
                                     borderBottom: 1,
                                     borderColor: "divider",
+                                    '& .MuiTab-root': {
+                                        fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' },
+                                        minWidth: { xs: 80, sm: 90 },
+                                        px: { xs: 1, md: 2 },
+                                    },
                                 }}
                             >
                                 <Tab label="Detalles" id="tab-0" aria-controls="tabpanel-0" />

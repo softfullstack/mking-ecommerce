@@ -780,22 +780,22 @@ export default function Profile() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>Mi Cuenta</Typography>
-      <Grid container spacing={4}>
+    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
+      <Typography variant="h4" sx={{ mb: { xs: 2, md: 4 }, fontWeight: 'bold', fontSize: { xs: '1.4rem', sm: '1.75rem', md: '2.125rem' } }}>Mi Cuenta</Typography>
+      <Grid container spacing={{ xs: 2, md: 4 }}>
         {/* Sidebar */}
         <Grid item xs={12} md={3}>
           <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
             {user && (
-              <Box sx={{ p: 3, textAlign: 'center', bgcolor: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                <Avatar sx={{ width: 80, height: 80, mx: 'auto', mb: 2, bgcolor: 'primary.main', fontSize: '2rem' }} src={user.image ? (user.image.startsWith('http') ? user.image : `${import.meta.env.VITE_AWS_URL}/${user.image}`) : undefined}>
+              <Box sx={{ p: { xs: 2, md: 3 }, textAlign: 'center', bgcolor: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px solid rgba(255, 255, 255, 0.12)', display: { xs: 'none', md: 'block' } }}>
+                <Avatar sx={{ width: { xs: 60, md: 80 }, height: { xs: 60, md: 80 }, mx: 'auto', mb: { xs: 1, md: 2 }, bgcolor: 'primary.main', fontSize: '2rem' }} src={user.image ? (user.image.startsWith('http') ? user.image : `${import.meta.env.VITE_AWS_URL}/${user.image}`) : undefined}>
                   {!user.image && (user.name ? user.name.charAt(0).toUpperCase() : <PersonIcon />)}
                 </Avatar>
-                <Typography variant="subtitle1" fontWeight="bold">{user.name} {user.last_name}</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ fontSize: { xs: '0.85rem', md: '1rem' } }}>{user.name} {user.last_name}</Typography>
                 <Typography variant="caption" color="text.secondary">{user.email}</Typography>
               </Box>
             )}
-            <List disablePadding>
+            <List disablePadding sx={{ display: { xs: 'flex', md: 'block' }, overflowX: { xs: 'auto', md: 'visible' }, '&::-webkit-scrollbar': { height: 0 } }}>
               {menuItems.map((item) => (
                 <ListItem key={item.id} disablePadding>
                   <ListItemButton
@@ -839,7 +839,7 @@ export default function Profile() {
 
         {/* Content */}
         <Grid item xs={12} md={9}>
-          <Paper variant="outlined" sx={{ p: 3, minHeight: 400 }}>
+          <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, minHeight: { xs: 300, md: 400 } }}>
             {renderContent()}
           </Paper>
         </Grid>

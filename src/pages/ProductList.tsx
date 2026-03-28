@@ -300,9 +300,9 @@ const ProductList = () => {
     }
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-                <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
+        <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 2, md: 4 } }}>
+                <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", fontSize: { xs: "1.3rem", sm: "1.6rem", md: "2.125rem" } }}>
                     Chalecos Industriales
                 </Typography>
                 <Button variant="outlined" startIcon={<FilterList />} onClick={toggleDrawer} sx={{ display: { md: "none" } }}>
@@ -377,9 +377,9 @@ const ProductList = () => {
                         {filteredProducts.length} productos encontrados
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
                         {filteredProducts.map((product) => (
-                            <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
+                            <Grid item key={product.id} xs={6} sm={6} md={4} lg={3}>
                                 <ProductCard
                                     product={{
                                         ...product,

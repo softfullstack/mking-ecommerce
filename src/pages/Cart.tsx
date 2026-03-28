@@ -209,9 +209,9 @@ const Cart = () => {
                         </Typography>
 
                         {items.map((item, index) => (
-                            <Card key={index} sx={{ mb: 2, backgroundColor: "#1e1e1e" }}>
-                                <CardContent sx={{ p: 2 }}>
-                                    <Grid container spacing={2} alignItems="center">
+                            <Card key={index} sx={{ mb: { xs: 1.5, md: 2 }, backgroundColor: "#1e1e1e" }}>
+                                <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
+                                    <Grid container spacing={{ xs: 1, sm: 2 }} alignItems="center">
                                         <Grid item xs={3} sm={2}>
                                             <Box
                                                 component="img"
@@ -616,11 +616,21 @@ const Cart = () => {
     )
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+        <Container maxWidth="lg" sx={{ py: { xs: 1, md: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
+            <Stepper 
+                activeStep={activeStep} 
+                sx={{ mb: { xs: 2, md: 4 }, '& .MuiStepIcon-root': { fontSize: { xs: 20, md: 24 } } }}
+                alternativeLabel
+            >
                 {steps.map((label) => (
                     <Step key={label}>
-                        <StepLabel>{label}</StepLabel>
+                        <StepLabel
+                            sx={{
+                                '& .MuiStepLabel-label': {
+                                    fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+                                },
+                            }}
+                        >{label}</StepLabel>
                     </Step>
                 ))}
             </Stepper>

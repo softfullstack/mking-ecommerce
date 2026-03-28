@@ -118,10 +118,10 @@ const Navbar = () => {
                     </Box>
 
                     {/* Cart icon */}
-                    <Box sx={{ flexGrow: 0, mr: 2 }}>
-                        <IconButton component={RouterLink} to="/carrito" aria-label="cart" color="inherit">
+                    <Box sx={{ flexGrow: 0, mr: { xs: 0.5, md: 2 } }}>
+                        <IconButton component={RouterLink} to="/carrito" aria-label="cart" color="inherit" sx={{ p: { xs: 0.5, md: 1 } }}>
                             <Badge badgeContent={totalItems} color="primary">
-                                <ShoppingBagIcon />
+                                <ShoppingBagIcon sx={{ fontSize: { xs: 22, md: 24 } }} />
                             </Badge>
                         </IconButton>
                     </Box>
@@ -165,9 +165,25 @@ const Navbar = () => {
                                 </Menu>
                             </>
                         ) : (
-                            <Button color="inherit" component={RouterLink} to="/login">
-                                Iniciar Sesión
-                            </Button>
+                            <>
+                                {/* Show icon on mobile, text on desktop */}
+                                <IconButton 
+                                    component={RouterLink} 
+                                    to="/login" 
+                                    color="inherit"
+                                    sx={{ display: { xs: 'flex', sm: 'none' }, p: 0.5 }}
+                                >
+                                    <PersonIcon />
+                                </IconButton>
+                                <Button 
+                                    color="inherit" 
+                                    component={RouterLink} 
+                                    to="/login"
+                                    sx={{ display: { xs: 'none', sm: 'flex' }, fontSize: { sm: '0.8rem', md: '0.875rem' } }}
+                                >
+                                    Iniciar Sesión
+                                </Button>
+                            </>
                         )}
                     </Box>
                 </Toolbar>

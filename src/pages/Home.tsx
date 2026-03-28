@@ -15,7 +15,7 @@ const Home = () => {
             <Box
                 sx={{
                     position: "relative",
-                    height: { xs: "60vh", md: "80vh" },
+                    height: { xs: "55vh", sm: "60vh", md: "80vh" },
                     backgroundColor: "#000",
                     color: "#fff",
                     display: "flex",
@@ -43,48 +43,51 @@ const Home = () => {
                             variant="h1"
                             sx={{
                                 fontWeight: 900,
-                                fontSize: { xs: "2.5rem", md: "4rem" },
-                                mb: 2,
+                                fontSize: { xs: "1.8rem", sm: "2.5rem", md: "4rem" },
+                                mb: { xs: 1, md: 2 },
                                 textTransform: "uppercase",
+                                lineHeight: 1.1,
                             }}
                         >
                             Seguridad con Estilo
                         </Typography>
-                        <Typography variant="h5" sx={{ mb: 4 }}>
+                        <Typography variant="h5" sx={{ mb: { xs: 2, md: 4 }, fontSize: { xs: "0.95rem", sm: "1.1rem", md: "1.5rem" } }}>
                             Descubre nuestra nueva colección de chalecos industriales que combinan seguridad y diseño.
                         </Typography>
-                        <Button
-                            component={RouterLink}
-                            to="/productos"
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            sx={{ mr: 2 }}
-                        >
-                            Comprar Ahora
-                        </Button>
-                        <Button
-                            component={RouterLink}
-                            to="/novedades"
-                            variant="outlined"
-                            color="primary"
-                            size="large"
-                            sx={{ borderColor: "#fff", color: "#fff" }}
-                        >
-                            Ver Novedades
-                        </Button>
+                        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: { xs: 1.5, sm: 2 }, alignItems: { xs: "stretch", sm: "flex-start" } }}>
+                            <Button
+                                component={RouterLink}
+                                to="/productos"
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                sx={{ fontSize: { xs: "0.85rem", md: "0.95rem" } }}
+                            >
+                                Comprar Ahora
+                            </Button>
+                            <Button
+                                component={RouterLink}
+                                to="/novedades"
+                                variant="outlined"
+                                color="primary"
+                                size="large"
+                                sx={{ borderColor: "#fff", color: "#fff", fontSize: { xs: "0.85rem", md: "0.95rem" } }}
+                            >
+                                Ver Novedades
+                            </Button>
+                        </Box>
                     </Box>
                 </Container>
             </Box>
 
             {/* Featured Products */}
-            <Container maxWidth="lg" sx={{ my: 8 }}>
-                <Typography variant="h4" component="h2" sx={{ mb: 4, fontWeight: "bold" }}>
+            <Container maxWidth="lg" sx={{ my: { xs: 4, md: 8 }, px: { xs: 2, sm: 3 } }}>
+                <Typography variant="h4" component="h2" sx={{ mb: { xs: 2, md: 4 }, fontWeight: "bold", fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2.125rem" } }}>
                     Productos Destacados
                 </Typography>
-                <Grid container spacing={3}>
+                <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
                     {featuredProducts.map((product) => (
-                        <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
+                        <Grid item key={product.id} xs={6} sm={6} md={4} lg={3}>
                             <ProductCard product={{
                                 ...product,
                                 uuid: `product-${product.id}`,
@@ -105,15 +108,15 @@ const Home = () => {
             </Container>
 
             {/* Categories */}
-            <Box sx={{ backgroundColor: "#0a0a0a", py: 8 }}>
-                <Container maxWidth="lg">
-                    <Typography variant="h4" component="h2" sx={{ mb: 4, fontWeight: "bold", color: "white" }}>
+            <Box sx={{ backgroundColor: "#0a0a0a", py: { xs: 4, md: 8 } }}>
+                <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 } }}>
+                    <Typography variant="h4" component="h2" sx={{ mb: { xs: 2, md: 4 }, fontWeight: "bold", color: "white", fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2.125rem" } }}>
                         Categorías
                     </Typography>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
                         <Grid item xs={12} sm={6} md={4}>
                             <Card sx={{ height: "100%", backgroundColor: "#1e1e1e" }}>
-                                <CardMedia component="img" height="200" image="/images/category-1.jpg" alt="Alta Visibilidad" />
+                                <CardMedia component="img" sx={{ height: { xs: 140, sm: 180, md: 200 } }} image="/images/category-1.jpg" alt="Alta Visibilidad" />
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: "bold" }}>
                                         Alta Visibilidad
@@ -129,7 +132,7 @@ const Home = () => {
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
                             <Card sx={{ height: "100%", backgroundColor: "#1e1e1e" }}>
-                                <CardMedia component="img" height="200" image="/images/category-2.jpg" alt="Multibolsillos" />
+                                <CardMedia component="img" sx={{ height: { xs: 140, sm: 180, md: 200 } }} image="/images/category-2.jpg" alt="Multibolsillos" />
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: "bold" }}>
                                         Multibolsillos
@@ -145,7 +148,7 @@ const Home = () => {
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
                             <Card sx={{ height: "100%", backgroundColor: "#1e1e1e" }}>
-                                <CardMedia component="img" height="200" image="/images/category-3.jpg" alt="Ignífugos" />
+                                <CardMedia component="img" sx={{ height: { xs: 140, sm: 180, md: 200 } }} image="/images/category-3.jpg" alt="Ignífugos" />
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: "bold" }}>
                                         Ignífugos
@@ -164,8 +167,8 @@ const Home = () => {
             </Box>
 
             {/* Features */}
-            <Container maxWidth="lg" sx={{ my: 8 }}>
-                <Grid container spacing={4}>
+            <Container maxWidth="lg" sx={{ my: { xs: 4, md: 8 }, px: { xs: 2, sm: 3 } }}>
+                <Grid container spacing={{ xs: 3, md: 4 }}>
                     <Grid item xs={12} md={6}>
                         <Box
                             component="img"
@@ -181,7 +184,7 @@ const Home = () => {
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <Box sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                            <Typography variant="h4" component="h2" sx={{ mb: 3, fontWeight: "bold" }}>
+                            <Typography variant="h4" component="h2" sx={{ mb: { xs: 2, md: 3 }, fontWeight: "bold", fontSize: { xs: "1.4rem", sm: "1.75rem", md: "2.125rem" } }}>
                                 Por qué elegir nuestros chalecos
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 3 }}>

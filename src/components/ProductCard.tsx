@@ -125,12 +125,12 @@ const ProductCard = ({ product }: { product: Product }) => {
             >
                 <CardMedia
                     component="img"
-                    height="200"
                     image={imageUrl}
                     alt={name}
                     sx={{
+                        height: { xs: 140, sm: 180, md: 200 },
                         objectFit: "cover",
-                        transition: 'opacity 0.3s ease-in-out', // Transición suave para el cambio de imagen
+                        transition: 'opacity 0.3s ease-in-out',
                     }}
                 />
 
@@ -156,36 +156,38 @@ const ProductCard = ({ product }: { product: Product }) => {
                     )}
                 </IconButton>
 
-                <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", p: { xs: 1, sm: 1.5, md: 2 }, "&:last-child": { pb: { xs: 1, sm: 1.5, md: 2 } } }}>
                     <Typography
                         variant="h6"
                         component="h3"
                         sx={{
                             fontWeight: "bold",
-                            mb: 1,
+                            mb: { xs: 0.5, md: 1 },
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: "vertical",
+                            fontSize: { xs: "0.85rem", sm: "0.95rem", md: "1.25rem" },
+                            lineHeight: 1.3,
                         }}
                     >
                         {name}
                     </Typography>
 
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: { xs: 0.5, md: 2 }, flexWrap: "wrap" }}>
                         {discount && discount > 0 ? (
                             <>
                                 <Typography
                                     variant="h6"
                                     color="primary"
-                                    sx={{ fontWeight: "bold", mr: 1 }}
+                                    sx={{ fontWeight: "bold", mr: 1, fontSize: { xs: "0.9rem", sm: "1rem", md: "1.25rem" } }}
                                 >
                                     ${(price * (1 - discount / 100)).toFixed(2)}
                                 </Typography>
                                 <Typography
                                     variant="body2"
-                                    sx={{ textDecoration: "line-through", color: "text.secondary" }}
+                                    sx={{ textDecoration: "line-through", color: "text.secondary", fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.875rem" } }}
                                 >
                                     ${price.toFixed(2)}
                                 </Typography>
@@ -194,7 +196,7 @@ const ProductCard = ({ product }: { product: Product }) => {
                             <Typography
                                 variant="h6"
                                 color="primary"
-                                sx={{ fontWeight: "bold" }}
+                                sx={{ fontWeight: "bold", fontSize: { xs: "0.9rem", sm: "1rem", md: "1.25rem" } }}
                             >
                                 ${price.toFixed(2)}
                             </Typography>
@@ -203,7 +205,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
                     {/* Color chips */}
                     {colors && colors.length > 0 && (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: { xs: 0, md: 2 } }}>
                             {/* Indicador principal de colores combinados */}
                             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                                 {colors.length === 1 ? (

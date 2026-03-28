@@ -8,6 +8,16 @@
   color: white;
 } */
 
+/* Mobile responsive improvements */
+html, body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
@@ -15,6 +25,29 @@ code {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Prevent images from overflowing containers */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Improve touch targets on mobile */
+@media (max-width: 600px) {
+  .MuiIconButton-root {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  
+  .MuiButton-root {
+    min-height: 40px;
+  }
+
+  /* Prevent horizontal scroll from MUI containers */
+  .MuiContainer-root {
+    overflow-x: hidden;
+  }
 }
 
 /* Scrollbar personalizada */
@@ -34,4 +67,12 @@ a {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #cc0000;
+}
+
+/* Hide scrollbar on mobile for horizontal scroll elements */
+@media (max-width: 600px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
 }

@@ -8,14 +8,14 @@ const Footer = () => {
             sx={{
                 bgcolor: "black",
                 color: "white",
-                py: 6,
+                py: { xs: 4, md: 6 },
                 mt: "auto",
             }}
         >
-            <Container maxWidth="lg">
-                <Grid container spacing={4}>
+            <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 } }}>
+                <Grid container spacing={{ xs: 3, md: 4 }}>
                     <Grid item xs={12} sm={6} md={3}>
-                        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
                             AYUDA
                         </Typography>
                         <Link component={RouterLink} to="/ayuda/estado-pedido" color="inherit" sx={{ display: "block", mb: 1 }}>
@@ -36,7 +36,7 @@ const Footer = () => {
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={3}>
-                        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
                             ACERCA DE MKING
                         </Typography>
                         <Link component={RouterLink} to="/nosotros" color="inherit" sx={{ display: "block", mb: 1 }}>
@@ -57,7 +57,7 @@ const Footer = () => {
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={3}>
-                        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
                             VENTAJAS
                         </Typography>
                         <Link component={RouterLink} to="/ventajas/app" color="inherit" sx={{ display: "block", mb: 1 }}>
@@ -75,7 +75,7 @@ const Footer = () => {
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={3}>
-                        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
                             SÍGUENOS
                         </Typography>
                         <Box sx={{ display: "flex", gap: 1 }}>

@@ -72,7 +72,7 @@ const ProductCarousel = ({ images, onImageClick, initialIndex = 0, isModal = fal
                         <Box
                             component="img"
                             sx={{
-                                height: isModal ? "85vh" : 500,
+                                height: isModal ? "85vh" : { xs: 280, sm: 380, md: 500 },
                                 display: "block",
                                 width: "100%",
                                 objectFit: "contain",
@@ -139,8 +139,8 @@ const ProductCarousel = ({ images, onImageClick, initialIndex = 0, isModal = fal
                                     src={image}
                                     alt={`Thumbnail ${index + 1}`}
                                     sx={{
-                                        height: 80,
-                                        width: 80,
+                                        height: { xs: 60, sm: 70, md: 80 },
+                                        width: { xs: 60, sm: 70, md: 80 },
                                         objectFit: "cover",
                                         cursor: "pointer",
                                         borderRadius: 1,
