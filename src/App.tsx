@@ -11,6 +11,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import ConfirmEmail from "./pages/ConfirmEmail"
 import Profile from "./pages/Profile"
+import About from "./pages/About"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ScrollToTop from "./components/ScrollToTop"
 import { useEffect } from 'react'
@@ -59,6 +60,7 @@ function App() {
           <Route path="/registro" element={<Register />} />
           <Route path="/confirmar-correo" element={<ConfirmEmail />} />
           <Route path="/perfil" element={<Profile />} />
+          <Route path="/nosotros" element={<About />} />
         </Routes>
         <Footer />
       </Router>

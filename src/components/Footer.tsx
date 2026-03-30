@@ -18,18 +18,7 @@ const Footer = () => {
                         <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
                             AYUDA
                         </Typography>
-                        <Link component={RouterLink} to="/ayuda/estado-pedido" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Estado del pedido
-                        </Link>
-                        <Link component={RouterLink} to="/ayuda/envio" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Envío y entrega
-                        </Link>
-                        <Link component={RouterLink} to="/ayuda/devoluciones" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Devoluciones
-                        </Link>
-                        <Link component={RouterLink} to="/ayuda/opciones-pago" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Opciones de pago
-                        </Link>
+
                         <Link component={RouterLink} to="/contacto" color="inherit" sx={{ display: "block", mb: 1 }}>
                             Contacto
                         </Link>
@@ -45,32 +34,14 @@ const Footer = () => {
                         <Link component={RouterLink} to="/noticias" color="inherit" sx={{ display: "block", mb: 1 }}>
                             Noticias
                         </Link>
-                        <Link component={RouterLink} to="/empleo" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Empleo
-                        </Link>
-                        <Link component={RouterLink} to="/inversores" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Inversores
-                        </Link>
-                        <Link component={RouterLink} to="/sostenibilidad" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Sostenibilidad
-                        </Link>
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={3}>
                         <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
                             VENTAJAS
                         </Typography>
-                        <Link component={RouterLink} to="/ventajas/app" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            MKing
-                        </Link>
-                        <Link component={RouterLink} to="/ventajas/email" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Registrarse para emails
-                        </Link>
                         <Link component={RouterLink} to="/ventajas/descuentos" color="inherit" sx={{ display: "block", mb: 1 }}>
                             Descuentos para empresas
-                        </Link>
-                        <Link component={RouterLink} to="/ventajas/estudiantes" color="inherit" sx={{ display: "block", mb: 1 }}>
-                            Descuentos para estudiantes
                         </Link>
                     </Grid>
 

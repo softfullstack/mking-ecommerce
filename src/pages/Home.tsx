@@ -26,7 +26,7 @@ const Home = () => {
             >
                 <Box
                     component="img"
-                    src="images/home.png"
+                    src="images/home.jpeg"
                     alt="Home"
                     sx={{
                         position: "absolute",
