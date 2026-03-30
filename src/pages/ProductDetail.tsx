@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Helmet } from "react-helmet-async"
 import { useParams, Link as RouterLink, useNavigate } from "react-router-dom"
 import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, List, ListItem, ListItemText, Chip, IconButton, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Breadcrumbs, Link, Dialog } from "@mui/material"
 import { Favorite, FavoriteBorder, Share, LocalShipping, Verified, ArrowBack, Close } from "@mui/icons-material"
@@ -236,7 +237,20 @@ const ProductDetail = () => {
 
     return (
         <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
-            {/* Breadcrumbs */}
+            <Helmet>
+                <title>{product.name} | Chaleco de Seguridad Industrial - MKing México</title>
+                <meta name="description" content={`Compra ${product.name} en MKing. ${product.description ? product.description.substring(0, 120) : 'Chaleco de seguridad industrial de alta calidad'}. Precio: $${Number(product.price).toFixed(2)}. Envíos a todo México.`} />
+                <link rel="canonical" href={`https://mking.com.mx/producto/${uuid}`} />
+                <meta property="og:title" content={`${product.name} | MKing`} />
+                <meta property="og:description" content={`${product.name} - $${Number(product.price).toFixed(2)} MXN. Chaleco de seguridad industrial de alta calidad.`} />
+                <meta property="og:type" content="product" />
+                <meta property="og:url" content={`https://mking.com.mx/producto/${uuid}`} />
+                {product.images && product.images.length > 0 && (
+                    <meta property="og:image" content={product.images[0].url || product.images[0].image_path} />
+                )}
+                <meta property="product:price:amount" content={String(product.price)} />
+                <meta property="product:price:currency" content="MXN" />
+            </Helmet>
             <Breadcrumbs sx={{ mb: 3 }}>
                 <Link component={RouterLink} to="/" color="inherit">
                     Inicio

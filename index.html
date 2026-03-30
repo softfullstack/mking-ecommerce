@@ -1,35 +1,128 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-MX">
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/public/images/icon.png" />
+  <link rel="icon" type="image/png" href="/public/images/icon.png" />
+  <link rel="apple-touch-icon" href="/public/images/icon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <!-- SEO Básico -->
-  <title>MKing | Tu tienda en línea favorita</title>
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://mking.com.mx/" />
+
+  <!-- SEO Principal -->
+  <title>MKing – Fábrica de Chalecos de Seguridad Industrial | Venta en Línea México</title>
   <meta name="description"
-    content="Descubre los mejores productos y ofertas en MKing. Calidad garantizada en cada compra." />
-  <meta name="keywords" content="MKing, tienda en línea, ecommerce, compras, productos, ofertas" />
-  <meta name="author" content="MKing" />
-  <meta name="robots" content="index, follow" />
+    content="Fábrica y tienda en línea de chalecos de seguridad industrial, equipo de protección personal y ropa de trabajo. Fabricación 100% nacional, bordado personalizado y envíos a todo México. Venta al mayoreo y menudeo." />
+  <meta name="keywords"
+    content="chalecos de seguridad, chalecos industriales, equipo de protección personal, EPP, ropa de trabajo, chalecos reflejantes, seguridad industrial, alta visibilidad, MKing, Maquila King, bordado personalizado, venta mayoreo, chalecos México, chaleco de seguridad industrial, botas de seguridad, cascos de seguridad" />
+  <meta name="author" content="MKing - Maquila King" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+  <!-- Geo Tags para SEO Local -->
+  <meta name="geo.region" content="MX" />
+  <meta name="geo.placename" content="México" />
 
   <!-- Open Graph para Redes Sociales -->
-  <meta property="og:title" content="MKing | Tu tienda en línea favorita" />
-  <meta property="og:description" content="Descubre los mejores productos y ofertas en MKing." />
+  <meta property="og:title" content="MKing – Fábrica de Chalecos de Seguridad Industrial | Tienda en Línea" />
+  <meta property="og:description"
+    content="Chalecos de seguridad industrial, equipo de protección personal y ropa de trabajo. Fabricación 100% nacional con bordado personalizado. Envíos a todo México." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://mking.com.mx" />
+  <meta property="og:url" content="https://mking.com.mx/" />
   <meta property="og:image" content="https://mking.com.mx/images/logo-ceo.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="MKing - Chalecos de Seguridad Industrial" />
+  <meta property="og:site_name" content="MKing Ecommerce" />
+  <meta property="og:locale" content="es_MX" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MKing | Tu tienda en línea favorita" />
-  <meta name="twitter:description" content="Descubre los mejores productos y ofertas en MKing." />
+  <meta name="twitter:title" content="MKing – Chalecos de Seguridad Industrial | Tienda en Línea México" />
+  <meta name="twitter:description"
+    content="Fábrica de chalecos industriales con bordado personalizado. Envíos a todo México. Venta al mayoreo y menudeo." />
+  <meta name="twitter:image" content="https://mking.com.mx/images/logo-ceo.webp" />
+  <meta name="twitter:image:alt" content="MKing - Chalecos de Seguridad Industrial" />
 
+  <!-- Preconnect para rendimiento -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- JSON-LD Structured Data: Organization -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "MKing - Maquila King",
+      "url": "https://mking.com.mx",
+      "logo": "https://mking.com.mx/images/icon.png",
+      "description": "Fábrica y tienda en línea de chalecos de seguridad industrial, equipo de protección personal y ropa de trabajo en México.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "MX"
+      },
+      "sameAs": [
+        "https://www.facebook.com/maquilaking",
+        "https://www.instagram.com/maquilaking",
+        "https://www.tiktok.com/@maquilaking"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "availableLanguage": "Spanish"
+      }
+    }
+  </script>
+
+  <!-- JSON-LD Structured Data: WebSite with SearchAction -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MKing Ecommerce",
+      "url": "https://mking.com.mx",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://mking.com.mx/productos?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
+
+  <!-- JSON-LD Structured Data: Online Store -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "MKing - Tienda de Seguridad Industrial",
+      "url": "https://mking.com.mx",
+      "image": "https://mking.com.mx/images/logo-ceo.webp",
+      "description": "Tienda en línea de chalecos de seguridad industrial, equipo de protección personal y ropa de trabajo.",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "MX"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "18:00"
+      }
+    }
+  </script>
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#d32f2f" />
+  <meta name="msapplication-TileColor" content="#d32f2f" />
 </head>
 
 <body>
   <div id="root"></div>
+  <noscript>
+    <p>Para usar la tienda en línea de MKing necesitas habilitar JavaScript en tu navegador.</p>
+  </noscript>
   <script type="module" src="/src/Main.tsx"></script>
 </body>
 

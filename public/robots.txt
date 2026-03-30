@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /carrito
+Disallow: /perfil
 
-Sitemap: https://www.mking.com/sitemap.xml
+Sitemap: https://mking.com.mx/sitemap.xml

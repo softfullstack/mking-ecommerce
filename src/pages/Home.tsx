@@ -8,8 +8,9 @@ const Home = () => {
     return (
         <Box>
             <Helmet>
-                <title>Inicio | MKing</title>
-                <meta name="description" content="Descubre nuestros chalecos industriales de alta seguridad y diseño. MKing te ofrece la mejor protección con estilo." />
+                <title>MKing – Chalecos de Seguridad Industrial | Tienda en Línea México</title>
+                <meta name="description" content="Fábrica y tienda en línea de chalecos de seguridad industrial con bordado personalizado. Equipo de protección personal, ropa de trabajo y envíos a todo México. Venta al mayoreo y menudeo." />
+                <link rel="canonical" href="https://mking.com.mx/" />
             </Helmet>
             {/* Hero Section */}
             <Box

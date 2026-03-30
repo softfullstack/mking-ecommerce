@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Helmet } from "react-helmet-async"
 import { Box, Container, Grid, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Checkbox, Slider, Button, FormControl, InputLabel, Select, MenuItem, Divider, Chip, IconButton, useMediaQuery, useTheme, SelectChangeEvent } from "@mui/material"
 import { FilterList, Close } from "@mui/icons-material"
 import ProductCard from "../components/ProductCard"
@@ -34,7 +35,7 @@ const ProductList = () => {
     const [sortBy, setSortBy] = useState("featured")
 
     // Zustand store
-    const { colors, setColors, categories, setCategories} = useFiltersStore()
+    const { colors, setColors, categories, setCategories } = useFiltersStore()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,7 +70,7 @@ const ProductList = () => {
             }
         }
         fetchData()
-        }, [setColors, setCategories])
+    }, [setColors, setCategories])
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen)
@@ -174,7 +175,7 @@ const ProductList = () => {
     const filterDrawerContent = (
         <Box
             sx={{
-                width: isMobile ? "100vw" : 250,
+                width: isMobile ? "100vw" : 240,
                 p: 3,
                 height: "100%",
                 overflow: "auto",
@@ -189,6 +190,8 @@ const ProductList = () => {
                     <Close />
                 </IconButton>
             </Box>
+
+
 
             <Divider sx={{ mb: 2 }} />
 
@@ -300,24 +303,44 @@ const ProductList = () => {
     }
 
     return (
+        <>
+        <Helmet>
+            <title>Chalecos de Seguridad Industrial | Catálogo MKing México</title>
+            <meta name="description" content="Explora nuestro catálogo de chalecos de seguridad industrial, equipo de protección personal y ropa de trabajo. Filtros por color, categoría y precio. Envíos a todo México." />
+            <link rel="canonical" href="https://mking.com.mx/productos" />
+        </Helmet>
         <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 2, md: 4 } }}>
+
                 <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", fontSize: { xs: "1.3rem", sm: "1.6rem", md: "2.125rem" } }}>
                     Chalecos Industriales
                 </Typography>
-                <Button variant="outlined" startIcon={<FilterList />} onClick={toggleDrawer} sx={{ display: { md: "none" } }}>
-                    Filtros
-                </Button>
+
+                <Box sx={{ display: "flex", gap: 2 }}>
+                    <Button variant="outlined" startIcon={<FilterList />} onClick={toggleDrawer}>
+                        Filtros
+                    </Button>
+                    <FormControl sx={{ minWidth: 120 }} size="small">
+                        <InputLabel id="sort-select-label">Ordenar por</InputLabel>
+                        <Select
+                            labelId="sort-select-label"
+                            id="sort-select"
+                            value={sortBy}
+                            label="Ordenar por"
+                            onChange={handleSortChange}
+                        >
+                            <MenuItem value="featured">Destacados</MenuItem>
+                            <MenuItem value="newest">Más recientes</MenuItem>
+                            <MenuItem value="price-low">Precio: Bajo a Alto</MenuItem>
+                            <MenuItem value="price-high">Precio: Alto a Bajo</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
             </Box>
 
             <Grid container spacing={3}>
-                {/* Filters for desktop */}
-                <Grid item md={3} lg={2} sx={{ display: { xs: "none", md: "block" } }}>
-                    {filterDrawerContent}
-                </Grid>
-
                 {/* Product grid */}
-                <Grid item xs={12} md={9} lg={10}>
+                <Grid item xs={12}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                             {selectedCategories.map((categoryId) => {
@@ -356,21 +379,7 @@ const ProductList = () => {
                             )}
                         </Box>
 
-                        <FormControl sx={{ minWidth: 120 }} size="small">
-                            <InputLabel id="sort-select-label">Ordenar por</InputLabel>
-                            <Select
-                                labelId="sort-select-label"
-                                id="sort-select"
-                                value={sortBy}
-                                label="Ordenar por"
-                                onChange={handleSortChange}
-                            >
-                                <MenuItem value="featured">Destacados</MenuItem>
-                                <MenuItem value="newest">Más recientes</MenuItem>
-                                <MenuItem value="price-low">Precio: Bajo a Alto</MenuItem>
-                                <MenuItem value="price-high">Precio: Alto a Bajo</MenuItem>
-                            </Select>
-                        </FormControl>
+
                     </Box>
 
                     <Typography variant="body2" sx={{ mb: 2 }}>
@@ -412,11 +421,12 @@ const ProductList = () => {
                 </Grid>
             </Grid>
 
-            {/* Mobile drawer */}
+            {/* Filter drawer */}
             <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer}>
                 {filterDrawerContent}
             </Drawer>
         </Container>
+        </>
     )
 }
 

@@ -1,4 +1,5 @@
 import React from "react"
+import { Helmet } from "react-helmet-async"
 import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom"
 import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Alert } from "@mui/material"
 import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
@@ -59,6 +60,11 @@ const Login = () => {
 
     return (
         <Container maxWidth="sm" sx={{ py: 8 }}>
+            <Helmet>
+                <title>Iniciar Sesión | MKing - Tienda de Seguridad Industrial</title>
+                <meta name="description" content="Inicia sesión en tu cuenta MKing para comprar chalecos de seguridad industrial y equipo de protección personal." />
+                <meta name="robots" content="noindex, nofollow" />
+            </Helmet>
             <Paper sx={{ p: 4, backgroundColor: "#1e1e1e" }}>
                 <Box sx={{ textAlign: "center", mb: 4 }}>
                     <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", mb: 1 }}>
