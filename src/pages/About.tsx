@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import { Box, Container, Typography, Grid, Card, CardContent, Button, Divider } from "@mui/material"
 import { Helmet } from "react-helmet-async"
 import { Link as RouterLink } from "react-router-dom"
@@ -13,6 +14,10 @@ import {
     TrendingUp as TrendingUpIcon,
     Star as StarIcon,
 } from "@mui/icons-material"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+gsap.registerPlugin(ScrollTrigger)
 
 const stats = [
     { number: "10+", label: "Años de Experiencia", icon: <TrendingUpIcon /> },
@@ -68,6 +73,220 @@ const features = [
 ]
 
 const About = () => {
+    const heroContentRef = useRef<HTMLDivElement>(null)
+    const statsRef = useRef<HTMLDivElement>(null)
+    const quienesTextRef = useRef<HTMLDivElement>(null)
+    const quienesImageRef = useRef<HTMLDivElement>(null)
+    const misionVisionRef = useRef<HTMLDivElement>(null)
+    const valoresGridRef = useRef<HTMLDivElement>(null)
+    const valoresTitleRef = useRef<HTMLDivElement>(null)
+    const featuresGridRef = useRef<HTMLDivElement>(null)
+    const featuresTitleRef = useRef<HTMLDivElement>(null)
+    const ctaRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            // Hero content
+            if (heroContentRef.current) {
+                gsap.fromTo(
+                    heroContentRef.current.children,
+                    { opacity: 0, y: 50 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        stagger: 0.18,
+                        ease: "power3.out",
+                        delay: 0.3,
+                    }
+                )
+            }
+
+            // Stats counter animation
+            if (statsRef.current) {
+                gsap.fromTo(
+                    statsRef.current.querySelectorAll(".stat-item"),
+                    { opacity: 0, y: 30, scale: 0.9 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.6,
+                        stagger: 0.1,
+                        ease: "back.out(1.4)",
+                        scrollTrigger: {
+                            trigger: statsRef.current,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+
+            // Quiénes somos text
+            if (quienesTextRef.current) {
+                gsap.fromTo(
+                    quienesTextRef.current.children,
+                    { opacity: 0, x: -40 },
+                    {
+                        opacity: 1,
+                        x: 0,
+                        duration: 0.7,
+                        stagger: 0.12,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: quienesTextRef.current,
+                            start: "top 80%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+
+            // Quiénes somos image
+            if (quienesImageRef.current) {
+                gsap.fromTo(
+                    quienesImageRef.current,
+                    { opacity: 0, x: 60, scale: 0.92 },
+                    {
+                        opacity: 1,
+                        x: 0,
+                        scale: 1,
+                        duration: 1,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: quienesImageRef.current,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+
+            // Misión/Visión cards
+            if (misionVisionRef.current) {
+                gsap.fromTo(
+                    misionVisionRef.current.children,
+                    { opacity: 0, y: 50, rotateY: 8 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        rotateY: 0,
+                        duration: 0.8,
+                        stagger: 0.2,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: misionVisionRef.current,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+
+            // Valores title
+            if (valoresTitleRef.current) {
+                gsap.fromTo(
+                    valoresTitleRef.current,
+                    { opacity: 0, y: 40 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: valoresTitleRef.current,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+
+            // Valores cards staggered
+            if (valoresGridRef.current) {
+                gsap.fromTo(
+                    valoresGridRef.current.children,
+                    { opacity: 0, y: 60, scale: 0.9 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.7,
+                        stagger: 0.12,
+                        ease: "back.out(1.2)",
+                        scrollTrigger: {
+                            trigger: valoresGridRef.current,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+
+            // Features title
+            if (featuresTitleRef.current) {
+                gsap.fromTo(
+                    featuresTitleRef.current,
+                    { opacity: 0, y: 40 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: featuresTitleRef.current,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+
+            // Features grid staggered
+            if (featuresGridRef.current) {
+                gsap.fromTo(
+                    featuresGridRef.current.children,
+                    { opacity: 0, x: -30 },
+                    {
+                        opacity: 1,
+                        x: 0,
+                        duration: 0.6,
+                        stagger: 0.15,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: featuresGridRef.current,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+
+            // CTA section
+            if (ctaRef.current) {
+                gsap.fromTo(
+                    ctaRef.current.children,
+                    { opacity: 0, y: 40 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.7,
+                        stagger: 0.15,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: ctaRef.current,
+                            start: "top 85%",
+                            toggleActions: "play none none none",
+                        },
+                    }
+                )
+            }
+        })
+
+        return () => ctx.revert()
+    }, [])
+
     return (
         <Box>
             <Helmet>
@@ -98,64 +317,66 @@ const About = () => {
                 }}
             >
                 <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-                    <Typography
-                        variant="overline"
-                        sx={{ color: "#d32f2f", fontWeight: 700, letterSpacing: 3, fontSize: { xs: "0.7rem", md: "0.85rem" } }}
-                    >
-                        Desde Guadalajara, Jalisco para todo México
-                    </Typography>
-                    <Typography
-                        variant="h2"
-                        component="h1"
-                        sx={{
-                            fontWeight: 800,
-                            color: "#fff",
-                            mb: 2,
-                            fontSize: { xs: "1.8rem", sm: "2.5rem", md: "3.5rem" },
-                            lineHeight: 1.1,
-                        }}
-                    >
-                        Fabricantes de Chalecos<br />
-                        de Seguridad Industrial
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            color: "rgba(255,255,255,0.8)",
-                            maxWidth: 550,
-                            mb: 3,
-                            fontSize: { xs: "0.9rem", md: "1.15rem" },
-                            lineHeight: 1.6
-                        }}
-                    >
-                        Más de 10 años de experiencia confeccionando prendas de alta visibilidad
-                        con certificación ISO 20471. Fabricación 100% nacional.
-                    </Typography>
-                    <Button
-                        component={RouterLink}
-                        to="/productos"
-                        variant="contained"
-                        size="large"
-                        sx={{
-                            bgcolor: "#d32f2f",
-                            px: 4,
-                            py: 1.5,
-                            fontWeight: 700,
-                            fontSize: { xs: "0.85rem", md: "1rem" },
-                            "&:hover": { bgcolor: "#b71c1c" },
-                        }}
-                    >
-                        Ver Nuestros Productos
-                    </Button>
+                    <Box ref={heroContentRef}>
+                        <Typography
+                            variant="overline"
+                            sx={{ color: "#d32f2f", fontWeight: 700, letterSpacing: 3, fontSize: { xs: "0.7rem", md: "0.85rem" } }}
+                        >
+                            Desde Guadalajara, Jalisco para todo México
+                        </Typography>
+                        <Typography
+                            variant="h2"
+                            component="h1"
+                            sx={{
+                                fontWeight: 800,
+                                color: "#fff",
+                                mb: 2,
+                                fontSize: { xs: "1.8rem", sm: "2.5rem", md: "3.5rem" },
+                                lineHeight: 1.1,
+                            }}
+                        >
+                            Fabricantes de Chalecos<br />
+                            de Seguridad Industrial
+                        </Typography>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: "rgba(255,255,255,0.8)",
+                                maxWidth: 550,
+                                mb: 3,
+                                fontSize: { xs: "0.9rem", md: "1.15rem" },
+                                lineHeight: 1.6
+                            }}
+                        >
+                            Más de 10 años de experiencia confeccionando prendas de alta visibilidad
+                            con certificación ISO 20471. Fabricación 100% nacional.
+                        </Typography>
+                        <Button
+                            component={RouterLink}
+                            to="/productos"
+                            variant="contained"
+                            size="large"
+                            sx={{
+                                bgcolor: "#d32f2f",
+                                px: 4,
+                                py: 1.5,
+                                fontWeight: 700,
+                                fontSize: { xs: "0.85rem", md: "1rem" },
+                                "&:hover": { bgcolor: "#b71c1c" },
+                            }}
+                        >
+                            Ver Nuestros Productos
+                        </Button>
+                    </Box>
                 </Container>
             </Box>
 
             {/* Stats Section */}
             <Box sx={{ bgcolor: "#d32f2f", py: { xs: 4, md: 5 } }}>
                 <Container maxWidth="lg">
-                    <Grid container spacing={3}>
+                    <Grid ref={statsRef} container spacing={3}>
                         {stats.map((stat, index) => (
-                            <Grid item xs={6} md={3} key={index}>
+                            <Grid item xs={6} md={3} key={index} className="stat-item">
                                 <Box sx={{ textAlign: "center", color: "#fff" }}>
                                     <Box sx={{ mb: 1, opacity: 0.9 }}>{stat.icon}</Box>
                                     <Typography variant="h3" sx={{ fontWeight: 800, fontSize: { xs: "2rem", md: "2.8rem" } }}>
@@ -175,47 +396,50 @@ const About = () => {
             <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 } }}>
                 <Grid container spacing={{ xs: 4, md: 8 }} alignItems="center">
                     <Grid item xs={12} md={6}>
-                        <Typography
-                            variant="overline"
-                            sx={{ color: "#d32f2f", fontWeight: 700, letterSpacing: 2 }}
-                        >
-                            ¿Quiénes Somos?
-                        </Typography>
-                        <Typography
-                            variant="h3"
-                            component="h2"
-                            sx={{ fontWeight: 800, mb: 3, fontSize: { xs: "1.6rem", md: "2.5rem" } }}
-                        >
-                            Maquila King – Líderes en Seguridad Industrial
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            sx={{ color: "text.secondary", mb: 3, lineHeight: 1.8, fontSize: { xs: "0.9rem", md: "1rem" } }}
-                        >
-                            Somos una empresa 100% mexicana con sede en Guadalajara, Jalisco, especializada en la
-                            fabricación de chalecos de seguridad industrial de alta visibilidad. Con más de una década
-                            de experiencia en el mercado, nos hemos consolidado como referentes en la industria de la
-                            seguridad laboral en México.
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            sx={{ color: "text.secondary", mb: 3, lineHeight: 1.8, fontSize: { xs: "0.9rem", md: "1rem" } }}
-                        >
-                            Nuestra planta de producción cuenta con tecnología de punta y personal altamente capacitado
-                            para garantizar que cada prenda cumpla con los estándares internacionales de calidad y seguridad,
-                            incluyendo la certificación ISO 20471 de alta visibilidad.
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            sx={{ color: "text.secondary", lineHeight: 1.8, fontSize: { xs: "0.9rem", md: "1rem" } }}
-                        >
-                            Nos distinguimos por ofrecer la gama de colores más amplia del mercado, personalización
-                            con bordado desde una sola pieza y la mejor relación precio-calidad al ser fabricantes directos
-                            sin intermediarios.
-                        </Typography>
+                        <Box ref={quienesTextRef}>
+                            <Typography
+                                variant="overline"
+                                sx={{ color: "#d32f2f", fontWeight: 700, letterSpacing: 2 }}
+                            >
+                                ¿Quiénes Somos?
+                            </Typography>
+                            <Typography
+                                variant="h3"
+                                component="h2"
+                                sx={{ fontWeight: 800, mb: 3, fontSize: { xs: "1.6rem", md: "2.5rem" } }}
+                            >
+                                Maquila King – Líderes en Seguridad Industrial
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                sx={{ color: "text.secondary", mb: 3, lineHeight: 1.8, fontSize: { xs: "0.9rem", md: "1rem" } }}
+                            >
+                                Somos una empresa 100% mexicana con sede en Guadalajara, Jalisco, especializada en la
+                                fabricación de chalecos de seguridad industrial de alta visibilidad. Con más de una década
+                                de experiencia en el mercado, nos hemos consolidado como referentes en la industria de la
+                                seguridad laboral en México.
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                sx={{ color: "text.secondary", mb: 3, lineHeight: 1.8, fontSize: { xs: "0.9rem", md: "1rem" } }}
+                            >
+                                Nuestra planta de producción cuenta con tecnología de punta y personal altamente capacitado
+                                para garantizar que cada prenda cumpla con los estándares internacionales de calidad y seguridad,
+                                incluyendo la certificación ISO 20471 de alta visibilidad.
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                sx={{ color: "text.secondary", lineHeight: 1.8, fontSize: { xs: "0.9rem", md: "1rem" } }}
+                            >
+                                Nos distinguimos por ofrecer la gama de colores más amplia del mercado, personalización
+                                con bordado desde una sola pieza y la mejor relación precio-calidad al ser fabricantes directos
+                                sin intermediarios.
+                            </Typography>
+                        </Box>
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <Box
+                            ref={quienesImageRef}
                             sx={{
                                 borderRadius: 4,
                                 overflow: "hidden",
@@ -247,7 +471,7 @@ const About = () => {
             {/* Misión y Visión */}
             <Box sx={{ bgcolor: "rgba(211, 47, 47, 0.05)", py: { xs: 6, md: 10 } }}>
                 <Container maxWidth="lg">
-                    <Grid container spacing={4}>
+                    <Grid ref={misionVisionRef} container spacing={4}>
                         <Grid item xs={12} md={6}>
                             <Card
                                 sx={{
@@ -346,7 +570,7 @@ const About = () => {
 
             {/* Valores */}
             <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 } }}>
-                <Box sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
+                <Box ref={valoresTitleRef} sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
                     <Typography variant="overline" sx={{ color: "#d32f2f", fontWeight: 700, letterSpacing: 2 }}>
                         Lo que nos define
                     </Typography>
@@ -366,7 +590,7 @@ const About = () => {
                     </Typography>
                 </Box>
 
-                <Grid container spacing={3}>
+                <Grid ref={valoresGridRef} container spacing={3}>
                     {values.map((value, index) => (
                         <Grid item xs={12} sm={6} md={3} key={index}>
                             <Card
@@ -419,7 +643,7 @@ const About = () => {
             {/* ¿Por qué elegirnos? */}
             <Box sx={{ py: { xs: 6, md: 10 } }}>
                 <Container maxWidth="lg">
-                    <Box sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
+                    <Box ref={featuresTitleRef} sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
                         <Typography variant="overline" sx={{ color: "#d32f2f", fontWeight: 700, letterSpacing: 2 }}>
                             Ventajas competitivas
                         </Typography>
@@ -432,7 +656,7 @@ const About = () => {
                         </Typography>
                     </Box>
 
-                    <Grid container spacing={4}>
+                    <Grid ref={featuresGridRef} container spacing={4}>
                         {features.map((feature, index) => (
                             <Grid item xs={12} sm={6} key={index}>
                                 <Box
@@ -477,7 +701,7 @@ const About = () => {
                     textAlign: "center",
                 }}
             >
-                <Container maxWidth="md">
+                <Container ref={ctaRef} maxWidth="md">
                     <Typography
                         variant="h3"
                         sx={{ fontWeight: 800, color: "#fff", mb: 2, fontSize: { xs: "1.5rem", md: "2.5rem" } }}
@@ -510,7 +734,7 @@ const About = () => {
                         </Button>
                         <Button
                             component="a"
-                            href="https://wa.me/523312345678"
+                            href="https://api.whatsapp.com/send?phone=523351146348&text=Hola+deseo+m%C3%A1s+informaci%C3%B3n+%F0%9F%A6%BA"
                             target="_blank"
                             variant="outlined"
                             size="large"

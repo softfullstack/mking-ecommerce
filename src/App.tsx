@@ -1,5 +1,5 @@
 import './App.css'
-import { ThemeProvider, CssBaseline } from "@mui/material"
+import { ThemeProvider, CssBaseline, Box } from "@mui/material"
 import { Theme } from "./Theme"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
@@ -14,6 +14,7 @@ import Profile from "./pages/Profile"
 import About from "./pages/About"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ScrollToTop from "./components/ScrollToTop"
+import PageTransition from "./components/PageTransition"
 import { useEffect } from 'react'
 import { GetMeService } from './services/MKing.service'
 import useAuthStore from './store/AuthStore'
@@ -51,17 +52,21 @@ function App() {
       <Router>
         <ScrollToTop />
         <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/productos" element={<ProductList />} />
-          <Route path="/producto/:uuid" element={<ProductDetail />} />
-          <Route path="/carrito" element={<Cart />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Register />} />
-          <Route path="/confirmar-correo" element={<ConfirmEmail />} />
-          <Route path="/perfil" element={<Profile />} />
-          <Route path="/nosotros" element={<About />} />
-        </Routes>
+        {/* Spacer for fixed navbar */}
+        <Box sx={{ height: { xs: 56, sm: 64 } }} />
+        <PageTransition>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/productos" element={<ProductList />} />
+            <Route path="/producto/:uuid" element={<ProductDetail />} />
+            <Route path="/carrito" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Register />} />
+            <Route path="/confirmar-correo" element={<ConfirmEmail />} />
+            <Route path="/perfil" element={<Profile />} />
+            <Route path="/nosotros" element={<About />} />
+          </Routes>
+        </PageTransition>
         <Footer />
       </Router>
     </ThemeProvider>

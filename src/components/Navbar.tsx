@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Link as RouterLink } from "react-router-dom"
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem, Badge, Drawer, List, ListItem, ListItemText, ListItemButton, Divider, ListItemIcon } from "@mui/material"
 import { styled } from "@mui/material/styles"
@@ -8,6 +8,7 @@ import useAuthStore from "../store/AuthStore"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import LogoIcon from "../assets/images/logo-header.png";
+import gsap from "gsap"
 
 const Logo = styled("img")({
     height: 40,
@@ -17,9 +18,42 @@ const Logo = styled("img")({
 const Navbar = () => {
     const [anchorElUser, setAnchorElUser] = useState(null)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const appBarRef = useRef<HTMLElement>(null)
+    const isScrolledRef = useRef(false)
 
     const { totalItems } = useCartStore() as { totalItems: number }
     const { isAuthenticated, user, logout } = useAuthStore()
+
+    // GSAP scroll-based navbar transparency
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollY = window.scrollY
+            const threshold = 80
+
+            if (scrollY > threshold && !isScrolledRef.current) {
+                isScrolledRef.current = true
+                gsap.to(appBarRef.current, {
+                    backgroundColor: "rgba(0, 0, 0, 0.75)",
+                    backdropFilter: "blur(12px)",
+                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.3)",
+                    duration: 0.4,
+                    ease: "power2.out",
+                })
+            } else if (scrollY <= threshold && isScrolledRef.current) {
+                isScrolledRef.current = false
+                gsap.to(appBarRef.current, {
+                    backgroundColor: "rgba(0, 0, 0, 1)",
+                    backdropFilter: "blur(0px)",
+                    boxShadow: "none",
+                    duration: 0.4,
+                    ease: "power2.out",
+                })
+            }
+        }
+
+        window.addEventListener("scroll", handleScroll, { passive: true })
+        return () => window.removeEventListener("scroll", handleScroll)
+    }, [])
 
     const handleOpenUserMenu = (event: any) => {
         setAnchorElUser(event.currentTarget)
@@ -45,12 +79,20 @@ const Navbar = () => {
     const menuItems = [
         { text: "Inicio", path: "/" },
         { text: "Productos", path: "/productos" },
-        { text: "Ofertas", path: "/ofertas" },
-        { text: "Novedades", path: "/novedades" },
+        { text: "Nosotros", path: "/nosotros" },
+        { text: "Contacto", path: "/contacto" },
     ]
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: "black" }}>
+        <AppBar
+            ref={appBarRef}
+            position="fixed"
+            sx={{
+                backgroundColor: "rgba(0, 0, 0, 1)",
+                transition: "background-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease",
+                zIndex: (theme) => theme.zIndex.appBar + 1,
+            }}
+        >
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     {/* Logo for desktop */}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Typography, Container, Grid, Paper, Box, Avatar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button, TextField, Chip, Card, CardContent, CardMedia, CardActions, Divider, IconButton, Stack } from '@mui/material';
 import AddressDialog from '../components/AddressDialog';
 import SizeSelectionDialog from '../components/SizeSelectionDialog';
@@ -21,6 +21,7 @@ import { GetMeService, DeleteFavoriteService, GetOrdersService, UpdateProfileSer
 import { toast } from 'react-toastify';
 import { showCartToast } from '../utils/toastUtils';
 import { getPreferredIdentifier } from '../utils/uuidUtils';
+import ProfileImageCropper from '../components/ProfileImageCropper';
 
 
 
@@ -31,6 +32,8 @@ const ProfileSection = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
 
   // Catalogs state
   const [regimens, setRegimens] = useState<any[]>([]);
@@ -124,15 +127,30 @@ const ProfileSection = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setSelectedImage(file);
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setRawImageSrc(reader.result as string);
+        setCropperOpen(true);
       };
       reader.readAsDataURL(file);
+
+      // Reset input so re-selecting the same file triggers change
+      e.target.value = '';
     }
   };
+
+  const handleCropComplete = useCallback((croppedFile: File) => {
+    setSelectedImage(croppedFile);
+    setImagePreview(URL.createObjectURL(croppedFile));
+    setCropperOpen(false);
+    setRawImageSrc(null);
+  }, []);
+
+  const handleCropperClose = useCallback(() => {
+    setCropperOpen(false);
+    setRawImageSrc(null);
+  }, []);
 
   const handleTriggerFileSelect = () => {
     fileInputRef.current?.click();
@@ -356,6 +374,16 @@ const ProfileSection = () => {
           {loading ? 'Guardando...' : 'Guardar Cambios'}
         </Button>
       </Box>
+
+      {/* Image Cropper Dialog */}
+      {rawImageSrc && (
+        <ProfileImageCropper
+          open={cropperOpen}
+          imageSrc={rawImageSrc}
+          onClose={handleCropperClose}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </Box>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { Helmet } from "react-helmet-async"
 import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom"
 import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Alert } from "@mui/material"
@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form"
 import useAuthStore from "../store/AuthStore"
 import useCartStore from "../store/CartStore"
 import { LoginService } from "../services/MKing.service"
+import gsap from "gsap"
 
 const Login = () => {
     const navigate = useNavigate()
@@ -15,6 +16,17 @@ const Login = () => {
     const { fetchCart } = useCartStore()
     const [showPassword, setShowPassword] = React.useState(false)
     const [loginError, setLoginError] = React.useState("")
+    const formRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (formRef.current) {
+            gsap.fromTo(
+                formRef.current,
+                { opacity: 0, y: 40, scale: 0.95 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power3.out", delay: 0.1 }
+            )
+        }
+    }, [])
 
     const from = location.state?.from || "/"
 
@@ -65,7 +77,7 @@ const Login = () => {
                 <meta name="description" content="Inicia sesión en tu cuenta MKing para comprar chalecos de seguridad industrial y equipo de protección personal." />
                 <meta name="robots" content="noindex, nofollow" />
             </Helmet>
-            <Paper sx={{ p: 4, backgroundColor: "#1e1e1e" }}>
+            <Paper ref={formRef} sx={{ p: 4, backgroundColor: "#1e1e1e" }}>
                 <Box sx={{ textAlign: "center", mb: 4 }}>
                     <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", mb: 1 }}>
                         Iniciar Sesión

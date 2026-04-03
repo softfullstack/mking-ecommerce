@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Helmet } from "react-helmet-async"
 import { Box, Container, Grid, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Checkbox, Slider, Button, FormControl, InputLabel, Select, MenuItem, Divider, Chip, IconButton, useMediaQuery, useTheme, SelectChangeEvent } from "@mui/material"
 import { FilterList, Close } from "@mui/icons-material"
@@ -8,6 +8,7 @@ import ProductCard from "../components/ProductCard"
 import { Product, transformApiProduct } from "../interfaces/Product"
 import { ProdutcList } from "../services/MKing.service"
 import useFiltersStore from "../store/FiltersStore"
+import gsap from "gsap"
 
 interface CategoryType {
     id: number
@@ -33,6 +34,38 @@ const ProductList = () => {
     const [selectedCategories, setSelectedCategories] = useState<number[]>([])
     const [selectedColors, setSelectedColors] = useState<number[]>([])
     const [sortBy, setSortBy] = useState("featured")
+    const productGridRef = useRef<HTMLDivElement>(null)
+    const headerRef = useRef<HTMLDivElement>(null)
+
+    // Animate product grid when filteredProducts changes
+    useEffect(() => {
+        if (productGridRef.current && filteredProducts.length > 0) {
+            gsap.fromTo(
+                productGridRef.current.children,
+                { opacity: 0, y: 30, scale: 0.95 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.5,
+                    stagger: 0.06,
+                    ease: "power3.out",
+                    clearProps: "transform",
+                }
+            )
+        }
+    }, [filteredProducts])
+
+    // Animate header on mount
+    useEffect(() => {
+        if (headerRef.current) {
+            gsap.fromTo(
+                headerRef.current,
+                { opacity: 0, y: -20 },
+                { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
+            )
+        }
+    }, [loading])
 
     // Zustand store
     const { colors, setColors, categories, setCategories } = useFiltersStore()
@@ -310,7 +343,7 @@ const ProductList = () => {
             <link rel="canonical" href="https://mking.com.mx/productos" />
         </Helmet>
         <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 2, md: 4 } }}>
+            <Box ref={headerRef} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 2, md: 4 } }}>
 
                 <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", fontSize: { xs: "1.3rem", sm: "1.6rem", md: "2.125rem" } }}>
                     Chalecos Industriales
@@ -386,7 +419,7 @@ const ProductList = () => {
                         {filteredProducts.length} productos encontrados
                     </Typography>
 
-                    <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
+                    <Grid ref={productGridRef} container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
                         {filteredProducts.map((product) => (
                             <Grid item key={product.id} xs={6} sm={6} md={4} lg={3}>
                                 <ProductCard
