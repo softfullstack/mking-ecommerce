@@ -103,3 +103,5 @@ export const DeleteAddressService = (id: number) => axios.delete(`${apiUrl}/addr
 
 export const UpdateCartService = (items: any[]) => axios.post(`${apiUrl}/cart`, { items });
 export const ClearCartService = () => axios.delete(`${apiUrl}/cart`);
+
+export const GetCollectionBySlugService = (slug: string) => axios.get(`${apiUrl}/collections/${slug}`);

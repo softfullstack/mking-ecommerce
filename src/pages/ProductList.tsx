@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { Helmet } from "react-helmet-async"
 import { Box, Container, Grid, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Checkbox, Slider, Button, FormControl, InputLabel, Select, MenuItem, Divider, Chip, IconButton, useMediaQuery, useTheme, SelectChangeEvent } from "@mui/material"
 import { FilterList, Close } from "@mui/icons-material"
+import { useSearchParams } from "react-router-dom"
 import ProductCard from "../components/ProductCard"
 import { Product, transformApiProduct } from "../interfaces/Product"
 import { ProdutcList } from "../services/MKing.service"
@@ -34,6 +35,7 @@ const ProductList = () => {
     const [selectedCategories, setSelectedCategories] = useState<number[]>([])
     const [selectedColors, setSelectedColors] = useState<number[]>([])
     const [sortBy, setSortBy] = useState("featured")
+    const [searchParams, setSearchParams] = useSearchParams()
     const productGridRef = useRef<HTMLDivElement>(null)
     const headerRef = useRef<HTMLDivElement>(null)
 
@@ -105,6 +107,29 @@ const ProductList = () => {
         fetchData()
     }, [setColors, setCategories])
 
+    // Sync categories from URL to state
+    useEffect(() => {
+        if (categories.length > 0) {
+            const categoriaSlugs = searchParams.get('categoria')
+            if (categoriaSlugs) {
+                const slugsArray = categoriaSlugs.split(',').map(s => s.trim().toLowerCase())
+                const matchingIds = categories
+                    .filter(c => slugsArray.includes(c.name.toLowerCase().replace(/ /g, '-')))
+                    .map(c => c.id)
+
+                const currentIdsStr = [...selectedCategories].sort().join(',')
+                const newIdsStr = [...matchingIds].sort().join(',')
+
+                if (currentIdsStr !== newIdsStr) {
+                    setSelectedCategories(matchingIds)
+                }
+            } else if (selectedCategories.length > 0) {
+                setSelectedCategories([])
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams.get('categoria'), categories.length])
+
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen)
     }
@@ -126,6 +151,21 @@ const ProductList = () => {
         }
 
         setSelectedCategories(newSelectedCategories)
+
+        const params = new URLSearchParams(searchParams)
+        if (newSelectedCategories.length > 0) {
+            const slugs = newSelectedCategories
+                .map(id => {
+                    const cat = categories.find(c => c.id === id)
+                    return cat ? cat.name.toLowerCase().replace(/ /g, '-') : ''
+                })
+                .filter(Boolean)
+                .join(',')
+            params.set("categoria", slugs)
+        } else {
+            params.delete("categoria")
+        }
+        setSearchParams(params, { replace: true })
     }
 
     const handleColorToggle = (colorId: number) => {
@@ -149,10 +189,30 @@ const ProductList = () => {
         setSelectedCategories([])
         setSelectedColors([])
         setPriceRange([0, 1000])
+
+        const params = new URLSearchParams(searchParams)
+        params.delete("categoria")
+        setSearchParams(params, { replace: true })
     }
 
     const removeCategory = (categoryId: number) => {
-        setSelectedCategories(selectedCategories.filter((id) => id !== categoryId))
+        const newSelectedCategories = selectedCategories.filter((id) => id !== categoryId)
+        setSelectedCategories(newSelectedCategories)
+
+        const params = new URLSearchParams(searchParams)
+        if (newSelectedCategories.length > 0) {
+            const slugs = newSelectedCategories
+                .map(id => {
+                    const cat = categories.find(c => c.id === id)
+                    return cat ? cat.name.toLowerCase().replace(/ /g, '-') : ''
+                })
+                .filter(Boolean)
+                .join(',')
+            params.set("categoria", slugs)
+        } else {
+            params.delete("categoria")
+        }
+        setSearchParams(params, { replace: true })
     }
 
     const removeColor = (colorId: number) => {
@@ -421,7 +481,7 @@ const ProductList = () => {
 
                     <Grid ref={productGridRef} container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
                         {filteredProducts.map((product) => (
-                            <Grid item key={product.id} xs={6} sm={6} md={4} lg={3}>
+                            <Grid item key={product.uuid} xs={6} sm={6} md={4} lg={3}>
                                 <ProductCard
                                     product={{
                                         ...product,

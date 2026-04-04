@@ -2,8 +2,8 @@
  * Utilidades para manejo de UUIDs
  */
 
-// Regex para validar UUID v4
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+// Regex para validar UUID (cualquier versión)
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Valida si una cadena es un UUID válido

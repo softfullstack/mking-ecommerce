@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react"
-import { Box, Button, Container, Grid, Typography, Card, CardContent, CardMedia } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
+import { Box, Button, Container, Grid, Typography } from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
 import { Helmet } from "react-helmet-async"
 import ProductCard from "../components/ProductCard"
-import { featuredProducts } from "../data/Products"
+import { GetCollectionBySlugService, ProdutcList } from "../services/MKing.service"
+import CategoriesCarousel from "../components/CategoriesCarousel"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
@@ -18,6 +19,51 @@ const Home = () => {
     const categoriesGridRef = useRef<HTMLDivElement>(null)
     const featureImageRef = useRef<HTMLDivElement>(null)
     const featureTextRef = useRef<HTMLDivElement>(null)
+
+    const [featured, setFeatured] = useState<any[]>([])
+    const [categories, setCategories] = useState<any[]>([])
+
+    useEffect(() => {
+        GetCollectionBySlugService('productos-destacados')
+            .then((res: any) => {
+                if (res.data && res.data.products) {
+                    setFeatured(res.data.products)
+                }
+            })
+            .catch((err) => console.error("Error fetching featured collection:", err))
+
+        ProdutcList()
+            .then((res: any) => {
+                if (res.data && res.data.categories && res.data.products) {
+                    const cats = res.data.categories
+                    const prods = res.data.products
+                    
+                    const categoriesWithImages = cats.map((cat: any) => {
+                        const catProducts = prods.filter((p: any) => p.category_id === cat.id && p.images && p.images.length > 0)
+                        let randomImg = "/images/category-1.jpg" // Fallback
+                        
+                        if (catProducts.length > 0) {
+                            const randomProduct = catProducts[Math.floor(Math.random() * catProducts.length)]
+                            const firstImage = randomProduct.images[0]
+                            randomImg = firstImage.url || firstImage.image_path || randomImg
+                        } else if (cat.name.toLowerCase().includes("multi")) {
+                            randomImg = "/images/category-2.jpg"
+                        } else if (cat.name.toLowerCase().includes("igni")) {
+                            randomImg = "/images/category-3.jpg"
+                        }
+                        
+                        return {
+                            id: cat.id,
+                            name: cat.name,
+                            image: randomImg,
+                            slug: cat.name.toLowerCase().replace(/ /g, '-')
+                        }
+                    })
+                    setCategories(categoriesWithImages)
+                }
+            })
+            .catch((err) => console.error("Error fetching categories:", err))
+    }, [])
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -109,17 +155,14 @@ const Home = () => {
                 )
             }
 
-            // Categories cards staggered
             if (categoriesGridRef.current) {
                 gsap.fromTo(
-                    categoriesGridRef.current.children,
-                    { opacity: 0, y: 50, rotateX: 8 },
+                    categoriesGridRef.current,
+                    { opacity: 0, y: 50 },
                     {
                         opacity: 1,
                         y: 0,
-                        rotateX: 0,
                         duration: 0.8,
-                        stagger: 0.15,
                         ease: "power3.out",
                         scrollTrigger: {
                             trigger: categoriesGridRef.current,
@@ -257,11 +300,13 @@ const Home = () => {
                     Productos Destacados
                 </Typography>
                 <Grid ref={featuredGridRef} container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
-                    {featuredProducts.map((product) => (
-                        <Grid item key={product.id} xs={6} sm={6} md={4} lg={3}>
+                    {featured.map((product: any) => (
+                        <Grid item key={product.uuid} xs={6} sm={6} md={4} lg={3}>
                             <ProductCard product={{
                                 ...product,
-                                uuid: `product-${product.id}`,
+                                price: Number(product.price) || 0,
+                                colors: product.colors?.map((c: any) => c.hex_code || c) || [],
+                                uuid: product.uuid,
                                 images: (product.images || []).map((img: any) =>
                                     typeof img === "string"
                                         ? { url: img }
@@ -284,56 +329,9 @@ const Home = () => {
                     <Typography ref={categoriesTitleRef} variant="h4" component="h2" sx={{ mb: { xs: 2, md: 4 }, fontWeight: "bold", color: "white", fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2.125rem" } }}>
                         Categorías
                     </Typography>
-                    <Grid ref={categoriesGridRef} container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card sx={{ height: "100%", backgroundColor: "#1e1e1e" }}>
-                                <CardMedia component="img" sx={{ height: { xs: 140, sm: 180, md: 200 } }} image="/images/category-1.jpg" alt="Alta Visibilidad" />
-                                <CardContent>
-                                    <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: "bold" }}>
-                                        Alta Visibilidad
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                        Chalecos diseñados para entornos que requieren máxima visibilidad.
-                                    </Typography>
-                                    <Button component={RouterLink} to="/categoria/alta-visibilidad" variant="text" color="primary">
-                                        Explorar
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card sx={{ height: "100%", backgroundColor: "#1e1e1e" }}>
-                                <CardMedia component="img" sx={{ height: { xs: 140, sm: 180, md: 200 } }} image="/images/category-2.jpg" alt="Multibolsillos" />
-                                <CardContent>
-                                    <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: "bold" }}>
-                                        Multibolsillos
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                        Funcionalidad y practicidad con múltiples compartimentos.
-                                    </Typography>
-                                    <Button component={RouterLink} to="/categoria/multibolsillos" variant="text" color="primary">
-                                        Explorar
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card sx={{ height: "100%", backgroundColor: "#1e1e1e" }}>
-                                <CardMedia component="img" sx={{ height: { xs: 140, sm: 180, md: 200 } }} image="/images/category-3.jpg" alt="Ignífugos" />
-                                <CardContent>
-                                    <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: "bold" }}>
-                                        Ignífugos
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                        Protección contra el fuego y altas temperaturas.
-                                    </Typography>
-                                    <Button component={RouterLink} to="/categoria/ignifugos" variant="text" color="primary">
-                                        Explorar
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    </Grid>
+                    <Box ref={categoriesGridRef}>
+                        <CategoriesCarousel categories={categories} />
+                    </Box>
                 </Container>
             </Box>
 

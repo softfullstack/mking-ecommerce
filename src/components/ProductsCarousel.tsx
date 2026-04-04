@@ -194,7 +194,7 @@ const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
 
                             return (
                                 <Card
-                                    key={product.id}
+                                    key={product.uuid}
                                     component={Link}
                                     to={`/producto/${productIdentifier}`}
                                     sx={{
