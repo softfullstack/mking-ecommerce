@@ -502,9 +502,9 @@ const FavoritesSection = () => {
   const [sizeDialogOpen, setSizeDialogOpen] = useState(false);
   const [selectedProductForSize, setSelectedProductForSize] = useState<any>(null);
 
-  const handleRemoveFavorite = async (productId: number, product: any) => {
+  const handleRemoveFavorite = async (productIdentifier: string | number, product: any) => {
     try {
-      await DeleteFavoriteService(productId);
+      await DeleteFavoriteService(productIdentifier as any);
       toggleFavoriteAction(product);
       toast.success('Eliminado de favoritos');
     } catch (error) {
@@ -607,7 +607,7 @@ const FavoritesSection = () => {
                     size="small"
                     color="error"
                     sx={{ bgcolor: 'rgba(211, 47, 47, 0.05)' }}
-                    onClick={() => handleRemoveFavorite(fav.id, fav)}
+                    onClick={() => handleRemoveFavorite(getPreferredIdentifier(fav) as any, fav)}
                   >
                     <DeleteIcon fontSize="small" />
                   </IconButton>

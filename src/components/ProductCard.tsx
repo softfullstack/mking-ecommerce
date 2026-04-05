@@ -53,7 +53,7 @@ const ProductCard = ({ product }: { product: Product }) => {
     const productIdentifier = getPreferredIdentifier({ uuid, id })
 
     const { user, toggleFavoriteAction, isAuthenticated } = useAuthStore()
-    const isFavorite = user?.favorites?.some((f: any) => f.id === id)
+    const isFavorite = user?.favorites?.some((f: any) => getPreferredIdentifier(f) === productIdentifier)
 
     const handleToggleFavorite = async (e: React.MouseEvent) => {
         e.preventDefault()
@@ -65,7 +65,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         }
 
         try {
-            await ToggleFavoriteService(id)
+            await ToggleFavoriteService(productIdentifier)
             toggleFavoriteAction(product)
         } catch (error) {
             console.error("Error toggling favorite:", error)

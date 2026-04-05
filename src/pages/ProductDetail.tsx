@@ -30,7 +30,8 @@ const ProductDetail = () => {
     const [modalActiveStep, setModalActiveStep] = useState(0)
     const { addToCart } = useCartStore()
     const { user, toggleFavoriteAction, isAuthenticated } = useAuthStore()
-    const isFavorite = user?.favorites?.some((f: any) => f.id === product?.id)
+    const productIdentifier = product ? getPreferredIdentifier(product) : "";
+    const isFavorite = user?.favorites?.some((f: any) => getPreferredIdentifier(f) === productIdentifier)
 
     // Fetch product data
     useEffect(() => {
@@ -183,7 +184,7 @@ const ProductDetail = () => {
         }
 
         try {
-            await ToggleFavoriteService(product.uuid)
+            await ToggleFavoriteService(productIdentifier)
             toggleFavoriteAction(product)
 
             toast.success(!isFavorite ? "Producto añadido a favoritos" : "Producto eliminado de favoritos")

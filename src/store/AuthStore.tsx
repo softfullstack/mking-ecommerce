@@ -35,10 +35,13 @@ const useAuthStore = create<AuthState>()(
             toggleFavoriteAction: (product: any) => set((state: AuthState) => {
                 if (!state.user) return state;
                 const favorites = state.user.favorites || [];
-                const isFavorite = favorites.some((f: any) => f.id === product.id);
+                // Se usa un fallback simple, la lógica real idealmente debería usar un id consistente o uuid si existe.
+                const pId = product.uuid || product.id;
+                
+                const isFavorite = favorites.some((f: any) => (f.uuid || f.id) === pId);
 
                 const newFavorites = isFavorite
-                    ? favorites.filter((f: any) => f.id !== product.id)
+                    ? favorites.filter((f: any) => (f.uuid || f.id) !== pId)
                     : [...favorites, product];
 
                 return {
