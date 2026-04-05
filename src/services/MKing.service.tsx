@@ -84,8 +84,8 @@ export const getProductByUuid = (uuid: string) => axios.get(`${apiUrl}/products/
 
 export const getProductsByCategory = (categoryId: number) => axios.get(`${apiUrl}/product/category/${categoryId}`);
 
-export const ToggleFavoriteService = (id: number) => axios.post(`${apiUrl}/favorites/${id}`);
-export const DeleteFavoriteService = (id: number) => axios.delete(`${apiUrl}/favorites/${id}`);
+export const ToggleFavoriteService = (id: string) => axios.post(`${apiUrl}/favorites/${id}`);
+export const DeleteFavoriteService = (id: string) => axios.delete(`${apiUrl}/favorites/${id}`);
 
 export const GetCartService = () => axios.get(`${apiUrl}/cart`);
 // Client Orders

@@ -159,7 +159,7 @@ const ProductDetail = () => {
 
     const handleAddToCart = () => {
         if (selectedColor === null || !selectedSize) {
-            toast.warning("Por favor selecciona color y talla")
+            toast.warning("Por favor selecciona la talla")
             return
         }
         // Buscar el color seleccionado como objeto para pasarlo al si es necesario
@@ -183,7 +183,7 @@ const ProductDetail = () => {
         }
 
         try {
-            await ToggleFavoriteService(product.id)
+            await ToggleFavoriteService(product.uuid)
             toggleFavoriteAction(product)
 
             toast.success(!isFavorite ? "Producto añadido a favoritos" : "Producto eliminado de favoritos")

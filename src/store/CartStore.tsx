@@ -28,7 +28,8 @@ const syncCart = async (items: CartItem[]) => {
     if (token) {
         try {
             const backendItems = items.map((item) => ({
-                productId: item.id,
+                productUuid: item.uuid,
+                productId: item.id, // Enviar también el id por compatibilidad o fallback
                 quantity: item.quantity,
                 price: item.price,
                 // Si tienes lógica de personalización en el frontend, puedes mapearla aquí
@@ -53,7 +54,7 @@ const useCartStore = create<CartStore>()(
                 const { items } = get()
 
                 const existingItemIndex = items.findIndex(
-                    (item) => item.id === product.id && item.size === size && item.color === color,
+                    (item) => item.uuid === product.uuid && item.size === size && item.color === color,
                 )
 
                 let newItems = [...items]
