@@ -38,6 +38,9 @@ const Register = () => {
     } = useForm<RegisterFormData>()
 
     const passwordValue = watch("password", "")
+    const confirmPasswordValue = watch("confirmPassword", "")
+    const isPasswordMatch = confirmPasswordValue.length > 0 && passwordValue === confirmPasswordValue && !errors.confirmPassword
+    const isPasswordMismatch = confirmPasswordValue.length > 0 && passwordValue !== confirmPasswordValue
 
     const onSubmit = async (data: RegisterFormData) => {
         setRegisterError("")
@@ -183,7 +186,19 @@ const Register = () => {
                             validate: (value) => value === passwordValue || "Las contraseñas no coinciden",
                         })}
                         error={!!errors.confirmPassword}
-                        helperText={errors.confirmPassword?.message as string}
+                        color={isPasswordMatch ? "success" : "primary"}
+                        helperText={
+                            errors.confirmPassword?.message 
+                                ? errors.confirmPassword.message as string 
+                                : isPasswordMatch 
+                                    ? "Las contraseñas coinciden" 
+                                    : ""
+                        }
+                        FormHelperTextProps={{
+                            sx: {
+                                color: isPasswordMatch ? "success.main" : undefined
+                            }
+                        }}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
