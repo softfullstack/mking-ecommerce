@@ -185,14 +185,16 @@ const Register = () => {
                             required: "Por favor confirma tu contraseña",
                             validate: (value) => value === passwordValue || "Las contraseñas no coinciden",
                         })}
-                        error={!!errors.confirmPassword}
+                        error={!!errors.confirmPassword || isPasswordMismatch}
                         color={isPasswordMatch ? "success" : "primary"}
                         helperText={
-                            errors.confirmPassword?.message 
-                                ? errors.confirmPassword.message as string 
-                                : isPasswordMatch 
-                                    ? "Las contraseñas coinciden" 
-                                    : ""
+                            errors.confirmPassword?.type === "required"
+                                ? (errors.confirmPassword.message as string)
+                                : isPasswordMismatch
+                                ? "Las contraseñas no coinciden"
+                                : isPasswordMatch
+                                ? "Las contraseñas coinciden"
+                                : ""
                         }
                         FormHelperTextProps={{
                             sx: {
