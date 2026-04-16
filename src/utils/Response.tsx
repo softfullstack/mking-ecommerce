@@ -23,7 +23,7 @@ export const Response = (code: any, msg?: string) => {
             toast.error("No se encontro recurso");
             break;
         case 401:
-            toast.error("Usuario no autorizado");
+            toast.warning("Inicia sesión");
             break;
         case 201:
             toast.success(msg ? msg : "Se guardaron los datos");

@@ -15,6 +15,7 @@ import About from "./pages/About"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ScrollToTop from "./components/ScrollToTop"
 import PageTransition from "./components/PageTransition"
+import ProtectedRoute from "./components/ProtectedRoute"
 import { useEffect } from 'react'
 import { GetMeService } from './services/MKing.service'
 import useAuthStore from './store/AuthStore'
@@ -63,7 +64,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Register />} />
             <Route path="/confirmar-correo" element={<ConfirmEmail />} />
-            <Route path="/perfil" element={<Profile />} />
+            <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/nosotros" element={<About />} />
           </Routes>
         </PageTransition>

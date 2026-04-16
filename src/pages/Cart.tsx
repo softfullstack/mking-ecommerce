@@ -26,9 +26,12 @@ import useAuthStore from "../store/AuthStore"
 import { getPreferredIdentifier } from "../utils/uuidUtils"
 import ProductCustomizer from "../components/ProductCustomizer"
 import { ItemCustomization } from "../interfaces/CustomizationInterface"
-import { GetAddressesService, CreateAddressService } from "../services/MKing.service"
+import { GetAddressesService, CreateAddressService, ProcessPaymentService } from "../services/MKing.service"
 import AddressDialog from "../components/AddressDialog"
+import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react'
 import { toast } from "react-toastify"
+
+initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '')
 
 const Cart = () => {
     const navigate = useNavigate()
@@ -46,6 +49,7 @@ const Cart = () => {
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null)
     const [loadingAddresses, setLoadingAddresses] = useState(false)
     const [openAddressDialog, setOpenAddressDialog] = useState(false)
+    const [paymentProcessing, setPaymentProcessing] = useState(false)
 
     useEffect(() => {
         if (activeStep === 1 && isAuthenticated) {
@@ -119,7 +123,7 @@ const Cart = () => {
         }
     }
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (activeStep === 0 && !isAuthenticated) {
             navigate("/login", { state: { from: "/carrito" } })
             return
@@ -131,13 +135,44 @@ const Cart = () => {
         }
 
         setActiveStep((prevStep) => prevStep + 1)
+    }
 
-        // If we reach the confirmation step, clear the cart
-        if (activeStep === 2) {
-            // In a real app, this would process payment and create an order
-            setTimeout(() => {
-                clearCart()
-            }, 1000)
+    const handlePaymentSubmit = async (formData: any) => {
+        setPaymentProcessing(true)
+        try {
+            console.log('MP formData recibido:', formData) // para debug
+            const response = await ProcessPaymentService({
+                token: formData.token,
+                issuer_id: formData.issuer_id,
+                payment_method_id: formData.payment_method_id,
+                transaction_amount: calculateTotal(),
+                installments: formData.installments,
+                description: `Pedido Maquila King - ${totalItems} artículo(s)`,
+                payer: {
+                    email: formData.payer?.email,
+                    identification: formData.payer?.identification,
+                },
+            })
+
+            const { status, message, statusDetail } = response.data
+
+            if (status === 'approved') {
+                toast.success('¡Pago aprobado! Procesando tu pedido...')
+                setActiveStep(3)
+                setTimeout(() => clearCart(), 1000)
+            } else if (status === 'pending') {
+                toast.info('Tu pago está en proceso. Te notificaremos por correo.')
+                setActiveStep(3)
+            } else {
+                // rejected
+                toast.error(`Pago rechazado: ${statusDetail || message}. Intenta con otra tarjeta.`)
+            }
+        } catch (error: any) {
+            console.error('Error processing payment:', error)
+            const msg = error?.response?.data?.message || 'Error al procesar el pago'
+            toast.error(msg)
+        } finally {
+            setPaymentProcessing(false)
         }
     }
 
@@ -530,68 +565,76 @@ const Cart = () => {
     // Payment step content
     const renderPaymentContent = () => (
         <Paper sx={{ p: 3, backgroundColor: "#1e1e1e" }}>
-            <Typography variant="h6" sx={{ mb: 3 }}>
+            <Typography variant="h6" sx={{ mb: 1 }}>
                 Información de Pago
             </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                💳 Pago 100% seguro procesado por Mercado Pago
+            </Typography>
 
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <TextField fullWidth label="Número de Tarjeta" variant="outlined" placeholder="1234 5678 9012 3456" />
+            <Grid container spacing={3}>
+                {/* Card Payment Form */}
+                <Grid item xs={12} md={7}>
+                    <CardPayment
+                        initialization={{ amount: calculateTotal() }}
+                        onSubmit={handlePaymentSubmit}
+                        onError={(error) => {
+                            console.error('MP CardPayment error:', error)
+                            toast.error('Error en el formulario de pago')
+                        }}
+                        customization={{
+                            paymentMethods: { minInstallments: 1, maxInstallments: 12 }
+                        }}
+                    />
+                    {paymentProcessing && (
+                        <Typography align="center" sx={{ mt: 2 }} color="text.secondary">
+                            Procesando pago...
+                        </Typography>
+                    )}
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Fecha de Expiración" variant="outlined" placeholder="MM/AA" />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="CVV" variant="outlined" placeholder="123" />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField fullWidth label="Nombre en la Tarjeta" variant="outlined" />
+
+                {/* Order Summary */}
+                <Grid item xs={12} md={5}>
+                    <Box sx={{ bgcolor: '#2a2a2a', borderRadius: 2, p: 2.5 }}>
+                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+                            Resumen del Pedido
+                        </Typography>
+
+                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                            <Typography variant="body2">Subtotal</Typography>
+                            <Typography variant="body2">${calculateSubtotal().toFixed(2)}</Typography>
+                        </Box>
+
+                        {couponDiscount > 0 && (
+                            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                                <Typography variant="body2">Descuento</Typography>
+                                <Typography variant="body2" color="error">
+                                    -${calculateDiscount().toFixed(2)}
+                                </Typography>
+                            </Box>
+                        )}
+
+                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                            <Typography variant="body2">Envío</Typography>
+                            <Typography variant="body2">
+                                {calculateShipping() === 0 ? "Gratis" : `$${calculateShipping().toFixed(2)}`}
+                            </Typography>
+                        </Box>
+
+                        <Divider sx={{ my: 1.5 }} />
+
+                        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="body1" sx={{ fontWeight: "bold" }}>Total</Typography>
+                            <Typography variant="body1" color="primary" sx={{ fontWeight: "bold" }}>
+                                ${calculateTotal().toFixed(2)}
+                            </Typography>
+                        </Box>
+                    </Box>
                 </Grid>
             </Grid>
 
             <Box sx={{ mt: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-                    Resumen del Pedido
-                </Typography>
-
-                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                    <Typography variant="body2">Subtotal</Typography>
-                    <Typography variant="body2">${calculateSubtotal().toFixed(2)}</Typography>
-                </Box>
-
-                {couponDiscount > 0 && (
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                        <Typography variant="body2">Descuento</Typography>
-                        <Typography variant="body2" color="error">
-                            -${calculateDiscount().toFixed(2)}
-                        </Typography>
-                    </Box>
-                )}
-
-                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                    <Typography variant="body2">Envío</Typography>
-                    <Typography variant="body2">
-                        {calculateShipping() === 0 ? "Gratis" : `$${calculateShipping().toFixed(2)}`}
-                    </Typography>
-                </Box>
-
-                <Divider sx={{ my: 1 }} />
-
-                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                        Total
-                    </Typography>
-                    <Typography variant="body1" color="primary" sx={{ fontWeight: "bold" }}>
-                        ${calculateTotal().toFixed(2)}
-                    </Typography>
-                </Box>
-            </Box>
-
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
                 <Button onClick={handleBack}>Volver</Button>
-                <Button variant="contained" color="primary" onClick={handleNext}>
-                    Confirmar Pedido
-                </Button>
             </Box>
         </Paper>
     )

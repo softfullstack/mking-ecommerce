@@ -10,43 +10,43 @@ interface AddressDialogProps {
 
 const AddressDialog = ({ open, onClose, address, onSave }: AddressDialogProps) => {
     const [formData, setFormData] = useState({
-        recipient_name: '',
+        recipientName: '',
         phone: '',
         street: '',
-        exterior_number: '',
-        interior_number: '',
+        exteriorNumber: '',
+        interiorNumber: '',
         neighborhood: '',
         municipality: '',
         state: '',
-        postal_code: '',
+        postalCode: '',
         references: ''
     });
 
     useEffect(() => {
         if (address) {
             setFormData({
-                recipient_name: address.recipient_name || '',
+                recipientName: address.recipientName || address.recipient_name || '',
                 phone: address.phone || '',
                 street: address.street || '',
-                exterior_number: address.exterior_number || '',
-                interior_number: address.interior_number || '',
+                exteriorNumber: address.exteriorNumber || address.exterior_number || '',
+                interiorNumber: address.interiorNumber || address.interior_number || '',
                 neighborhood: address.neighborhood || '',
                 municipality: address.municipality || '',
                 state: address.state || '',
-                postal_code: address.postal_code || '',
+                postalCode: address.postalCode || address.postal_code || '',
                 references: address.references || ''
             });
         } else {
             setFormData({
-                recipient_name: '',
+                recipientName: '',
                 phone: '',
                 street: '',
-                exterior_number: '',
-                interior_number: '',
+                exteriorNumber: '',
+                interiorNumber: '',
                 neighborhood: '',
                 municipality: '',
                 state: '',
-                postal_code: '',
+                postalCode: '',
                 references: ''
             });
         }
@@ -65,13 +65,13 @@ const AddressDialog = ({ open, onClose, address, onSave }: AddressDialogProps) =
             <DialogTitle>{address ? 'Editar Dirección' : 'Nueva Dirección de Envío'}</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-                    <TextField label="Nombre de quien recibe" name="recipient_name" value={formData.recipient_name} onChange={handleChange} fullWidth size="small" />
+                    <TextField label="Nombre de quien recibe" name="recipientName" value={formData.recipientName} onChange={handleChange} fullWidth size="small" />
                     <TextField label="Teléfono de contacto" name="phone" value={formData.phone} onChange={handleChange} fullWidth size="small" />
                     <Grid container spacing={2}>
                         <Grid item xs={8}><TextField label="Calle" name="street" value={formData.street} onChange={handleChange} fullWidth size="small" /></Grid>
-                        <Grid item xs={4}><TextField label="CP" name="postal_code" value={formData.postal_code} onChange={handleChange} fullWidth size="small" /></Grid>
-                        <Grid item xs={6}><TextField label="No. Exterior" name="exterior_number" value={formData.exterior_number} onChange={handleChange} fullWidth size="small" /></Grid>
-                        <Grid item xs={6}><TextField label="No. Interior" name="interior_number" value={formData.interior_number} onChange={handleChange} fullWidth size="small" /></Grid>
+                        <Grid item xs={4}><TextField label="CP" name="postalCode" value={formData.postalCode} onChange={handleChange} fullWidth size="small" /></Grid>
+                        <Grid item xs={6}><TextField label="No. Exterior" name="exteriorNumber" value={formData.exteriorNumber} onChange={handleChange} fullWidth size="small" /></Grid>
+                        <Grid item xs={6}><TextField label="No. Interior" name="interiorNumber" value={formData.interiorNumber} onChange={handleChange} fullWidth size="small" /></Grid>
                     </Grid>
                     <TextField label="Colonia" name="neighborhood" value={formData.neighborhood} onChange={handleChange} fullWidth size="small" />
                     <Grid container spacing={2}>

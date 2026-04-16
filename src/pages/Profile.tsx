@@ -301,7 +301,7 @@ const ProfileSection = () => {
               </TextField>
             </Grid>
             {renderTextField("RFC", "rfc")}
-            {renderTextField("Razón Social / Nombre Fiscal", "businessName")}
+            {formData.personType === 'persona moral' && renderTextField("Razón Social / Nombre Fiscal", "businessName")}
 
             {/* CFDI USE SELECT */}
             <Grid item xs={12} sm={6}>
