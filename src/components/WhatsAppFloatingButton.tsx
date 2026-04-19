@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fab, Zoom, useTheme, Tooltip } from '@mui/material';
+import { Fab, Zoom, Tooltip } from '@mui/material';
 import { WhatsApp as WhatsAppIcon } from '@mui/icons-material';
 import { useLocation } from 'react-router-dom';
 
@@ -12,7 +12,6 @@ const WhatsAppFloatingButton: React.FC<WhatsAppFloatingButtonProps> = ({
     phoneNumber,
     productName
 }) => {
-    const theme = useTheme();
     const location = useLocation();
 
     const handleWhatsAppClick = () => {

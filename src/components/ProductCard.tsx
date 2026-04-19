@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton, CardActions, Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material"
+import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, RadioGroup, FormControlLabel, Radio, CardActions, Button } from "@mui/material"
 import { Link } from "react-router-dom"
 import { Product } from "../interfaces/ProductInterface"
 import { useState, useEffect } from "react"
@@ -75,7 +75,6 @@ const ProductCard = ({ product }: { product: Product }) => {
     const categoryTitle = (product as any).category?.name || (product.categories && product.categories[0]) || "Categoría"
 
     const normalizedColors = colors?.map((c: any) => typeof c === 'string' ? c : (c.hex_code || c)) || []
-    const remainingColors = normalizedColors.length > 1 ? normalizedColors.slice(1) : []
 
     const normalizedSizesChoices = Array.isArray(product.sizes)
         ? product.sizes.map((s: any) => typeof s === 'object' && s.name ? s.name : s)

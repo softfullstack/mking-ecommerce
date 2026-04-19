@@ -151,9 +151,6 @@ const ProductDetail = () => {
         setTabValue(newValue)
     }
 
-    const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedColor(Number(event.target.value))
-    }
 
     const handleSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedSize(event.target.value)

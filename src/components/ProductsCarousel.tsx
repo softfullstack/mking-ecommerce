@@ -1,16 +1,22 @@
 import React from 'react';
-import { Box, IconButton, useTheme, useMediaQuery } from '@mui/material';
+import { Box, IconButton, useTheme, useMediaQuery, Typography } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import ProductCard from './ProductCard';
 
 interface ProductsCarouselProps {
     products: any[];
+    title?: string;
+    subtitle?: string;
+    showNavigation?: boolean;
     autoPlay?: boolean;
     autoPlayInterval?: number;
 }
 
 const ProductsCarousel: React.FC<ProductsCarouselProps> = ({ 
     products, 
+    title,
+    subtitle,
+    showNavigation = true,
     autoPlay = true,
     autoPlayInterval = 4000
 }) => {
@@ -120,8 +126,22 @@ const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
 
     return (
         <Box sx={{ position: 'relative', width: '100%' }}>
+            {(title || subtitle) && (
+                <Box sx={{ mb: { xs: 2, md: 4 } }}>
+                    {title && (
+                        <Typography variant="h4" component="h2" sx={{ fontWeight: "bold", fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2.125rem" } }}>
+                            {title}
+                        </Typography>
+                    )}
+                    {subtitle && (
+                        <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                            {subtitle}
+                        </Typography>
+                    )}
+                </Box>
+            )}
             <Box sx={{ position: 'relative' }}>
-                {products.length > itemsPerView && (
+                {showNavigation && products.length > itemsPerView && (
                     <>
                         <IconButton
                             onClick={handlePrevious}
