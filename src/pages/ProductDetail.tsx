@@ -15,8 +15,10 @@ import useAuthStore from "../store/AuthStore"
 import { ToggleFavoriteService } from "../services/MKing.service"
 import { showCartToast } from "../utils/toastUtils"
 import { toast } from "react-toastify"
+import useUIStore from "../store/UIStore"
 
 const ProductDetail = () => {
+    const { setProductName } = useUIStore()
     const { uuid } = useParams()
     const navigate = useNavigate()
     const [product, setProduct] = useState<Product | null>(null)
@@ -54,6 +56,7 @@ const ProductDetail = () => {
                     }
 
                     const foundProduct = response.data
+                    setProductName(foundProduct.name) // Set for WhatsApp button
 
                     // Transformar el producto principal para incluir isNew
                     const transformedProduct = {
@@ -123,7 +126,11 @@ const ProductDetail = () => {
             }
         }
         fetchProduct()
-    }, [uuid])
+
+        return () => {
+            setProductName(null) // Clean up on leave
+        }
+    }, [uuid, setProductName])
 
     if (!product) {
         return (
@@ -194,14 +201,32 @@ const ProductDetail = () => {
         }
     }
 
-    const handleShare = () => {
-        navigator.clipboard.writeText(window.location.href)
-        toast.info("Enlace copiado al portapapeles")
-    }
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: product?.name,
+                    text: `Mira este producto en MKing: ${product?.name}`,
+                    url: window.location.href,
+                });
+            } catch (err) {
+                console.error("Error sharing:", err);
+                // Si el usuario cancela no hacemos nada, pero si falla por otra cosa copiamos
+                if ((err as Error).name !== 'AbortError') {
+                    copyToClipboard();
+                }
+            }
+        } else {
+            copyToClipboard();
+        }
+    };
 
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(window.location.href);
+        toast.info("Enlace copiado al portapapeles");
+    };
 
     const handleColorClick = (colorId: number) => {
-        // Buscar el producto que tenga este color
         const productWithColor = relatedProducts.find(p =>
             p.colors && p.colors.some((c: any) => c.id === colorId)
         )
@@ -211,9 +236,6 @@ const ProductDetail = () => {
             navigate(`/producto/${productIdentifier}`)
         }
     }
-
-
-
 
     const getSizeName = (sizeId: string) => {
         const sizeMap: Record<string, string> = {
@@ -236,19 +258,41 @@ const ProductDetail = () => {
         setIsImageModalOpen(false)
     }
 
+    // Helper to get absolute image URL for meta tags
+    const getAbsoluteImageUrl = () => {
+        if (!product || !product.images || product.images.length === 0) return "";
+        const img = product.images[0];
+        const url = img.url || img.image_path || "";
+        if (url.startsWith('http')) return url;
+        return `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+    };
+
+    const absoluteImageUrl = getAbsoluteImageUrl();
+
     return (
         <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
             <Helmet>
                 <title>{product.name} | Chaleco de Seguridad Industrial - MKing México</title>
                 <meta name="description" content={`Compra ${product.name} en MKing. ${product.description ? product.description.substring(0, 120) : 'Chaleco de seguridad industrial de alta calidad'}. Precio: $${Number(product.price).toFixed(2)}. Envíos a todo México.`} />
                 <link rel="canonical" href={`https://mking.com.mx/producto/${uuid}`} />
+                
+                {/* Open Graph / Facebook */}
+                <meta property="og:type" content="product" />
+                <meta property="og:url" content={window.location.href} />
                 <meta property="og:title" content={`${product.name} | MKing`} />
                 <meta property="og:description" content={`${product.name} - $${Number(product.price).toFixed(2)} MXN. Chaleco de seguridad industrial de alta calidad.`} />
-                <meta property="og:type" content="product" />
-                <meta property="og:url" content={`https://mking.com.mx/producto/${uuid}`} />
-                {product.images && product.images.length > 0 && (
-                    <meta property="og:image" content={product.images[0].url || product.images[0].image_path} />
-                )}
+                {absoluteImageUrl && <meta property="og:image" content={absoluteImageUrl} />}
+                {absoluteImageUrl && <meta property="og:image:secure_url" content={absoluteImageUrl} />}
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+
+                {/* Twitter */}
+                <meta property="twitter:card" content="summary_large_image" />
+                <meta property="twitter:url" content={window.location.href} />
+                <meta property="twitter:title" content={`${product.name} | MKing`} />
+                <meta property="twitter:description" content={`${product.name} - $${Number(product.price).toFixed(2)} MXN. Chaleco de seguridad industrial de alta calidad.`} />
+                {absoluteImageUrl && <meta property="twitter:image" content={absoluteImageUrl} />}
+
                 <meta property="product:price:amount" content={String(product.price)} />
                 <meta property="product:price:currency" content="MXN" />
             </Helmet>
@@ -318,191 +362,107 @@ const ProductDetail = () => {
 
                         <Divider sx={{ mb: 3 }} />
 
-                        {/* Color selection */}
-                        <FormControl component="fieldset" sx={{ mb: 3 }}>
-                            <FormLabel component="legend" sx={{ fontWeight: "bold", color: "text.primary" }}>
-                                Color
-                            </FormLabel>
-                            <RadioGroup row aria-label="color" name="color" value={selectedColor ?? ''} onChange={handleColorChange}>
-                                {Array.isArray(product.colors) && product.colors.length > 0
-                                    ? product.colors.map((color: any, idx: number) => {
-                                        const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
-                                        const isSelected = selectedColor === color.id;
+                        {/* Color selection combined */}
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                Colores
+                            </Typography>
+                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                                {/* Renderear los colores del producto actual primero */}
+                                {Array.isArray(product.colors) && product.colors.map((color: any, idx: number) => {
+                                    const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
+                                    const isSelected = selectedColor === color.id;
 
+                                    return (
+                                        <Box
+                                            key={`current-${color.id || color.name || idx}`}
+                                            onClick={() => setSelectedColor(color.id)}
+                                            sx={{
+                                                width: 30,
+                                                height: 30,
+                                                borderRadius: "50%",
+                                                border: isSelected ? "3px solid #1976d2" : "2px solid #e0e0e0",
+                                                background: hasSecondColor
+                                                    ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
+                                                    : color.hex_code,
+                                                boxShadow: isSelected
+                                                    ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)"
+                                                    : "0 2px 8px rgba(0,0,0,0.1)",
+                                                transition: "all 0.3s ease-in-out",
+                                                cursor: "pointer",
+                                                "&:hover": {
+                                                    transform: "scale(1.08)",
+                                                    boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+                                                    border: isSelected ? "1px solid #1976d2" : "1px solid #bdbdbd",
+                                                },
+                                                position: "relative",
+                                                overflow: "hidden",
+                                            }}
+                                            title={color.name}
+                                        >
+                                            {isSelected && (
+                                                <Box
+                                                    sx={{
+                                                        position: "absolute",
+                                                        top: "50%",
+                                                        left: "50%",
+                                                        transform: "translate(-50%, -50%)",
+                                                        width: 10,
+                                                        height: 10,
+                                                        borderRadius: "50%",
+                                                        backgroundColor: "white",
+                                                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                                                    }}
+                                                />
+                                            )}
+                                        </Box>
+                                    );
+                                })}
+
+                                {/* Renderear colores de productos relacionados */}
+                                {relatedProducts.map((relatedProduct) =>
+                                    relatedProduct.colors?.map((color: any) => {
+                                        const isCurrentProductColor = product.colors?.some((c: any) => c.id === color.id);
+                                        if (isCurrentProductColor) return null;
+
+                                        const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
                                         return (
-                                            <FormControlLabel
-                                                key={color.id || color.name || idx}
-                                                value={color.id || color.name}
-                                                control={
-                                                    <Radio
-                                                        sx={{
-                                                            color: "transparent",
-                                                            "&.Mui-checked": {
-                                                                color: "transparent",
-                                                            },
-                                                        }}
-                                                    />
-                                                }
-                                                label={
-                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                                                        {/* Indicador de color combinado */}
-                                                        <Box
-                                                            sx={{
-                                                                width: 36,
-                                                                height: 36,
-                                                                borderRadius: "50%",
-                                                                border: isSelected ? "3px solid #1976d2" : "2px solid #e0e0e0",
-                                                                background: hasSecondColor
-                                                                    ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
-                                                                    : color.hex_code,
-                                                                boxShadow: isSelected
-                                                                    ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)"
-                                                                    : "0 2px 8px rgba(0,0,0,0.1)",
-                                                                transition: "all 0.3s ease-in-out",
-                                                                cursor: "pointer",
-                                                                "&:hover": {
-                                                                    transform: "scale(1.08)",
-                                                                    boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
-                                                                    border: isSelected ? "3px solid #1976d2" : "2px solid #bdbdbd",
-                                                                },
-                                                                position: "relative",
-                                                                overflow: "hidden",
-                                                            }}
-                                                        >
-                                                            {/* Indicador de selección interno */}
-                                                            {isSelected && (
-                                                                <Box
-                                                                    sx={{
-                                                                        position: "absolute",
-                                                                        top: "50%",
-                                                                        left: "50%",
-                                                                        transform: "translate(-50%, -50%)",
-                                                                        width: 12,
-                                                                        height: 12,
-                                                                        borderRadius: "50%",
-                                                                        backgroundColor: "white",
-                                                                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                                                                    }}
-                                                                />
-                                                            )}
-                                                        </Box>
-                                                    </Box>
-                                                }
+                                            <Box
+                                                key={`related-${relatedProduct.id}-${color.id}`}
+                                                onClick={() => handleColorClick(color.id)}
                                                 sx={{
-                                                    margin: 0,
-                                                    marginRight: 2,
-                                                    marginBottom: 1,
+                                                    width: 30,
+                                                    height: 30,
+                                                    borderRadius: "50%",
+                                                    cursor: "pointer",
+                                                    border: "2px solid #e0e0e0",
+                                                    background: hasSecondColor
+                                                        ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
+                                                        : color.hex_code,
+                                                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                                    transition: "all 0.3s ease-in-out",
+                                                    "&:hover": {
+                                                        transform: "scale(1.1)",
+                                                        boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+                                                        border: "2px solid #bdbdbd",
+                                                    },
+                                                    position: "relative",
+                                                    overflow: "hidden",
                                                 }}
+                                                title={`${color.name} - ${relatedProduct.name}`}
                                             />
                                         );
-                                    })
-                                    : null}
-                            </RadioGroup>
-                        </FormControl>
-
-                        {/* Otros colores disponibles */}
-                        {(relatedProducts.length > 0 || (product.colors && product.colors.length > 1)) && (
-                            <Box sx={{ mb: 3 }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 2 }}>
-                                    Otros colores disponibles
-                                </Typography>
-                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
-                                    {relatedProducts.length > 0 ? (
-                                        // Mostrar colores de productos relacionados
-                                        relatedProducts.map((relatedProduct) =>
-                                            relatedProduct.colors?.map((color: any) => {
-                                                // Evitar mostrar colores que ya están seleccionados en el producto actual
-                                                const isCurrentProductColor = product.colors?.some((c: any) => c.id === color.id)
-                                                if (isCurrentProductColor) return null
-
-                                                const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
-                                                return (
-                                                    <Box
-                                                        key={`${relatedProduct.id}-${color.id}`}
-                                                        onClick={() => handleColorClick(color.id)}
-                                                        sx={{
-                                                            width: 44,
-                                                            height: 44,
-                                                            borderRadius: "50%",
-                                                            cursor: "pointer",
-                                                            border: "2px solid #e0e0e0",
-                                                            background: hasSecondColor
-                                                                ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
-                                                                : color.hex_code,
-                                                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                                                            transition: "all 0.3s ease-in-out",
-                                                            "&:hover": {
-                                                                transform: "scale(1.1)",
-                                                                boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
-                                                                border: "2px solid #bdbdbd",
-                                                            },
-                                                            position: "relative",
-                                                            overflow: "hidden",
-                                                        }}
-                                                        title={`${color.name} - ${relatedProduct.name}`}
-                                                    />
-                                                );
-                                            }).filter(Boolean) // Filtrar los null
-                                        )
-                                    ) : (
-                                        // Mostrar todos los colores del producto actual
-                                        product.colors?.map((color: any) => {
-                                            const hasSecondColor = color.hex_code_1 && color.hex_code_1 !== null;
-                                            const isSelected = selectedColor === color.id;
-                                            return (
-                                                <Box
-                                                    key={color.id}
-                                                    onClick={() => setSelectedColor(color.id)}
-                                                    sx={{
-                                                        width: 44,
-                                                        height: 44,
-                                                        borderRadius: "50%",
-                                                        cursor: "pointer",
-                                                        border: isSelected ? "3px solid #1976d2" : "2px solid #e0e0e0",
-                                                        background: hasSecondColor
-                                                            ? `linear-gradient(130deg, ${color.hex_code} 50%, ${color.hex_code_1} 50%)`
-                                                            : color.hex_code,
-                                                        boxShadow: isSelected
-                                                            ? "0 0 0 3px rgba(25, 118, 210, 0.15), 0 4px 12px rgba(0,0,0,0.15)"
-                                                            : "0 2px 8px rgba(0,0,0,0.1)",
-                                                        transition: "all 0.3s ease-in-out",
-                                                        "&:hover": {
-                                                            transform: "scale(1.1)",
-                                                            boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
-                                                            border: isSelected ? "3px solid #1976d2" : "2px solid #bdbdbd",
-                                                        },
-                                                        position: "relative",
-                                                        overflow: "hidden",
-                                                    }}
-                                                >
-                                                    {/* Indicador de selección interno */}
-                                                    {isSelected && (
-                                                        <Box
-                                                            sx={{
-                                                                position: "absolute",
-                                                                top: "50%",
-                                                                left: "50%",
-                                                                transform: "translate(-50%, -50%)",
-                                                                width: 14,
-                                                                height: 14,
-                                                                borderRadius: "50%",
-                                                                backgroundColor: "white",
-                                                                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                                                            }}
-                                                        />
-                                                    )}
-                                                </Box>
-                                            );
-                                        })
-                                    )}
-                                </Box>
-                                {relatedProducts.every(p => !p.colors || p.colors.length === 0) && product.colors && product.colors.length <= 1 && (
-                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                        No hay otros colores disponibles en esta categoría.
-                                    </Typography>
+                                    }).filter(Boolean)
                                 )}
                             </Box>
-                        )}
+
+                            {/* Fallback si no hay colores extras */}
+                            {relatedProducts.every(p => !p.colors || p.colors.length === 0) && product.colors && product.colors.length <= 1 && (
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    No hay variaciones de color adicionales para este producto.
+                                </Typography>
+                            )}
+                        </Box>
 
                         {/* Size selection */}
                         <FormControl component="fieldset" sx={{ mb: 3 }}>

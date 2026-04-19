@@ -26,7 +26,7 @@ import useAuthStore from "../store/AuthStore"
 import { getPreferredIdentifier } from "../utils/uuidUtils"
 import ProductCustomizer from "../components/ProductCustomizer"
 import { ItemCustomization } from "../interfaces/CustomizationInterface"
-import { GetAddressesService, CreateAddressService, ProcessPaymentService } from "../services/MKing.service"
+import { GetAddressesService, CreateAddressService, ProcessPaymentService, CheckoutService } from "../services/MKing.service"
 import AddressDialog from "../components/AddressDialog"
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react'
 import { toast } from "react-toastify"
@@ -157,9 +157,17 @@ const Cart = () => {
             const { status, message, statusDetail } = response.data
 
             if (status === 'approved') {
-                toast.success('¡Pago aprobado! Procesando tu pedido...')
-                setActiveStep(3)
-                setTimeout(() => clearCart(), 1000)
+                try {
+                    await CheckoutService()
+                    toast.success('¡Pago aprobado! Tu pedido ha sido registrado.')
+                    setActiveStep(3)
+                    setTimeout(() => clearCart(), 1000)
+                } catch (checkoutError) {
+                    console.error('Error creating order after payment:', checkoutError)
+                    toast.warning('Pago aprobado, pero hubo un error al registrar el pedido. Contacta a soporte.')
+                    // Aún mostramos la pantalla de éxito o manejamos el caso
+                    setActiveStep(3)
+                }
             } else if (status === 'pending') {
                 toast.info('Tu pago está en proceso. Te notificaremos por correo.')
                 setActiveStep(3)

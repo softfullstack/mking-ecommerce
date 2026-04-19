@@ -48,6 +48,8 @@ export interface Product {
     images: ApiImage[]
     colors: string[]
     colorIds: number[]
+    color_id?: number
+    originalColors?: any[]
     sizes: string[]
     categories: string[]
     isNew: boolean
@@ -88,7 +90,9 @@ export function transformApiProduct(apiProduct: ApiProduct): Product {
         details: apiProduct.description, // Usando la misma descripción para details
         images: apiProduct.images,
         colors: transformedColors,
+        originalColors: apiProduct.colors,
         colorIds: apiProduct.colors.map(color => color.id),
+        color_id: apiProduct.color_id,
         sizes: ["s", "m", "l", "xl"], // Tamaños por defecto
         categories: [apiProduct.category.name.toLowerCase()],
         isNew: new Date(apiProduct.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Producto nuevo si tiene menos de 7 días

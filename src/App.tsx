@@ -22,8 +22,11 @@ import useAuthStore from './store/AuthStore'
 import useCartStore from './store/CartStore'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import WhatsAppFloatingButton from './components/WhatsAppFloatingButton';
+import useUIStore from './store/UIStore';
 
 function App() {
+  const { currentProductName } = useUIStore()
   const { login, logout } = useAuthStore()
   const { fetchCart } = useCartStore()
 
@@ -69,6 +72,7 @@ function App() {
           </Routes>
         </PageTransition>
         <Footer />
+        <WhatsAppFloatingButton phoneNumber="523351146348" productName={currentProductName} />
       </Router>
     </ThemeProvider>
   )

@@ -135,8 +135,8 @@ const useCartStore = create<CartStore>()(
                             ...item.product,
                             quantity: item.quantity,
                             price: parseFloat(item.price),
-                            size: item.customName, // Mapeo temporal según lo definido en syncCart
-                            color: item.embroideryImage,
+                            size: item.customName || item.custom_name || "",
+                            color: item.embroideryImage || item.embroidery_image || "",
                             customizations: [],
                         }))
 

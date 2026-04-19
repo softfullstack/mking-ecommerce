@@ -64,6 +64,62 @@ const CategoriesCarousel: React.FC<CategoriesCarouselProps> = ({
         return () => clearInterval(interval);
     }, [autoPlay, autoPlayInterval, maxIndex, categories.length, itemsPerView]);
 
+    const [touchStart, setTouchStart] = React.useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = React.useState<number | null>(null);
+    const [isDragging, setIsDragging] = React.useState(false);
+    
+    // the required distance between touchStart and touchEnd to be detected as a swipe
+    const minSwipeDistance = 50; 
+
+    const onTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+        setTouchEnd(null); 
+        const clientX = 'touches' in e ? e.targetTouches[0].clientX : (e as React.MouseEvent).clientX;
+        setTouchStart(clientX);
+    };
+
+    const onTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
+        const clientX = 'touches' in e ? e.targetTouches[0].clientX : (e as React.MouseEvent).clientX;
+        setTouchEnd(clientX);
+    };
+
+    const onTouchEndEvent = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+        
+        if (isLeftSwipe && currentIndex < maxIndex) {
+            handleNext();
+        }
+        if (isRightSwipe && currentIndex > 0) {
+            handlePrevious();
+        }
+    };
+
+    const onMouseDown = (e: React.MouseEvent) => {
+        setIsDragging(true);
+        onTouchStart(e);
+    };
+
+    const onMouseMove = (e: React.MouseEvent) => {
+        if (!isDragging) return;
+        onTouchMove(e);
+    };
+
+    const onMouseUp = () => {
+        if (isDragging) {
+            onTouchEndEvent();
+            setIsDragging(false);
+        }
+    };
+
+    const onMouseLeave = () => {
+        if (isDragging) {
+            onTouchEndEvent();
+            setIsDragging(false);
+        }
+    };
+
     if (categories.length === 0) {
         return null;
     }
@@ -130,7 +186,16 @@ const CategoriesCarousel: React.FC<CategoriesCarouselProps> = ({
                     </>
                 )}
 
-                <Box sx={{ overflow: 'hidden', padding: { xs: '10px 0', md: '20px 0' } }}>
+                <Box 
+                    sx={{ overflow: 'hidden', padding: { xs: '10px 0', md: '20px 0' }, cursor: isDragging ? 'grabbing' : 'grab' }}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEndEvent}
+                    onMouseDown={onMouseDown}
+                    onMouseMove={onMouseMove}
+                    onMouseUp={onMouseUp}
+                    onMouseLeave={onMouseLeave}
+                >
                     <Box
                         sx={{
                             display: 'flex',
@@ -138,6 +203,7 @@ const CategoriesCarousel: React.FC<CategoriesCarouselProps> = ({
                             transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
                             transition: 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)',
                             width: `${(categories.length / itemsPerView) * 100}%`, // Fix width calc for categories
+                            pointerEvents: isDragging ? 'none' : 'auto', // Evita que se activen links mientras arrastras
                         }}
                     >
                         {categories.map((category) => (
@@ -151,37 +217,66 @@ const CategoriesCarousel: React.FC<CategoriesCarouselProps> = ({
                                 <Card 
                                     component={Link}
                                     to={`/productos?categoria=${category.slug}`}
+                                    onClick={(e) => { 
+                                        if (isDragging || touchStart !== touchEnd && touchEnd !== null) { 
+                                            e.preventDefault(); // prevenir navegación si deslizó en móviles o arrastró en PC
+                                        } 
+                                    }}
                                     sx={{ 
-                                        height: '100%', 
-                                        backgroundColor: "#1e1e1e",
+                                        height: { xs: 260, sm: 300, md: 360 }, 
+                                        backgroundColor: "#ffffff",
                                         textDecoration: 'none',
-                                        color: 'inherit',
-                                        display: 'flex',
-                                        flexDirection: 'column',
+                                        position: 'relative',
+                                        overflow: 'hidden',
+                                        display: 'block',
                                         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                                         '&:hover': {
                                             transform: 'translateY(-6px)',
                                             boxShadow: '0 12px 30px rgba(0,0,0,0.3)',
+                                            '& .category-action': {
+                                                opacity: 1,
+                                            }
                                         },
                                     }}
                                 >
                                     <CardMedia 
                                         component="img" 
                                         sx={{ 
-                                            height: { xs: 180, sm: 220, md: 260 },
-                                            objectFit: 'cover'
+                                            height: '100%',
+                                            width: '100%',
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            objectFit: 'contain',
+                                            padding: '10px 10px 80px 10px',
+                                            backgroundColor: '#ffffff'
                                         }} 
                                         image={category.image} 
                                         alt={category.name} 
                                     />
-                                    <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                                        <Typography gutterBottom variant="h5" component="div" sx={{ fontWeight: "bold", color: 'white', textAlign: 'center', m: 0 }}>
+                                    
+                                    {/* Overlay for text */}
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            pt: 10,
+                                            pb: 3,
+                                            background: 'linear-gradient(to top, rgba(20,20,20,0.95) 0%, rgba(20,20,20,0.7) 40%, rgba(20,20,20,0) 100%)',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <Typography variant="h5" component="div" sx={{ fontWeight: "bold", color: 'white', textAlign: 'center', mb: 0.5 }}>
                                             {category.name}
                                         </Typography>
-                                        <Typography className="category-action" variant="button" sx={{ color: 'primary.main', mt: 2, fontWeight: 'bold', opacity: 0.8, transition: '0.2s' }}>
+                                        <Typography className="category-action" variant="button" sx={{ color: 'primary.light', fontWeight: 'bold', opacity: 0.8, transition: '0.2s' }}>
                                             Explorar Colección
                                         </Typography>
-                                    </CardContent>
+                                    </Box>
                                 </Card>
                             </Box>
                         ))}

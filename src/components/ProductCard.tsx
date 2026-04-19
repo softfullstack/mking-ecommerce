@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton } from "@mui/material"
+import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton, CardActions, Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material"
 import { Link } from "react-router-dom"
 import { Product } from "../interfaces/ProductInterface"
 import { useState, useEffect } from "react"
@@ -8,31 +8,33 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"
 import useAuthStore from "../store/AuthStore"
 import { ToggleFavoriteService } from "../services/MKing.service"
 import { toast } from "react-toastify"
+import useCartStore from "../store/CartStore"
+import { showCartToast } from "../utils/toastUtils"
 
 const ProductCard = ({ product }: { product: Product }) => {
     const { id, uuid, name, price, images: originalImages, colors, isNew, discount } = product
     // Reordenar imágenes para que la principal esté primero
     const images = originalImages && Array.isArray(originalImages)
         ? [...originalImages].sort((a, b) => {
-            // Si ambos tienen is_primary, o ambos no lo tienen, no cambiar el orden
             if ((a as any).is_primary === (b as any).is_primary) return 0;
-            // Si a es principal, va antes
             if ((a as any).is_primary) return -1;
-            // Si b es principal, va antes
             if ((b as any).is_primary) return 1;
-            // Si ninguno es principal, no cambiar el orden
             return 0;
         })
         : [];
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [isHovered, setIsHovered] = useState(false)
+    const [isSizeDialogOpen, setIsSizeDialogOpen] = useState(false)
+    const [selectedSize, setSelectedSize] = useState("")
+
+    const { addToCart } = useCartStore()
 
     useEffect(() => {
         let interval: number | null = null
         if (isHovered && images && images.length > 1) {
-            interval = setInterval(() => {
+            interval = window.setInterval(() => {
                 setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length)
-            }, 1000) // Cambia la imagen cada segundo
+            }, 1000)
         } else {
             setCurrentImageIndex(0)
         }
@@ -44,12 +46,10 @@ const ProductCard = ({ product }: { product: Product }) => {
         }
     }, [isHovered, images])
 
-    // Verificar si hay imágenes y si la imagen actual tiene una URL válida
     const hasImages = images && images.length > 0
     const currentImage = hasImages ? images[currentImageIndex] : null
     const imageUrl = currentImage?.url || currentImage?.image_path || "/images/placeholder.jpg"
 
-    // Obtener el identificador preferido (UUID o ID como fallback)
     const productIdentifier = getPreferredIdentifier({ uuid, id })
 
     const { user, toggleFavoriteAction, isAuthenticated } = useAuthStore()
@@ -70,6 +70,47 @@ const ProductCard = ({ product }: { product: Product }) => {
         } catch (error) {
             console.error("Error toggling favorite:", error)
         }
+    }
+
+    const categoryTitle = (product as any).category?.name || (product.categories && product.categories[0]) || "Categoría"
+
+    const normalizedColors = colors?.map((c: any) => typeof c === 'string' ? c : (c.hex_code || c)) || []
+    const remainingColors = normalizedColors.length > 1 ? normalizedColors.slice(1) : []
+
+    const normalizedSizesChoices = Array.isArray(product.sizes)
+        ? product.sizes.map((s: any) => typeof s === 'object' && s.name ? s.name : s)
+        : (typeof (product.sizes as string) === 'string'
+            ? (product.sizes as string).split(',').map((s: string) => s.trim()).filter(Boolean)
+            : []);
+
+    const handleAddToCartClick = (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+
+        if (normalizedSizesChoices.length > 1) {
+            setIsSizeDialogOpen(true)
+        } else {
+            const sizeToAdd = normalizedSizesChoices.length === 1 ? normalizedSizesChoices[0] : "Única"
+            executeAddToCart(sizeToAdd)
+        }
+    }
+
+    const executeAddToCart = (size: string) => {
+        const mainColor = colors && colors.length > 0 ? colors[0] : null
+        const colorName = mainColor && typeof mainColor === 'object' ? (mainColor as any).name : (typeof mainColor === 'string' ? mainColor : "")
+
+        addToCart(product, 1, size, colorName)
+        showCartToast(product)
+        setIsSizeDialogOpen(false)
+        setSelectedSize("")
+    }
+
+    const handleConfirmSize = () => {
+        if (!selectedSize) {
+            toast.warning("Por favor selecciona una talla")
+            return
+        }
+        executeAddToCart(selectedSize)
     }
 
     return (
@@ -118,167 +159,159 @@ const ProductCard = ({ product }: { product: Product }) => {
                 />
             )}
 
+            <IconButton
+                onClick={handleToggleFavorite}
+                sx={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
+                    zIndex: 2,
+                    bgcolor: "rgba(255, 255, 255, 0.8)",
+                    "&:hover": {
+                        bgcolor: "rgba(255, 255, 255, 1)",
+                        transform: "scale(1.1)",
+                    },
+                    transition: "all 0.2s ease-in-out",
+                }}
+            >
+                {isFavorite ? (
+                    <FavoriteIcon color="error" />
+                ) : (
+                    <FavoriteBorderIcon />
+                )}
+            </IconButton>
+
             <CardActionArea
                 component={Link}
                 to={`/producto/${productIdentifier}`}
                 sx={{ flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "stretch" }}
             >
-                <CardMedia
-                    component="img"
-                    image={imageUrl}
-                    alt={name}
-                    sx={{
-                        height: { xs: 140, sm: 180, md: 200 },
-                        objectFit: "cover",
-                        transition: 'opacity 0.3s ease-in-out',
-                    }}
-                />
+                <Box sx={{ position: "relative", pt: "100%", width: "100%" }}>
+                    <CardMedia
+                        component="img"
+                        image={imageUrl}
+                        alt={name}
+                        sx={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            height: "100%",
+                            width: "100%",
+                            objectFit: "contain",
+                            p: 2,
+                            backgroundColor: "#f8f8f8",
+                            transition: 'opacity 0.3s ease-in-out',
+                        }}
+                    />
+                </Box>
+                <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", p: { xs: 1.5, sm: 2 } }}>
+                    <Typography variant="caption" sx={{ fontWeight: "bold", color: "text.secondary", textTransform: "uppercase", letterSpacing: 0.5, mb: 0.5 }}>
+                        {categoryTitle}
+                    </Typography>
 
-                <IconButton
-                    onClick={handleToggleFavorite}
-                    sx={{
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                        zIndex: 2,
-                        bgcolor: "rgba(255, 255, 255, 0.8)",
-                        "&:hover": {
-                            bgcolor: "rgba(255, 255, 255, 1)",
-                            transform: "scale(1.1)",
-                        },
-                        transition: "all 0.2s ease-in-out",
-                    }}
-                >
-                    {isFavorite ? (
-                        <FavoriteIcon color="error" />
-                    ) : (
-                        <FavoriteBorderIcon />
-                    )}
-                </IconButton>
-
-                <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", p: { xs: 1, sm: 1.5, md: 2 }, "&:last-child": { pb: { xs: 1, sm: 1.5, md: 2 } } }}>
                     <Typography
-                        variant="h6"
+                        variant="body1"
                         component="h3"
                         sx={{
-                            fontWeight: "bold",
-                            mb: { xs: 0.5, md: 1 },
+                            mb: 1,
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: "vertical",
-                            fontSize: { xs: "0.85rem", sm: "0.95rem", md: "1.25rem" },
                             lineHeight: 1.3,
                         }}
                     >
                         {name}
                     </Typography>
 
-                    <Box sx={{ display: "flex", alignItems: "center", mb: { xs: 0.5, md: 2 }, flexWrap: "wrap" }}>
+                    {normalizedColors.length > 0 && (
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 1.5, gap: 1 }}>
+                            {((product as any).originalColors?.length > 0 ? (product as any).originalColors : normalizedColors).slice(0, 6).map((colorObj: any, index: number) => {
+                                const hexColor = typeof colorObj === 'string' ? colorObj : (colorObj.hex_code || normalizedColors[index]);
+                                const hasSecondColor = typeof colorObj === 'object' && colorObj.hex_code_1;
+                                
+                                const isSelected = (product as any).color_id !== undefined && typeof colorObj === 'object' 
+                                    ? colorObj.id === (product as any).color_id 
+                                    : index === 0;
+
+                                return (
+                                    <Box
+                                        key={index}
+                                        sx={{
+                                            width: 18,
+                                            height: 18,
+                                            borderRadius: "50%",
+                                            background: hasSecondColor 
+                                                ? `linear-gradient(130deg, ${hexColor} 50%, ${colorObj.hex_code_1} 50%)` 
+                                                : hexColor,
+                                            border: isSelected ? "2px solid #fff" : "1px solid #ccc",
+                                            boxShadow: isSelected ? "0 0 0 1px #333" : "none",
+                                            cursor: "pointer",
+                                        }}
+                                    />
+                                );
+                            })}
+                            {normalizedColors.length > 6 && (
+                                <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                                    +{normalizedColors.length - 6}
+                                </Typography>
+                            )}
+                        </Box>
+                    )}
+
+                    <Box sx={{ mt: 'auto', display: "flex", alignItems: "center", flexWrap: "wrap" }}>
                         {discount && discount > 0 ? (
                             <>
-                                <Typography
-                                    variant="h6"
-                                    color="primary"
-                                    sx={{ fontWeight: "bold", mr: 1, fontSize: { xs: "0.9rem", sm: "1rem", md: "1.25rem" } }}
-                                >
+                                <Typography variant="h6" color="text.primary" sx={{ fontWeight: "bold", mr: 1, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
                                     ${(price * (1 - discount / 100)).toFixed(2)}
                                 </Typography>
-                                <Typography
-                                    variant="body2"
-                                    sx={{ textDecoration: "line-through", color: "text.secondary", fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.875rem" } }}
-                                >
+                                <Typography variant="body2" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
                                     ${price.toFixed(2)}
                                 </Typography>
                             </>
                         ) : (
-                            <Typography
-                                variant="h6"
-                                color="primary"
-                                sx={{ fontWeight: "bold", fontSize: { xs: "0.9rem", sm: "1rem", md: "1.25rem" } }}
-                            >
+                            <Typography variant="h6" color="text.primary" sx={{ fontWeight: "bold", fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
                                 ${price.toFixed(2)}
                             </Typography>
                         )}
                     </Box>
-
-                    {/* Color chips */}
-                    {colors && colors.length > 0 && (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: { xs: 0, md: 2 } }}>
-                            {/* Indicador principal de colores combinados */}
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                                {colors.length === 1 ? (
-                                    // Si solo hay un color, mostrar un círculo simple
-                                    <Box
-                                        sx={{
-                                            width: 28,
-                                            height: 28,
-                                            borderRadius: "50%",
-                                            backgroundColor: colors[0],
-                                            border: "2px solid #fff",
-                                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                                        }}
-                                    />
-                                ) : (
-                                    // Si hay múltiples colores, mostrar un indicador con superposición
-                                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                                        {colors.slice(0, 3).map((color, index) => (
-                                            <Box
-                                                key={index}
-                                                sx={{
-                                                    width: 24,
-                                                    height: 24,
-                                                    borderRadius: "50%",
-                                                    backgroundColor: color,
-                                                    border: "2px solid #fff",
-                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                                                    marginLeft: index > 0 ? "-8px" : 0,
-                                                    zIndex: colors.length - index,
-                                                    position: "relative",
-                                                    "&:hover": {
-                                                        transform: "scale(1.1)",
-                                                        zIndex: 10,
-                                                    },
-                                                    transition: "transform 0.2s ease-in-out",
-                                                }}
-                                            />
-                                        ))}
-                                        {colors.length > 3 && (
-                                            <Box
-                                                sx={{
-                                                    width: 24,
-                                                    height: 24,
-                                                    borderRadius: "50%",
-                                                    backgroundColor: "#f0f0f0",
-                                                    border: "2px solid #fff",
-                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                                                    marginLeft: "-8px",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                    zIndex: 1,
-                                                }}
-                                            >
-                                                <Typography
-                                                    variant="caption"
-                                                    sx={{
-                                                        fontSize: "0.6rem",
-                                                        fontWeight: "bold",
-                                                        color: "#666"
-                                                    }}
-                                                >
-                                                    +{colors.length - 3}
-                                                </Typography>
-                                            </Box>
-                                        )}
-                                    </Box>
-                                )}
-                            </Box>
-                        </Box>
-                    )}
                 </CardContent>
             </CardActionArea>
+
+            <CardActions sx={{ px: { xs: 1.5, sm: 2 }, pb: { xs: 1.5, sm: 2 }, pt: 0, justifyContent: "flex-start" }}>
+                <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={handleAddToCartClick}
+                    sx={{ borderRadius: 8, textTransform: "none", fontWeight: "bold", fontSize: "0.8rem", px: 2, py: 0.5 }}
+                >
+                    Agregar al carrito
+                </Button>
+            </CardActions>
+
+            <Dialog open={isSizeDialogOpen} onClose={() => setIsSizeDialogOpen(false)}>
+                <DialogTitle>Selecciona la talla</DialogTitle>
+                <DialogContent>
+                    <FormControl>
+                        <RadioGroup
+                            value={selectedSize}
+                            onChange={(e) => setSelectedSize(e.target.value)}
+                        >
+                            {normalizedSizesChoices.map((size: string, idx: number) => (
+                                <FormControlLabel key={idx} value={size} control={<Radio />} label={size} />
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsSizeDialogOpen(false)}>Cancelar</Button>
+                    <Button onClick={handleConfirmSize} variant="contained" color="error" sx={{ borderRadius: 8, textTransform: "none", fontWeight: "bold", fontSize: "0.8rem", px: 2, py: 0.5 }}>
+                        Agregar al carrito
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Card>
     )
 }

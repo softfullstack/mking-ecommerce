@@ -3,6 +3,7 @@ import { Box, Button, Container, Grid, Typography } from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
 import { Helmet } from "react-helmet-async"
 import ProductCard from "../components/ProductCard"
+import ProductsCarousel from "../components/ProductsCarousel"
 import { GetCollectionBySlugService, ProdutcList } from "../services/MKing.service"
 import CategoriesCarousel from "../components/CategoriesCarousel"
 import gsap from "gsap"
@@ -37,28 +38,30 @@ const Home = () => {
                 if (res.data && res.data.categories && res.data.products) {
                     const cats = res.data.categories
                     const prods = res.data.products
-                    
-                    const categoriesWithImages = cats.map((cat: any) => {
-                        const catProducts = prods.filter((p: any) => p.category_id === cat.id && p.images && p.images.length > 0)
-                        let randomImg = "/images/category-1.jpg" // Fallback
-                        
-                        if (catProducts.length > 0) {
-                            const randomProduct = catProducts[Math.floor(Math.random() * catProducts.length)]
-                            const firstImage = randomProduct.images[0]
-                            randomImg = firstImage.url || firstImage.image_path || randomImg
-                        } else if (cat.name.toLowerCase().includes("multi")) {
-                            randomImg = "/images/category-2.jpg"
-                        } else if (cat.name.toLowerCase().includes("igni")) {
-                            randomImg = "/images/category-3.jpg"
-                        }
-                        
-                        return {
-                            id: cat.id,
-                            name: cat.name,
-                            image: randomImg,
-                            slug: cat.name.toLowerCase().replace(/ /g, '-')
-                        }
-                    })
+
+                    const categoriesWithImages = cats
+                        .filter((cat: any) => prods.some((p: any) => p.category_id === cat.id))
+                        .map((cat: any) => {
+                            const catProducts = prods.filter((p: any) => p.category_id === cat.id && p.images && p.images.length > 0)
+                            let randomImg = "/images/category-1.jpg" // Fallback
+
+                            if (catProducts.length > 0) {
+                                const randomProduct = catProducts[Math.floor(Math.random() * catProducts.length)]
+                                const firstImage = randomProduct.images[0]
+                                randomImg = firstImage.url || firstImage.image_path || randomImg
+                            } else if (cat.name.toLowerCase().includes("multi")) {
+                                randomImg = "/images/category-2.jpg"
+                            } else if (cat.name.toLowerCase().includes("igni")) {
+                                randomImg = "/images/category-3.jpg"
+                            }
+
+                            return {
+                                id: cat.id,
+                                name: cat.name,
+                                image: randomImg,
+                                slug: cat.name.toLowerCase().replace(/ /g, '-')
+                            }
+                        })
                     setCategories(categoriesWithImages)
                 }
             })
@@ -299,23 +302,9 @@ const Home = () => {
                 <Typography ref={featuredTitleRef} variant="h4" component="h2" sx={{ mb: { xs: 2, md: 4 }, fontWeight: "bold", fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2.125rem" } }}>
                     Productos Destacados
                 </Typography>
-                <Grid ref={featuredGridRef} container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
-                    {featured.map((product: any) => (
-                        <Grid item key={product.uuid} xs={6} sm={6} md={4} lg={3}>
-                            <ProductCard product={{
-                                ...product,
-                                price: Number(product.price) || 0,
-                                colors: product.colors?.map((c: any) => c.hex_code || c) || [],
-                                uuid: product.uuid,
-                                images: (product.images || []).map((img: any) =>
-                                    typeof img === "string"
-                                        ? { url: img }
-                                        : img
-                                ),
-                            }} />
-                        </Grid>
-                    ))}
-                </Grid>
+                <Box ref={featuredGridRef}>
+                    <ProductsCarousel products={featured} autoPlay={true} autoPlayInterval={5000} />
+                </Box>
                 <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
                     <Button component={RouterLink} to="/productos" variant="outlined" color="primary" size="large">
                         Ver Todos los Productos
@@ -342,7 +331,7 @@ const Home = () => {
                         <Box
                             ref={featureImageRef}
                             component="img"
-                            src="/images/feature.jpg"
+                            src="/images/feature.jpeg"
                             alt="Características"
                             sx={{
                                 width: "100%",
