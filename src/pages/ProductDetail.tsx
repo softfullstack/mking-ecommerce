@@ -259,9 +259,20 @@ const ProductDetail = () => {
     const getAbsoluteImageUrl = () => {
         if (!product || !product.images || product.images.length === 0) return "";
         const img = product.images[0];
-        const url = img.url || img.image_path || "";
+        let url = "";
+
+        if (typeof img === 'string') {
+            url = img;
+        } else if (img && typeof img === 'object') {
+            url = img.url || img.image_path || "";
+        }
+
+        if (!url) return "";
         if (url.startsWith('http')) return url;
-        return `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+        
+        // Ensure we don't have double slashes if origin has no trailing slash (which it shouldn't)
+        const origin = window.location.origin;
+        return `${origin}${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
     const absoluteImageUrl = getAbsoluteImageUrl();
