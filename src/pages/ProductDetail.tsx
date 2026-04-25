@@ -140,6 +140,16 @@ const ProductDetail = () => {
         )
     }
 
+    // Reordenar imágenes para que la principal esté primero
+    const sortedImages = product.images && Array.isArray(product.images)
+        ? [...product.images].sort((a, b) => {
+            if ((a as any).is_primary === (b as any).is_primary) return 0;
+            if ((a as any).is_primary) return -1;
+            if ((b as any).is_primary) return 1;
+            return 0;
+        })
+        : [];
+
     // Normalizar tallas y colores para el render
     const normalizedSizes = Array.isArray(product.sizes)
         ? product.sizes.map((s: any) => typeof s === 'object' && s.name ? s.name : s)
@@ -257,8 +267,8 @@ const ProductDetail = () => {
 
     // Helper to get absolute image URL for meta tags
     const getAbsoluteImageUrl = () => {
-        if (!product || !product.images || product.images.length === 0) return "";
-        const img = product.images[0];
+        if (sortedImages.length === 0) return "";
+        const img = sortedImages[0];
         let url = "";
 
         if (typeof img === 'string') {
@@ -322,7 +332,7 @@ const ProductDetail = () => {
                 {/* Product Images */}
                 <Grid item xs={12} md={6}>
                     <ProductCarousel
-                        images={product.images.map((img) => img.url || "")}
+                        images={sortedImages.map((img) => img.url || "")}
                         onImageClick={handleOpenImageModal}
                     />
                 </Grid>
@@ -691,7 +701,7 @@ const ProductDetail = () => {
                 <Box sx={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Box sx={{ width: "100%", maxWidth: "1200px" }}>
                         <ProductCarousel
-                            images={product.images.map((img) => img.url || "")}
+                            images={sortedImages.map((img) => img.url || "")}
                             initialIndex={modalActiveStep}
                             isModal={true}
                         />
