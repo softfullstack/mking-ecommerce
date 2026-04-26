@@ -97,26 +97,41 @@ const CategoriesCarousel: React.FC<CategoriesCarouselProps> = ({
     };
 
     const onMouseDown = (e: React.MouseEvent) => {
-        setIsDragging(true);
+        setIsDragging(false);
         onTouchStart(e);
     };
 
     const onMouseMove = (e: React.MouseEvent) => {
-        if (!isDragging) return;
+        if (touchStart === null) return;
+        setIsDragging(true);
         onTouchMove(e);
     };
 
     const onMouseUp = () => {
         if (isDragging) {
             onTouchEndEvent();
-            setIsDragging(false);
+            setTimeout(() => {
+                setIsDragging(false);
+                setTouchStart(null);
+                setTouchEnd(null);
+            }, 50);
+        } else {
+            setTouchStart(null);
+            setTouchEnd(null);
         }
     };
 
     const onMouseLeave = () => {
         if (isDragging) {
             onTouchEndEvent();
-            setIsDragging(false);
+            setTimeout(() => {
+                setIsDragging(false);
+                setTouchStart(null);
+                setTouchEnd(null);
+            }, 50);
+        } else {
+            setTouchStart(null);
+            setTouchEnd(null);
         }
     };
 
@@ -217,9 +232,10 @@ const CategoriesCarousel: React.FC<CategoriesCarouselProps> = ({
                                 <Card 
                                     component={Link}
                                     to={`/productos?categoria=${category.slug}`}
-                                    onClick={(e) => { 
-                                        if (isDragging || touchStart !== touchEnd && touchEnd !== null) { 
-                                            e.preventDefault(); // prevenir navegación si deslizó en móviles o arrastró en PC
+                                    onClickCapture={(e) => { 
+                                        if (isDragging || (touchStart !== touchEnd && touchEnd !== null)) { 
+                                            e.preventDefault();
+                                            e.stopPropagation();
                                         } 
                                     }}
                                     sx={{ 

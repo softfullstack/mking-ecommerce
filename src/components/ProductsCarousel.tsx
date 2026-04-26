@@ -97,26 +97,41 @@ const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
     };
 
     const onMouseDown = (e: React.MouseEvent) => {
-        setIsDragging(true);
+        setIsDragging(false);
         onTouchStart(e);
     };
 
     const onMouseMove = (e: React.MouseEvent) => {
-        if (!isDragging) return;
+        if (touchStart === null) return;
+        setIsDragging(true);
         onTouchMove(e);
     };
 
     const onMouseUp = () => {
         if (isDragging) {
             onTouchEndEvent();
-            setIsDragging(false);
+            setTimeout(() => {
+                setIsDragging(false);
+                setTouchStart(null);
+                setTouchEnd(null);
+            }, 50);
+        } else {
+            setTouchStart(null);
+            setTouchEnd(null);
         }
     };
 
     const onMouseLeave = () => {
         if (isDragging) {
             onTouchEndEvent();
-            setIsDragging(false);
+            setTimeout(() => {
+                setIsDragging(false);
+                setTouchStart(null);
+                setTouchEnd(null);
+            }, 50);
+        } else {
+            setTouchStart(null);
+            setTouchEnd(null);
         }
     };
 

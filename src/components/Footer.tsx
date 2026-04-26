@@ -1,6 +1,12 @@
-import { Box, Container, Grid, Typography, Link, IconButton, Divider } from "@mui/material"
-import { Facebook, Twitter, Instagram, YouTube } from "@mui/icons-material"
+import { Box, Container, Grid, Typography, Link, IconButton, Divider, SvgIcon } from "@mui/material"
+import { Facebook, Instagram, WhatsApp } from "@mui/icons-material"
 import { Link as RouterLink } from "react-router-dom"
+
+const TikTokIcon = (props: any) => (
+    <SvgIcon {...props} viewBox="0 0 24 24">
+        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.01.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 2.22-1.15 4.35-2.85 5.74-1.8 1.48-4.24 2.1-6.49 1.52-2.18-.54-4.04-2.1-4.88-4.18C1.51 17.79 1.7 15.53 2.91 13.8c1.17-1.71 3.06-2.83 5.12-3.12 1.05-.15 2.13-.06 3.16.19v4.06c-.66-.17-1.36-.21-2.04-.1-.7.1-1.37.45-1.85.95-.51.52-.81 1.25-.83 1.99-.02.73.23 1.46.7 2.01.5.58 1.25.9 2.01.93.75.03 1.5-.22 2.08-.7.54-.46.88-1.11.96-1.8.03-.25.04-.51.04-.76V.02z" />
+    </SvgIcon>
+)
 
 const Footer = () => {
     return (
@@ -50,17 +56,17 @@ const Footer = () => {
                             SÍGUENOS
                         </Typography>
                         <Box sx={{ display: "flex", gap: 1 }}>
-                            <IconButton color="inherit" aria-label="Facebook">
+                            <IconButton color="inherit" aria-label="Facebook" component="a" href="https://www.facebook.com/MKingbag" target="_blank" rel="noopener noreferrer">
                                 <Facebook />
                             </IconButton>
-                            <IconButton color="inherit" aria-label="Twitter">
-                                <Twitter />
-                            </IconButton>
-                            <IconButton color="inherit" aria-label="Instagram">
+                            <IconButton color="inherit" aria-label="Instagram" component="a" href="https://www.instagram.com/maquilaking/" target="_blank" rel="noopener noreferrer">
                                 <Instagram />
                             </IconButton>
-                            <IconButton color="inherit" aria-label="YouTube">
-                                <YouTube />
+                            <IconButton color="inherit" aria-label="TikTok" component="a" href="https://www.tiktok.com/@maquilaking" target="_blank" rel="noopener noreferrer">
+                                <TikTokIcon />
+                            </IconButton>
+                            <IconButton color="inherit" aria-label="WhatsApp" component="a" href="https://api.whatsapp.com/send?phone=523351146348&text=Hola%2C%20vengo%20desde%20MKing%20y%20deseo%20m%C3%A1s%20informaci%C3%B3n.%20http%3A%2F%2Flocalhost%3A5173%2F" target="_blank" rel="noopener noreferrer">
+                                <WhatsApp />
                             </IconButton>
                         </Box>
                     </Grid>
