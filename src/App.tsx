@@ -12,6 +12,8 @@ import Register from "./pages/Register"
 import ConfirmEmail from "./pages/ConfirmEmail"
 import Profile from "./pages/Profile"
 import About from "./pages/About"
+import Novedades from "./pages/Novedades"
+import Contact from "./pages/Contact"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ScrollToTop from "./components/ScrollToTop"
 import PageTransition from "./components/PageTransition"
@@ -69,6 +71,8 @@ function App() {
             <Route path="/confirmar-correo" element={<ConfirmEmail />} />
             <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/nosotros" element={<About />} />
+            <Route path="/novedades" element={<Novedades />} />
+            <Route path="/contacto" element={<Contact />} />
           </Routes>
         </PageTransition>
         <Footer />

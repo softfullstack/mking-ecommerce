@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 const Home = () => {
     const heroTextRef = useRef<HTMLDivElement>(null)
-    const heroImageRef = useRef<HTMLImageElement>(null)
+    const heroImageRef = useRef<HTMLDivElement>(null)
     const featuredTitleRef = useRef<HTMLDivElement>(null)
     const featuredGridRef = useRef<HTMLDivElement>(null)
     const categoriesTitleRef = useRef<HTMLDivElement>(null)
@@ -22,6 +22,12 @@ const Home = () => {
 
     const [featured, setFeatured] = useState<any[]>([])
     const [categories, setCategories] = useState<any[]>([])
+
+    const heroImages = [
+        "images/home.jpeg",
+        "images/home_2.jpeg",
+        "images/home_3.jpeg"
+    ];
 
     useEffect(() => {
         GetCollectionBySlugService('productos-destacados')
@@ -85,17 +91,39 @@ const Home = () => {
                 )
             }
 
-            // Hero image parallax
-            if (heroImageRef.current) {
-                gsap.fromTo(
-                    heroImageRef.current,
-                    { scale: 1.15 },
-                    {
-                        scale: 1,
-                        duration: 1.5,
-                        ease: "power2.out",
+            // Hero image slider animation
+            if (heroImageRef.current && heroImageRef.current.children.length > 0) {
+                const images = gsap.utils.toArray(heroImageRef.current.children) as HTMLElement[];
+
+                // Initialize all images
+                gsap.set(images, { opacity: 0, scale: 1.15, zIndex: 0 });
+
+                const tl = gsap.timeline({ repeat: -1 });
+
+                images.forEach((img, index) => {
+                    const isFirst = index === 0;
+                    const isLast = index === images.length - 1;
+
+                    // Bring current image to front
+                    tl.set(img, { zIndex: 1 }, isFirst ? 0 : "-=1.5");
+
+                    // Fade in and zoom out slightly
+                    tl.to(img, { opacity: 0.6, scale: 1, duration: 2, ease: "power2.out" }, isFirst ? 0 : "-=1.5");
+
+                    // Hold and zoom in (Ken Burns)
+                    tl.to(img, { scale: 1.05, duration: 4, ease: "none" });
+
+                    if (!isLast) {
+                        // Fade out as the next one fades in
+                        tl.to(img, { opacity: 0, duration: 1.5, ease: "power2.inOut" });
+                        tl.set(img, { zIndex: 0 });
+                    } else {
+                        // The last image fades out at the very beginning of the timeline 
+                        // so it crossfades seamlessly with the first image on repeat.
+                        tl.set(img, { zIndex: 0 });
+                        tl.to(img, { opacity: 0, duration: 1.5, ease: "power2.inOut" }, 0);
                     }
-                )
+                });
             }
 
             // Featured products section
@@ -240,19 +268,32 @@ const Home = () => {
             >
                 <Box
                     ref={heroImageRef}
-                    component="img"
-                    src="images/home.jpeg"
-                    alt="Home"
                     sx={{
                         position: "absolute",
                         top: 0,
                         left: 0,
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
-                        opacity: 0.6,
                     }}
-                />
+                >
+                    {heroImages.map((src, index) => (
+                        <Box
+                            key={index}
+                            component="img"
+                            src={src}
+                            alt={`MKing Home ${index + 1}`}
+                            sx={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                opacity: 0, // GSAP will handle opacity
+                            }}
+                        />
+                    ))}
+                </Box>
                 <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
                     <Box ref={heroTextRef} sx={{ maxWidth: { xs: "100%", md: "50%" } }}>
                         <Typography
