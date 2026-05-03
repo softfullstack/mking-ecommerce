@@ -138,55 +138,68 @@ const Cart = () => {
     }
 
     const handlePaymentSubmit = async (formData: any) => {
-        setPaymentProcessing(true)
-        try {
-            // Generate a unique reference for this payment attempt
-            const paymentReference = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+        // CardPayment Brick REQUIERE que onSubmit retorne una Promise
+        // con resolve() / reject() para manejar el estado de carga del Brick.
+        return new Promise<void>(async (resolve, reject) => {
+            setPaymentProcessing(true)
+            try {
+                // Generar referencia única para este intento de pago
+                const paymentReference = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`
 
-            console.log('MP formData recibido:', formData)
-            const response = await ProcessPaymentService({
-                token: formData.token,
-                issuer_id: formData.issuer_id,
-                payment_method_id: formData.payment_method_id,
-                transaction_amount: calculateTotal(),
-                installments: formData.installments,
-                description: `Pedido Maquila King - ${totalItems} artículo(s)`,
-                payer: {
-                    email: formData.payer?.email,
-                    identification: formData.payer?.identification,
-                },
-                external_reference: paymentReference, // Enviar UUID para webhook
-            })
+                console.log('MP formData recibido:', JSON.stringify(formData, null, 2))
 
-            const { status, message, statusDetail } = response.data
+                // IMPORTANTE: El Brick envía campos en camelCase, pero el backend
+                // y la API de MP esperan snake_case. Mapeamos correctamente:
+                const response = await ProcessPaymentService({
+                    token: formData.token,
+                    issuer_id: formData.issuer_id || formData.issuerId,
+                    payment_method_id: formData.payment_method_id || formData.paymentMethodId,
+                    transaction_amount: calculateTotal(),
+                    installments: Number(formData.installments) || 1,
+                    description: `Pedido Maquila King - ${totalItems} artículo(s)`,
+                    payer: {
+                        email: formData.payer?.email || formData.cardholderEmail,
+                        identification: formData.payer?.identification || {
+                            type: formData.identificationType,
+                            number: formData.identificationNumber,
+                        },
+                    },
+                    external_reference: paymentReference,
+                })
 
-            if (status === 'approved' || status === 'pending') {
-                try {
-                    // Solo creamos el pedido si el pago fue aprobado o está pendiente
-                    await CheckoutService({ external_reference: paymentReference })
-                    
-                    if (status === 'approved') {
-                        toast.success('¡Pago aprobado! Tu pedido ha sido registrado.')
-                    } else {
-                        toast.info('Tu pago está en proceso. Te notificaremos por correo.')
+                const { status, message, statusDetail } = response.data
+
+                if (status === 'approved' || status === 'pending') {
+                    try {
+                        // Solo creamos el pedido si el pago fue aprobado o está pendiente
+                        await CheckoutService({ external_reference: paymentReference })
+                        
+                        if (status === 'approved') {
+                            toast.success('¡Pago aprobado! Tu pedido ha sido registrado.')
+                        } else {
+                            toast.info('Tu pago está en proceso. Te notificaremos por correo.')
+                        }
+                        setActiveStep(3)
+                        setTimeout(() => clearCart(), 1000)
+                    } catch (checkoutError) {
+                        console.error('Error creating order after payment:', checkoutError)
+                        toast.warning('Pago procesado, pero hubo un error al registrar el pedido. Contacta a soporte.')
+                        setActiveStep(3)
                     }
-                    setActiveStep(3)
-                    setTimeout(() => clearCart(), 1000)
-                } catch (checkoutError) {
-                    console.error('Error creating order after payment:', checkoutError)
-                    toast.warning('Pago procesado, pero hubo un error al registrar el pedido. Contacta a soporte.')
-                    setActiveStep(3)
+                    resolve() // Indicar al Brick que el proceso terminó exitosamente
+                } else {
+                    toast.error(`Pago rechazado: ${statusDetail || message}. Intenta con otra tarjeta.`)
+                    resolve() // Resolve también en rechazo para que el Brick libere su UI
                 }
-            } else {
-                toast.error(`Pago rechazado: ${statusDetail || message}. Intenta con otra tarjeta.`)
+            } catch (error: any) {
+                console.error('Error processing payment or checkout:', error)
+                const msg = error?.response?.data?.message || 'Error al procesar el pago o registrar el pedido'
+                toast.error(msg)
+                reject() // Indicar al Brick que hubo un error de comunicación
+            } finally {
+                setPaymentProcessing(false)
             }
-        } catch (error: any) {
-            console.error('Error processing payment or checkout:', error)
-            const msg = error?.response?.data?.message || 'Error al procesar el pago o registrar el pedido'
-            toast.error(msg)
-        } finally {
-            setPaymentProcessing(false)
-        }
+        })
     }
 
     const handleBack = () => {
