@@ -214,8 +214,7 @@ const CategoriesCarousel: React.FC<CategoriesCarouselProps> = ({
                     <Box
                         sx={{
                             display: 'flex',
-                            gap: { xs: 1.5, sm: 2, md: 3 },
-                            transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+                            transform: `translateX(-${currentIndex * (100 / categories.length)}%)`,
                             transition: 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)',
                             width: `${(categories.length / itemsPerView) * 100}%`, // Fix width calc for categories
                             pointerEvents: isDragging ? 'none' : 'auto', // Evita que se activen links mientras arrastras
@@ -226,7 +225,8 @@ const CategoriesCarousel: React.FC<CategoriesCarouselProps> = ({
                                 key={category.id} 
                                 sx={{ 
                                     width: `calc(100% / ${categories.length})`, // Ensure child width corresponds to total flex ratio
-                                    flexShrink: 0
+                                    flexShrink: 0,
+                                    px: { xs: 0.75, sm: 1, md: 1.5 }
                                 }}
                             >
                                 <Card 

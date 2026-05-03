@@ -105,6 +105,6 @@ export const UpdateCartService = (items: any[]) => axios.post(`${apiUrl}/cart`, 
 export const ClearCartService = () => axios.delete(`${apiUrl}/cart`);
 
 export const ProcessPaymentService = (data: any) => axios.post(`${apiUrl}/payment/process`, data);
-export const CheckoutService = () => axios.post(`${apiUrl}/checkout`);
+export const CheckoutService = (body?: any) => axios.post(`${apiUrl}/checkout`, body);
 
 export const GetCollectionBySlugService = (slug: string) => axios.get(`${apiUrl}/collections/${slug}`);

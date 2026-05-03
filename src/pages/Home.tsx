@@ -145,17 +145,15 @@ const Home = () => {
                 )
             }
 
-            // Featured products grid staggered
+            // Featured products grid
             if (featuredGridRef.current) {
                 gsap.fromTo(
-                    featuredGridRef.current.children,
-                    { opacity: 0, y: 60, scale: 0.95 },
+                    featuredGridRef.current,
+                    { opacity: 0, y: 30 },
                     {
                         opacity: 1,
                         y: 0,
-                        scale: 1,
-                        duration: 0.7,
-                        stagger: 0.12,
+                        duration: 0.8,
                         ease: "power3.out",
                         scrollTrigger: {
                             trigger: featuredGridRef.current,
@@ -188,7 +186,7 @@ const Home = () => {
             if (categoriesGridRef.current) {
                 gsap.fromTo(
                     categoriesGridRef.current,
-                    { opacity: 0, y: 50 },
+                    { opacity: 0, y: 30 },
                     {
                         opacity: 1,
                         y: 0,
@@ -311,13 +309,13 @@ const Home = () => {
                         <Typography variant="h5" sx={{ mb: { xs: 2, md: 4 }, fontSize: { xs: "0.95rem", sm: "1.1rem", md: "1.5rem" } }}>
                             Descubre nuestra nueva colección de chalecos industriales que combinan seguridad y diseño.
                         </Typography>
-                        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: { xs: 1.5, sm: 2 }, alignItems: { xs: "stretch", sm: "flex-start" } }}>
+                        <Box sx={{ display: "flex", flexDirection: { xs: "row", sm: "row" }, gap: { xs: 1.5, sm: 2 }, alignItems: { xs: "stretch", sm: "flex-start" } }}>
                             <Button
                                 component={RouterLink}
                                 to="/productos"
-                                variant="contained"
+                                variant="outlined"
                                 color="primary"
-                                size="large"
+                                size="small"
                                 sx={{ fontSize: { xs: "0.85rem", md: "0.95rem" } }}
                             >
                                 Comprar Ahora
@@ -327,7 +325,7 @@ const Home = () => {
                                 to="/novedades"
                                 variant="outlined"
                                 color="primary"
-                                size="large"
+                                size="small"
                                 sx={{ borderColor: "#fff", color: "#fff", fontSize: { xs: "0.85rem", md: "0.95rem" } }}
                             >
                                 Ver Novedades

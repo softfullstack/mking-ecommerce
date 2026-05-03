@@ -228,8 +228,7 @@ const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
                     <Box
                         sx={{
                             display: 'flex',
-                            gap: { xs: 1.5, sm: 2, md: 3 },
-                            transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+                            transform: `translateX(-${currentIndex * (100 / products.length)}%)`,
                             transition: 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)',
                             width: `${(products.length / itemsPerView) * 100}%`,
                             pointerEvents: isDragging ? 'none' : 'auto', 
@@ -246,7 +245,8 @@ const ProductsCarousel: React.FC<ProductsCarouselProps> = ({
                                 }}
                                 sx={{ 
                                     width: `calc(100% / ${products.length})`, 
-                                    flexShrink: 0
+                                    flexShrink: 0,
+                                    px: { xs: 0.75, sm: 1, md: 1.5 }
                                 }}
                             >
                                 <ProductCard product={{

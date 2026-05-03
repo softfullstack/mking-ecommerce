@@ -140,7 +140,10 @@ const Cart = () => {
     const handlePaymentSubmit = async (formData: any) => {
         setPaymentProcessing(true)
         try {
-            console.log('MP formData recibido:', formData) // para debug
+            // Generate a unique reference for this payment attempt
+            const paymentReference = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+
+            console.log('MP formData recibido:', formData)
             const response = await ProcessPaymentService({
                 token: formData.token,
                 issuer_id: formData.issuer_id,
@@ -152,32 +155,34 @@ const Cart = () => {
                     email: formData.payer?.email,
                     identification: formData.payer?.identification,
                 },
+                external_reference: paymentReference, // Enviar UUID para webhook
             })
 
             const { status, message, statusDetail } = response.data
 
-            if (status === 'approved') {
+            if (status === 'approved' || status === 'pending') {
                 try {
-                    await CheckoutService()
-                    toast.success('¡Pago aprobado! Tu pedido ha sido registrado.')
+                    // Solo creamos el pedido si el pago fue aprobado o está pendiente
+                    await CheckoutService({ external_reference: paymentReference })
+                    
+                    if (status === 'approved') {
+                        toast.success('¡Pago aprobado! Tu pedido ha sido registrado.')
+                    } else {
+                        toast.info('Tu pago está en proceso. Te notificaremos por correo.')
+                    }
                     setActiveStep(3)
                     setTimeout(() => clearCart(), 1000)
                 } catch (checkoutError) {
                     console.error('Error creating order after payment:', checkoutError)
-                    toast.warning('Pago aprobado, pero hubo un error al registrar el pedido. Contacta a soporte.')
-                    // Aún mostramos la pantalla de éxito o manejamos el caso
+                    toast.warning('Pago procesado, pero hubo un error al registrar el pedido. Contacta a soporte.')
                     setActiveStep(3)
                 }
-            } else if (status === 'pending') {
-                toast.info('Tu pago está en proceso. Te notificaremos por correo.')
-                setActiveStep(3)
             } else {
-                // rejected
                 toast.error(`Pago rechazado: ${statusDetail || message}. Intenta con otra tarjeta.`)
             }
         } catch (error: any) {
-            console.error('Error processing payment:', error)
-            const msg = error?.response?.data?.message || 'Error al procesar el pago'
+            console.error('Error processing payment or checkout:', error)
+            const msg = error?.response?.data?.message || 'Error al procesar el pago o registrar el pedido'
             toast.error(msg)
         } finally {
             setPaymentProcessing(false)

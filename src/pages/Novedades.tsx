@@ -92,14 +92,14 @@ const Novedades = () => {
             <Box 
                 sx={{
                     position: 'relative',
-                    height: { xs: '40vh', md: '50vh' },
+                    height: { xs: '50vh', sm: '40vh', md: '50vh' },
                     bgcolor: '#111',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     overflow: 'hidden',
-                    mb: 6
+                    mb: { xs: 4, md: 6 }
                 }}
             >
                 <Box
@@ -121,10 +121,10 @@ const Novedades = () => {
                         <Typography variant="overline" sx={{ letterSpacing: 3, fontWeight: 'bold', color: '#ff3d00' }}>
                             RECIÉN LLEGADOS
                         </Typography>
-                        <Typography variant="h2" fontWeight="900" sx={{ mt: 1, mb: 2, textTransform: 'uppercase' }}>
+                        <Typography variant="h2" fontWeight="900" sx={{ mt: 1, mb: 2, textTransform: 'uppercase', fontSize: { xs: '2.2rem', sm: '3rem', md: '3.75rem' } }}>
                             Innovación en Seguridad
                         </Typography>
-                        <Typography variant="h6" color="grey.300">
+                        <Typography variant="h6" color="grey.300" sx={{ fontSize: { xs: '1rem', md: '1.25rem' }, px: { xs: 2, md: 0 } }}>
                             Descubre nuestra nueva línea de chalecos con materiales más resistentes, diseño ergonómico y tecnología reflectante de última generación.
                         </Typography>
                     </Box>
@@ -132,8 +132,8 @@ const Novedades = () => {
             </Box>
 
             {/* Grid de Productos Novedades */}
-            <Container maxWidth="lg">
-                <Grid container spacing={4} ref={gridRef}>
+            <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 } }}>
+                <Grid container spacing={{ xs: 3, md: 4 }} ref={gridRef}>
                     {products.map((product) => (
                         <Grid item xs={12} sm={6} md={4} key={product.id}>
                             <Card sx={{ 
@@ -155,7 +155,7 @@ const Novedades = () => {
                                     sx={{ 
                                         position: 'absolute', 
                                         top: -15, 
-                                        right: 20, 
+                                        right: { xs: 10, sm: 20 }, 
                                         zIndex: 10,
                                         fontWeight: 'bold',
                                         boxShadow: '0 4px 8px rgba(211,47,47,0.3)'
