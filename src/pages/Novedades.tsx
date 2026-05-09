@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GetCollectionBySlugService, ProdutcList } from '../services/MKing.service';
 import Product3DModal from '../components/Product3DModal';
+import InteractiveVest from '../components/InteractiveVest';
 import ThreeDRotationIcon from '@mui/icons-material/ThreeDRotation';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -130,6 +131,9 @@ const Novedades = () => {
                     </Box>
                 </Container>
             </Box>
+
+            {/* Sección Producto Interactivo */}
+            <InteractiveVest />
 
             {/* Grid de Productos Novedades */}
             <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 } }}>
