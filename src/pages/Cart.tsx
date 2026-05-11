@@ -179,7 +179,7 @@ const Cart = () => {
                     try {
                         // Solo creamos el pedido si el pago fue aprobado o está pendiente
                         await CheckoutService({ external_reference: paymentReference })
-                        
+
                         if (status === 'approved') {
                             toast.success('¡Pago aprobado! Tu pedido ha sido registrado.')
                         } else {
@@ -199,7 +199,12 @@ const Cart = () => {
                 }
             } catch (error: any) {
                 console.error('Error processing payment or checkout:', error)
-                const msg = error?.response?.data?.message || 'Error al procesar el pago o registrar el pedido'
+                console.error('Response data:', JSON.stringify(error?.response?.data, null, 2))
+                const backendError = error?.response?.data
+                const msg = backendError?.cause?.message 
+                    || backendError?.cause?.description
+                    || backendError?.message 
+                    || 'Error al procesar el pago o registrar el pedido'
                 toast.error(msg)
                 reject() // Indicar al Brick que hubo un error de comunicación
             } finally {
@@ -409,9 +414,6 @@ const Cart = () => {
                             <Button component={RouterLink} to="/productos" startIcon={<ArrowBack />}>
                                 Continuar Comprando
                             </Button>
-                            <Button variant="outlined" color="error" onClick={() => clearCart()}>
-                                Vaciar Bolsa
-                            </Button>
                         </Box>
                     </Grid>
 
@@ -483,7 +485,7 @@ const Cart = () => {
                                 </Box>
 
                                 <Button variant="contained" color="primary" size="large" fullWidth onClick={handleNext}>
-                                    Cotizar
+                                    Proceder al Pago
                                 </Button>
 
                                 <Box sx={{ mt: 3, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -692,8 +694,8 @@ const Cart = () => {
 
     return (
         <Container maxWidth="lg" sx={{ py: { xs: 1, md: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
-            <Stepper 
-                activeStep={activeStep} 
+            <Stepper
+                activeStep={activeStep}
                 sx={{ mb: { xs: 2, md: 4 }, '& .MuiStepIcon-root': { fontSize: { xs: 20, md: 24 } } }}
                 alternativeLabel
             >
