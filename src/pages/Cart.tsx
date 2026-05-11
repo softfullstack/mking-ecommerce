@@ -36,7 +36,7 @@ initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '')
 const Cart = () => {
     const navigate = useNavigate()
     const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart, updateCustomizations } = useCartStore()
-    const { isAuthenticated } = useAuthStore()
+    const { isAuthenticated, user } = useAuthStore()
     const [couponCode, setCouponCode] = useState("")
     const [couponError, setCouponError] = useState("")
     const [couponDiscount, setCouponDiscount] = useState(0)
@@ -159,6 +159,19 @@ const Cart = () => {
                     ? rawIdentification
                     : undefined
 
+                // Obtener dirección de envío seleccionada
+                const selectedAddress = addresses.find((a: any) => a.id === selectedAddressId)
+
+                // Construir items para additional_info (requerido por MP para mejor aprobación)
+                const mpItems = items.map((item) => ({
+                    id: String(item.uuid || item.id),
+                    title: item.name,
+                    description: item.description?.substring(0, 256) || item.name,
+                    category_id: item.categories?.[0] || 'others',
+                    quantity: item.quantity,
+                    unit_price: item.price,
+                }))
+
                 const response = await ProcessPaymentService({
                     token: formData.token,
                     issuer_id: formData.issuer_id || formData.issuerId,
@@ -169,8 +182,29 @@ const Cart = () => {
                     payer: {
                         email: formData.payer?.email || formData.cardholderEmail,
                         ...(identification && { identification }),
+                        first_name: user?.name || undefined,
+                        last_name: user?.last_name || undefined,
                     },
                     external_reference: paymentReference,
+                    // additional_info para mejorar aprobación y calidad MP
+                    additional_info: {
+                        items: mpItems,
+                        payer: {
+                            first_name: user?.name || undefined,
+                            last_name: user?.last_name || undefined,
+                        },
+                        ...(selectedAddress && {
+                            shipments: {
+                                receiver_address: {
+                                    zip_code: selectedAddress.postal_code || '',
+                                    state_name: selectedAddress.state || '',
+                                    city_name: selectedAddress.municipality || '',
+                                    street_name: selectedAddress.street || '',
+                                    street_number: Number(selectedAddress.exterior_number) || 0,
+                                },
+                            },
+                        }),
+                    },
                 })
 
                 const { status, message, statusDetail } = response.data
