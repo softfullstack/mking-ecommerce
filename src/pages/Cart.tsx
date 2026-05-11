@@ -150,6 +150,15 @@ const Cart = () => {
 
                 // IMPORTANTE: El Brick envía campos en camelCase, pero el backend
                 // y la API de MP esperan snake_case. Mapeamos correctamente:
+                // Construir identification solo si tiene datos válidos
+                const rawIdentification = formData.payer?.identification || {
+                    type: formData.identificationType,
+                    number: formData.identificationNumber,
+                }
+                const identification = (rawIdentification?.type && rawIdentification?.number)
+                    ? rawIdentification
+                    : undefined
+
                 const response = await ProcessPaymentService({
                     token: formData.token,
                     issuer_id: formData.issuer_id || formData.issuerId,
@@ -159,10 +168,7 @@ const Cart = () => {
                     description: `Pedido Maquila King - ${totalItems} artículo(s)`,
                     payer: {
                         email: formData.payer?.email || formData.cardholderEmail,
-                        identification: formData.payer?.identification || {
-                            type: formData.identificationType,
-                            number: formData.identificationNumber,
-                        },
+                        ...(identification && { identification }),
                     },
                     external_reference: paymentReference,
                 })
