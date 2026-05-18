@@ -460,14 +460,23 @@ const OrdersSection = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                  {/* Placeholder status as backend doesn't have status field yet on Quotation table visible in earlier steps */}
-                  <Chip
-                    label="Procesando"
-                    color="warning"
-                    size="small"
-                    variant="outlined"
-                    sx={{ borderRadius: '4px', height: 24 }}
-                  />
+                  {(() => {
+                    const statusMap: Record<string, { label: string; color: 'warning' | 'info' | 'success' }> = {
+                      received: { label: 'Recibido / Procesando', color: 'warning' },
+                      in_transit: { label: 'En Tránsito', color: 'info' },
+                      delivered: { label: 'Entregado', color: 'success' },
+                    }
+                    const s = statusMap[order.status] || statusMap['received']
+                    return (
+                      <Chip
+                        label={s.label}
+                        color={s.color}
+                        size="small"
+                        variant="outlined"
+                        sx={{ borderRadius: '4px', height: 24 }}
+                      />
+                    )
+                  })()}
                 </Grid>
                 <Grid item xs={12} sm={2} sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
                   <Button

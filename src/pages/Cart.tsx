@@ -146,7 +146,6 @@ const Cart = () => {
                 // Generar referencia única para este intento de pago
                 const paymentReference = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`
 
-                console.log('MP formData recibido:', JSON.stringify(formData, null, 2))
 
                 // IMPORTANTE: El Brick envía campos en camelCase, pero el backend
                 // y la API de MP esperan snake_case. Mapeamos correctamente:
@@ -207,15 +206,21 @@ const Cart = () => {
                     },
                 })
 
-                const { status, message, statusDetail } = response.data
+                const { status, message, statusDetail, paymentId } = response.data
 
                 if (status === 'approved' || status === 'pending') {
                     try {
-                        // Solo creamos el pedido si el pago fue aprobado o está pendiente
-                        await CheckoutService({ external_reference: paymentReference })
+                        // Crear cotización + orden pasando la info del pago
+                        const checkoutResponse = await CheckoutService({
+                            external_reference: paymentReference,
+                            payment_id: paymentId ? String(paymentId) : null,
+                            payment_status: status,
+                        })
+
+                        const orderFolio = checkoutResponse?.data?.order?.folio
 
                         if (status === 'approved') {
-                            toast.success('¡Pago aprobado! Tu pedido ha sido registrado.')
+                            toast.success(`¡Pago aprobado! Tu pedido ${orderFolio || ''} ha sido registrado.`)
                         } else {
                             toast.info('Tu pago está en proceso. Te notificaremos por correo.')
                         }
@@ -232,8 +237,7 @@ const Cart = () => {
                     resolve() // Resolve también en rechazo para que el Brick libere su UI
                 }
             } catch (error: any) {
-                console.error('Error processing payment or checkout:', error)
-                console.error('Response data:', JSON.stringify(error?.response?.data, null, 2))
+                console.error('Error processing payment:', error?.response?.data || error.message)
                 const backendError = error?.response?.data
                 const msg = backendError?.cause?.message 
                     || backendError?.cause?.description

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Container, Typography, Grid, Card, CardMedia, CardContent, Button, Chip } from '@mui/material';
-import { Helmet } from 'react-helmet-async';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GetCollectionBySlugService, ProdutcList } from '../services/MKing.service';
@@ -13,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 const Novedades = () => {
     const headerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
-    
+
     const [products, setProducts] = useState<any[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,53 +83,6 @@ const Novedades = () => {
 
     return (
         <Box sx={{ bgcolor: '#f8f9fa', minHeight: '100vh', pb: 10 }}>
-            <Helmet>
-                <title>Novedades y Lanzamientos | MKing</title>
-                <meta name="description" content="Descubre lo último en chalecos de seguridad industrial y tecnología de protección personal en MKing." />
-            </Helmet>
-
-            {/* Hero Banner Especial */}
-            <Box 
-                sx={{
-                    position: 'relative',
-                    height: { xs: '50vh', sm: '40vh', md: '50vh' },
-                    bgcolor: '#111',
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    mb: { xs: 4, md: 6 }
-                }}
-            >
-                <Box
-                    component="img"
-                    src="/images/home.jpeg" // Reutilizamos imagen o puedes poner una específica
-                    sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        opacity: 0.4,
-                        filter: 'blur(2px)'
-                    }}
-                />
-                <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                    <Box ref={headerRef}>
-                        <Typography variant="overline" sx={{ letterSpacing: 3, fontWeight: 'bold', color: '#ff3d00' }}>
-                            RECIÉN LLEGADOS
-                        </Typography>
-                        <Typography variant="h2" fontWeight="900" sx={{ mt: 1, mb: 2, textTransform: 'uppercase', fontSize: { xs: '2.2rem', sm: '3rem', md: '3.75rem' } }}>
-                            Innovación en Seguridad
-                        </Typography>
-                        <Typography variant="h6" color="grey.300" sx={{ fontSize: { xs: '1rem', md: '1.25rem' }, px: { xs: 2, md: 0 } }}>
-                            Descubre nuestra nueva línea de chalecos con materiales más resistentes, diseño ergonómico y tecnología reflectante de última generación.
-                        </Typography>
-                    </Box>
-                </Container>
-            </Box>
 
             {/* Sección Producto Interactivo */}
             <InteractiveVest />
@@ -140,10 +92,10 @@ const Novedades = () => {
                 <Grid container spacing={{ xs: 3, md: 4 }} ref={gridRef}>
                     {products.map((product) => (
                         <Grid item xs={12} sm={6} md={4} key={product.id}>
-                            <Card sx={{ 
-                                height: '100%', 
-                                display: 'flex', 
-                                flexDirection: 'column', 
+                            <Card sx={{
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
                                 position: 'relative',
                                 transition: 'transform 0.3s, box-shadow 0.3s',
                                 '&:hover': {
@@ -153,17 +105,17 @@ const Novedades = () => {
                                 borderRadius: 3,
                                 overflow: 'visible'
                             }}>
-                                <Chip 
-                                    label="NUEVO" 
-                                    color="error" 
-                                    sx={{ 
-                                        position: 'absolute', 
-                                        top: -15, 
-                                        right: { xs: 10, sm: 20 }, 
+                                <Chip
+                                    label="NUEVO"
+                                    color="error"
+                                    sx={{
+                                        position: 'absolute',
+                                        top: -15,
+                                        right: { xs: 10, sm: 20 },
                                         zIndex: 10,
                                         fontWeight: 'bold',
                                         boxShadow: '0 4px 8px rgba(211,47,47,0.3)'
-                                    }} 
+                                    }}
                                 />
                                 <Box sx={{ position: 'relative', pt: '100%', bgcolor: '#f0f0f0', borderTopLeftRadius: 12, borderTopRightRadius: 12, overflow: 'hidden' }}>
                                     <CardMedia
@@ -172,9 +124,9 @@ const Novedades = () => {
                                         alt={product.name}
                                         sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', p: 2 }}
                                     />
-                                    
+
                                     {/* Botón flotante para ver en 3D */}
-                                    <Box 
+                                    <Box
                                         className="btn-3d-container"
                                         sx={{
                                             position: 'absolute',
@@ -192,8 +144,8 @@ const Novedades = () => {
                                             }
                                         }}
                                     >
-                                        <Button 
-                                            variant="contained" 
+                                        <Button
+                                            variant="contained"
                                             color="secondary"
                                             startIcon={<ThreeDRotationIcon />}
                                             onClick={() => handleOpen3D(product)}
@@ -221,10 +173,10 @@ const Novedades = () => {
             </Container>
 
             {/* Modal Interactivo */}
-            <Product3DModal 
-                open={isModalOpen} 
-                onClose={handleCloseModal} 
-                product={selectedProduct} 
+            <Product3DModal
+                open={isModalOpen}
+                onClose={handleCloseModal}
+                product={selectedProduct}
             />
         </Box>
     );

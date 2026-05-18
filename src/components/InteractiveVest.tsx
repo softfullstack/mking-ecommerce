@@ -245,18 +245,7 @@ const InteractiveVest = () => {
 
       {/* Section Title */}
       <Box ref={titleRef} sx={{ textAlign: 'center', mb: { xs: 4, md: 6 }, position: 'relative', zIndex: 1 }}>
-        <Typography
-          variant="overline"
-          sx={{
-            letterSpacing: 4,
-            fontWeight: 'bold',
-            color: '#ff3d00',
-            fontSize: '0.85rem',
-            display: 'block',
-          }}
-        >
-          PRODUCTO INTERACTIVO
-        </Typography>
+
         <Typography
           variant="h3"
           sx={{
@@ -490,63 +479,7 @@ const InteractiveVest = () => {
         </Box>
       </Box>
 
-      {/* Mobile instruction */}
-      <Typography
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          textAlign: 'center',
-          color: 'rgba(255,255,255,0.4)',
-          fontSize: '0.75rem',
-          mt: 3,
-        }}
-      >
-        Toca los puntos para ver la descripción
-      </Typography>
 
-      {/* Color options decorative row */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: { xs: 1, md: 1.5 },
-          mt: { xs: 4, md: 5 },
-          flexWrap: 'wrap',
-        }}
-      >
-        {['#1565c0', '#000000', '#d32f2f', '#f57c00', '#fbc02d', '#2e7d32', '#7b1fa2', '#00838f', '#795548'].map(
-          (color, i) => (
-            <Box
-              key={i}
-              sx={{
-                width: { xs: 28, md: 36 },
-                height: { xs: 28, md: 36 },
-                borderRadius: '50%',
-                background: color,
-                border: i === 0 ? '3px solid #ff3d00' : '2px solid rgba(255,255,255,0.2)',
-                cursor: 'pointer',
-                transition: 'all 0.3s',
-                boxShadow: i === 0 ? '0 0 12px rgba(255,61,0,0.4)' : 'none',
-                '&:hover': {
-                  transform: 'scale(1.2)',
-                  border: '3px solid #ff3d00',
-                  boxShadow: '0 0 12px rgba(255,61,0,0.4)',
-                },
-              }}
-            />
-          )
-        )}
-      </Box>
-      <Typography
-        sx={{
-          textAlign: 'center',
-          color: 'rgba(255,255,255,0.4)',
-          fontSize: '0.8rem',
-          mt: 1.5,
-          letterSpacing: 2,
-        }}
-      >
-        COLORES DISPONIBLES
-      </Typography>
     </Box>
   );
 };
