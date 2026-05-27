@@ -14,6 +14,7 @@ import Profile from "./pages/Profile"
 import About from "./pages/About"
 import Novedades from "./pages/Novedades"
 import Contact from "./pages/Contact"
+import Ubicaciones from "./pages/Ubicaciones"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ScrollToTop from "./components/ScrollToTop"
 import PageTransition from "./components/PageTransition"
@@ -26,6 +27,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WhatsAppFloatingButton from './components/WhatsAppFloatingButton';
 import useUIStore from './store/UIStore';
+import DescuentosEmpresas from './pages/DescuentosEmpresas'
 
 function App() {
   const { currentProductName } = useUIStore()
@@ -73,6 +75,8 @@ function App() {
             <Route path="/nosotros" element={<About />} />
             <Route path="/novedades" element={<Novedades />} />
             <Route path="/contacto" element={<Contact />} />
+            <Route path="/ubicaciones" element={<Ubicaciones />} />
+            <Route path="/descuentos" element={<DescuentosEmpresas />} />
           </Routes>
         </PageTransition>
         <Footer />

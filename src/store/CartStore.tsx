@@ -15,12 +15,14 @@ interface CartStore {
     items: CartItem[]
     totalItems: number
     totalPrice: number
+    guestInfo: any | null
     addToCart: (product: Product, quantity: number, size?: string, color?: string) => Promise<void>
     removeFromCart: (itemIndex: number) => Promise<void>
     updateQuantity: (itemIndex: number, newQuantity: number) => Promise<void>
     updateCustomizations: (itemIndex: number, customizations: ItemCustomization[]) => Promise<void>
     clearCart: () => Promise<void>
     fetchCart: () => Promise<void>
+    setGuestInfo: (info: any) => void
 }
 
 const syncCart = async (items: CartItem[]) => {
@@ -49,6 +51,9 @@ const useCartStore = create<CartStore>()(
             items: [],
             totalItems: 0,
             totalPrice: 0,
+            guestInfo: null,
+
+            setGuestInfo: (info: any) => set({ guestInfo: info }),
 
             addToCart: async (product: Product, quantity: number, size?: string, color?: string) => {
                 const { items } = get()

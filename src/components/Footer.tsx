@@ -46,7 +46,7 @@ const Footer = () => {
                         <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold", fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
                             VENTAJAS
                         </Typography>
-                        <Link component={RouterLink} to="/ventajas/descuentos" color="inherit" sx={{ display: "block", mb: 1 }}>
+                        <Link component={RouterLink} to="/descuentos" color="inherit" sx={{ display: "block", mb: 1 }}>
                             Descuentos para empresas
                         </Link>
                     </Grid>

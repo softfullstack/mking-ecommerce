@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link as RouterLink, useNavigate } from "react-router-dom"
+import { Link as RouterLink } from "react-router-dom"
 import {
     Box,
     Container,
@@ -34,8 +34,7 @@ import { toast } from "react-toastify"
 initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '')
 
 const Cart = () => {
-    const navigate = useNavigate()
-    const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart, updateCustomizations } = useCartStore()
+    const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart, updateCustomizations, guestInfo, setGuestInfo } = useCartStore()
     const { isAuthenticated, user } = useAuthStore()
     const [couponCode, setCouponCode] = useState("")
     const [couponError, setCouponError] = useState("")
@@ -43,6 +42,43 @@ const Cart = () => {
     const [activeStep, setActiveStep] = useState(0)
     const [customizerOpen, setCustomizerOpen] = useState(false)
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null)
+
+    // Guest Form State
+    const [guestForm, setGuestForm] = useState({
+        email: "",
+        recipientName: "",
+        phone: "",
+        street: "",
+        exteriorNumber: "",
+        interiorNumber: "",
+        neighborhood: "",
+        municipality: "",
+        state: "",
+        postalCode: "",
+        references: ""
+    })
+
+    useEffect(() => {
+        if (guestInfo) {
+            setGuestForm({
+                email: guestInfo.email || "",
+                recipientName: guestInfo.recipientName || "",
+                phone: guestInfo.phone || "",
+                street: guestInfo.street || "",
+                exteriorNumber: guestInfo.exteriorNumber || "",
+                interiorNumber: guestInfo.interiorNumber || "",
+                neighborhood: guestInfo.neighborhood || "",
+                municipality: guestInfo.municipality || "",
+                state: guestInfo.state || "",
+                postalCode: guestInfo.postalCode || "",
+                references: guestInfo.references || ""
+            })
+        }
+    }, [guestInfo])
+
+    const handleGuestFormChange = (e: any) => {
+        setGuestForm({ ...guestForm, [e.target.name]: e.target.value })
+    }
 
     // Address State
     const [addresses, setAddresses] = useState<any[]>([])
@@ -125,13 +161,23 @@ const Cart = () => {
 
     const handleNext = async () => {
         if (activeStep === 0 && !isAuthenticated) {
-            navigate("/login", { state: { from: "/carrito" } })
+            setActiveStep((prevStep) => prevStep + 1)
             return
         }
 
-        if (activeStep === 1 && selectedAddressId === null) {
-            toast.error("Por favor selecciona una dirección de envío")
-            return
+        if (activeStep === 1) {
+            if (isAuthenticated) {
+                if (selectedAddressId === null) {
+                    toast.error("Por favor selecciona una dirección de envío")
+                    return
+                }
+            } else {
+                if (!guestForm.email || !guestForm.recipientName || !guestForm.phone || !guestForm.street || !guestForm.exteriorNumber || !guestForm.neighborhood || !guestForm.municipality || !guestForm.state || !guestForm.postalCode) {
+                    toast.error("Por favor completa todos los campos requeridos de contacto y envío")
+                    return
+                }
+                setGuestInfo(guestForm)
+            }
         }
 
         setActiveStep((prevStep) => prevStep + 1)
@@ -158,8 +204,10 @@ const Cart = () => {
                     ? rawIdentification
                     : undefined
 
-                // Obtener dirección de envío seleccionada
-                const selectedAddress = addresses.find((a: any) => a.id === selectedAddressId)
+                // Obtener dirección de envío seleccionada o datos de invitado
+                const addressToUse = isAuthenticated
+                    ? addresses.find((a: any) => a.id === selectedAddressId)
+                    : guestInfo
 
                 // Construir items para additional_info (requerido por MP para mejor aprobación)
                 const mpItems = items.map((item) => ({
@@ -179,27 +227,27 @@ const Cart = () => {
                     installments: Number(formData.installments) || 1,
                     description: `Pedido Maquila King - ${totalItems} artículo(s)`,
                     payer: {
-                        email: formData.payer?.email || formData.cardholderEmail,
+                        email: formData.payer?.email || formData.cardholderEmail || (guestInfo ? guestInfo.email : undefined),
                         ...(identification && { identification }),
-                        first_name: user?.name || undefined,
-                        last_name: user?.last_name || undefined,
+                        first_name: user?.name || (guestInfo ? guestInfo.recipientName.split(' ')[0] : 'Invitado'),
+                        last_name: user?.last_name || (guestInfo ? guestInfo.recipientName.split(' ').slice(1).join(' ') : ''),
                     },
                     external_reference: paymentReference,
                     // additional_info para mejorar aprobación y calidad MP
                     additional_info: {
                         items: mpItems,
                         payer: {
-                            first_name: user?.name || undefined,
-                            last_name: user?.last_name || undefined,
+                            first_name: user?.name || (guestInfo ? guestInfo.recipientName.split(' ')[0] : 'Invitado'),
+                            last_name: user?.last_name || (guestInfo ? guestInfo.recipientName.split(' ').slice(1).join(' ') : ''),
                         },
-                        ...(selectedAddress && {
+                        ...(addressToUse && {
                             shipments: {
                                 receiver_address: {
-                                    zip_code: selectedAddress.postal_code || '',
-                                    state_name: selectedAddress.state || '',
-                                    city_name: selectedAddress.municipality || '',
-                                    street_name: selectedAddress.street || '',
-                                    street_number: Number(selectedAddress.exterior_number) || 0,
+                                    zip_code: addressToUse.postalCode || addressToUse.postal_code || '',
+                                    state_name: addressToUse.state || '',
+                                    city_name: addressToUse.municipality || '',
+                                    street_name: addressToUse.street || '',
+                                    street_number: Number(addressToUse.exteriorNumber || addressToUse.exterior_number) || 0,
                                 },
                             },
                         }),
@@ -210,11 +258,21 @@ const Cart = () => {
 
                 if (status === 'approved' || status === 'pending') {
                     try {
-                        // Crear cotización + orden pasando la info del pago
+                        // Crear cotización + orden pasando la info del pago y opcionalmente items/guest_info
                         const checkoutResponse = await CheckoutService({
                             external_reference: paymentReference,
                             payment_id: paymentId ? String(paymentId) : null,
                             payment_status: status,
+                            ...(!isAuthenticated && {
+                                items: items.map(item => ({
+                                    id: item.id,
+                                    price: item.price,
+                                    quantity: item.quantity,
+                                    color: typeof item.color === 'object' && item.color !== null ? (item.color as any).name : item.color,
+                                    size: typeof item.size === 'object' && item.size !== null ? (item.size as any).name : item.size,
+                                })),
+                                guest_info: guestInfo,
+                            })
                         })
 
                         const orderFolio = checkoutResponse?.data?.order?.folio
@@ -541,98 +599,262 @@ const Cart = () => {
     )
 
     // Shipping step content
-    const renderShippingContent = () => (
-        <Paper sx={{ p: 3, backgroundColor: "#1e1e1e" }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6">
-                    Información de Envío
-                </Typography>
-                <Button
-                    variant="outlined"
-                    startIcon={<Add />}
-                    onClick={() => setOpenAddressDialog(true)}
-                    size="small"
-                >
-                    Nueva Dirección
-                </Button>
-            </Box>
+    const renderShippingContent = () => {
+        if (!isAuthenticated) {
+            return (
+                <Paper sx={{ p: 3, backgroundColor: "#1e1e1e" }}>
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                            Información de Contacto y Envío
+                        </Typography>
+                        <Alert severity="info" sx={{ mb: 3, backgroundColor: 'rgba(2, 136, 209, 0.08)', color: '#fff', border: '1px solid rgba(2, 136, 209, 0.3)' }}>
+                            💡 ¿Ya tienes una cuenta?{' '}
+                            <Button
+                                component={RouterLink}
+                                to="/login"
+                                state={{ from: '/carrito' }}
+                                sx={{ p: 0, minWidth: 0, verticalAlign: 'baseline', textTransform: 'none', fontWeight: 'bold', textDecoration: 'underline' }}
+                            >
+                                Inicia sesión aquí
+                            </Button>{' '}
+                            para usar tus direcciones guardadas y tener un seguimiento más sencillo.
+                        </Alert>
+                    </Box>
 
-            {loadingAddresses ? (
-                <Typography>Cargando direcciones...</Typography>
-            ) : addresses.length === 0 ? (
-                <Box textAlign="center" py={4}>
-                    <Typography color="text.secondary" paragraph>
-                        No tienes direcciones guardadas.
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                        <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 'bold', mb: -1 }}>
+                            Datos de Contacto
+                        </Typography>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Correo Electrónico *"
+                                    name="email"
+                                    type="email"
+                                    value={guestForm.email}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Nombre y Apellido de quien recibe *"
+                                    name="recipientName"
+                                    value={guestForm.recipientName}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Teléfono de Contacto *"
+                                    name="phone"
+                                    value={guestForm.phone}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                        </Grid>
+
+                        <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 'bold', mb: -1, mt: 1 }}>
+                            Dirección de Envío
+                        </Typography>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={8}>
+                                <TextField
+                                    label="Calle *"
+                                    name="street"
+                                    value={guestForm.street}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <TextField
+                                    label="Código Postal *"
+                                    name="postalCode"
+                                    value={guestForm.postalCode}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Número Exterior *"
+                                    name="exteriorNumber"
+                                    value={guestForm.exteriorNumber}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Número Interior (Opcional)"
+                                    name="interiorNumber"
+                                    value={guestForm.interiorNumber}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Colonia *"
+                                    name="neighborhood"
+                                    value={guestForm.neighborhood}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Municipio / Ciudad *"
+                                    name="municipality"
+                                    value={guestForm.municipality}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Estado *"
+                                    name="state"
+                                    value={guestForm.state}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    size="small"
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Referencias (Opcional)"
+                                    name="references"
+                                    value={guestForm.references}
+                                    onChange={handleGuestFormChange}
+                                    fullWidth
+                                    multiline
+                                    rows={2}
+                                    size="small"
+                                />
+                            </Grid>
+                        </Grid>
+                    </Box>
+
+                    <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+                        <Button onClick={handleBack}>Volver</Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleNext}
+                        >
+                            Continuar
+                        </Button>
+                    </Box>
+                </Paper>
+            )
+        }
+
+        return (
+            <Paper sx={{ p: 3, backgroundColor: "#1e1e1e" }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                    <Typography variant="h6">
+                        Información de Envío
                     </Typography>
-                    <Button variant="contained" onClick={() => setOpenAddressDialog(true)}>
-                        Agregar Dirección
+                    <Button
+                        variant="outlined"
+                        startIcon={<Add />}
+                        onClick={() => setOpenAddressDialog(true)}
+                        size="small"
+                    >
+                        Nueva Dirección
                     </Button>
                 </Box>
-            ) : (
-                <Grid container spacing={2}>
-                    {addresses.map((addr) => (
-                        <Grid item xs={12} md={6} key={addr.id}>
-                            <Card
-                                variant="outlined"
-                                sx={{
-                                    cursor: 'pointer',
-                                    borderColor: selectedAddressId === addr.id ? 'primary.main' : 'divider',
-                                    borderWidth: selectedAddressId === addr.id ? 2 : 1,
-                                    backgroundColor: selectedAddressId === addr.id ? 'rgba(25, 118, 210, 0.08)' : 'background.paper',
-                                    transition: 'all 0.2s',
-                                    '&:hover': {
-                                        borderColor: 'primary.light'
-                                    }
-                                }}
-                                onClick={() => setSelectedAddressId(addr.id)}
-                            >
-                                <CardContent>
-                                    <Box display="flex" justifyContent="space-between" alignItems="start">
-                                        <Typography variant="subtitle1" fontWeight="bold">
-                                            {addr.recipient_name || 'Destinatario'}
+
+                {loadingAddresses ? (
+                    <Typography>Cargando direcciones...</Typography>
+                ) : addresses.length === 0 ? (
+                    <Box textAlign="center" py={4}>
+                        <Typography color="text.secondary" paragraph>
+                            No tienes direcciones guardadas.
+                        </Typography>
+                        <Button variant="contained" onClick={() => setOpenAddressDialog(true)}>
+                            Agregar Dirección
+                        </Button>
+                    </Box>
+                ) : (
+                    <Grid container spacing={2}>
+                        {addresses.map((addr) => (
+                            <Grid item xs={12} md={6} key={addr.id}>
+                                <Card
+                                    variant="outlined"
+                                    sx={{
+                                        cursor: 'pointer',
+                                        borderColor: selectedAddressId === addr.id ? 'primary.main' : 'divider',
+                                        borderWidth: selectedAddressId === addr.id ? 2 : 1,
+                                        backgroundColor: selectedAddressId === addr.id ? 'rgba(25, 118, 210, 0.08)' : 'background.paper',
+                                        transition: 'all 0.2s',
+                                        '&:hover': {
+                                            borderColor: 'primary.light'
+                                        }
+                                    }}
+                                    onClick={() => setSelectedAddressId(addr.id)}
+                                >
+                                    <CardContent>
+                                        <Box display="flex" justifyContent="space-between" alignItems="start">
+                                            <Typography variant="subtitle1" fontWeight="bold">
+                                                {addr.recipient_name || 'Destinatario'}
+                                            </Typography>
+                                            {selectedAddressId === addr.id && (
+                                                <CheckCircle color="primary" fontSize="small" />
+                                            )}
+                                        </Box>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {addr.street} {addr.exterior_number} {addr.interior_number ? `Int. ${addr.interior_number}` : ''}
                                         </Typography>
-                                        {selectedAddressId === addr.id && (
-                                            <CheckCircle color="primary" fontSize="small" />
-                                        )}
-                                    </Box>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {addr.street} {addr.exterior_number} {addr.interior_number ? `Int. ${addr.interior_number}` : ''}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {addr.neighborhood}, {addr.municipality}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {addr.state}, CP: {addr.postal_code}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                                        Tel: {addr.phone}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            )}
+                                        <Typography variant="body2" color="text.secondary">
+                                            {addr.neighborhood}, {addr.municipality}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {addr.state}, CP: {addr.postal_code}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+                                            Tel: {addr.phone}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                )}
 
-            <AddressDialog
-                open={openAddressDialog}
-                onClose={() => setOpenAddressDialog(false)}
-                onSave={handleSaveAddress}
-            />
+                <AddressDialog
+                    open={openAddressDialog}
+                    onClose={() => setOpenAddressDialog(false)}
+                    onSave={handleSaveAddress}
+                />
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-                <Button onClick={handleBack}>Volver</Button>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
-                    disabled={selectedAddressId === null}
-                >
-                    Continuar
-                </Button>
-            </Box>
-        </Paper>
-    )
+                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+                    <Button onClick={handleBack}>Volver</Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNext}
+                        disabled={selectedAddressId === null}
+                    >
+                        Continuar
+                    </Button>
+                </Box>
+            </Paper>
+        )
+    }
 
     // Payment step content
     const renderPaymentContent = () => (
