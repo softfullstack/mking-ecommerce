@@ -140,13 +140,12 @@ const ProductDetail = () => {
         )
     }
 
-    // Reordenar imágenes para que la principal esté primero
+    // Reordenar imágenes para que la principal (is_primary = 1) esté siempre primero
     const sortedImages = product.images && Array.isArray(product.images)
-        ? [...product.images].sort((a, b) => {
-            if ((a as any).is_primary === (b as any).is_primary) return 0;
-            if ((a as any).is_primary) return -1;
-            if ((b as any).is_primary) return 1;
-            return 0;
+        ? [...product.images].sort((a: any, b: any) => {
+            const isPrimaryA = a?.is_primary === 1 || a?.is_primary === true || a?.is_primary === "1" ? 1 : 0;
+            const isPrimaryB = b?.is_primary === 1 || b?.is_primary === true || b?.is_primary === "1" ? 1 : 0;
+            return isPrimaryB - isPrimaryA;
         })
         : [];
 
@@ -265,17 +264,23 @@ const ProductDetail = () => {
         setIsImageModalOpen(false)
     }
 
-    // Helper to get absolute image URL for meta tags
+    // Helper to get absolute image URL for meta tags focusing on is_primary = 1
     const getAbsoluteImageUrl = () => {
         if (!product) return "";
         let url = "";
 
-        if (sortedImages && sortedImages.length > 0) {
-            const img = sortedImages[0];
-            if (typeof img === 'string') {
-                url = img;
-            } else if (img && typeof img === 'object') {
-                url = (img as any).url || (img as any).image_path || "";
+        // 1. Buscar explícitamente la imagen con is_primary == 1
+        if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+            const primaryImg = product.images.find((img: any) => 
+                img && (img.is_primary === 1 || img.is_primary === true || img.is_primary === "1")
+            );
+
+            const targetImg = primaryImg || sortedImages[0];
+
+            if (typeof targetImg === 'string') {
+                url = targetImg;
+            } else if (targetImg && typeof targetImg === 'object') {
+                url = (targetImg as any).url || (targetImg as any).image_path || "";
             }
         }
 
@@ -283,7 +288,9 @@ const ProductDetail = () => {
             url = (product as any).img_product;
         }
 
-        if (!url) return "";
+        if (!url) {
+            return 'https://mking.com.mx/images/logo-share.jpg';
+        }
 
         if (url.startsWith('http://') || url.startsWith('https://')) {
             return url;
