@@ -259,20 +259,20 @@ const Home = () => {
                 <meta property="og:url" content="https://mking.com.mx/" />
                 <meta property="og:title" content="MKing – Fábrica de Chalecos en Guadalajara | Seguridad Industrial" />
                 <meta property="og:description" content="Fábrica de chalecos de seguridad industrial en Guadalajara, Jalisco. Venta directa de fábrica con bordado personalizado." />
-                <meta property="og:image" content="https://mking.com.mx/images/og-share.jpg" />
-                <meta property="og:image:secure_url" content="https://mking.com.mx/images/og-share.jpg" />
+                <meta property="og:image" content="https://mking.com.mx/images/logo-share.jpg" />
+                <meta property="og:image:secure_url" content="https://mking.com.mx/images/logo-share.jpg" />
                 <meta property="og:image:type" content="image/jpeg" />
-                <meta property="og:image:width" content="1200" />
-                <meta property="og:image:height" content="630" />
-                <meta property="og:image:alt" content="MKing - Fábrica de Chalecos de Seguridad Industrial en Guadalajara" />
+                <meta property="og:image:width" content="600" />
+                <meta property="og:image:height" content="600" />
+                <meta property="og:image:alt" content="MKing" />
 
                 {/* Twitter Cards */}
-                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:card" content="summary" />
                 <meta name="twitter:url" content="https://mking.com.mx/" />
                 <meta name="twitter:title" content="MKing – Fábrica de Chalecos de Seguridad en Guadalajara" />
                 <meta name="twitter:description" content="Chalecos de seguridad industrial directos de fábrica en Guadalajara, Jalisco. Bordado personalizado y precios al mayoreo." />
-                <meta name="twitter:image" content="https://mking.com.mx/images/og-share.jpg" />
-                <meta name="twitter:image:alt" content="MKing - Chalecos de Seguridad Industrial Guadalajara" />
+                <meta name="twitter:image" content="https://mking.com.mx/images/logo-share.jpg" />
+                <meta name="twitter:image:alt" content="MKing" />
             </Helmet>
             {/* Hero Section */}
             <Box
