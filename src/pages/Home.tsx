@@ -248,8 +248,9 @@ const Home = () => {
     return (
         <Box>
             <Helmet>
-                <title>MKing – Chalecos de Seguridad Industrial | Tienda en Línea México</title>
-                <meta name="description" content="Fábrica y tienda en línea de chalecos de seguridad industrial con bordado personalizado. Equipo de protección personal, ropa de trabajo y envíos a todo México. Venta al mayoreo y menudeo." />
+                <title>Chalecos en Guadalajara | Fábrica de Chalecos de Seguridad Industrial – MKing</title>
+                <meta name="description" content="Fábrica de chalecos de seguridad industrial en Guadalajara, Jalisco. Venta al mayoreo y menudeo de chalecos reflejantes, tácticos, ropa de trabajo y bordado personalizado con envíos a todo México." />
+                <meta name="keywords" content="chalecos en guadalajara, chalecos de seguridad guadalajara, fabrica de chalecos guadalajara, chalecos industriales guadalajara, chalecos al mayoreo guadalajara, chalecos reflejantes guadalajara" />
                 <link rel="canonical" href="https://mking.com.mx/" />
             </Helmet>
             {/* Hero Section */}
@@ -427,6 +428,52 @@ const Home = () => {
                     </Grid>
                 </Grid>
             </Container>
+
+            {/* Local SEO Section: Chalecos en Guadalajara */}
+            <Box sx={{ bgcolor: '#f8f9fa', py: 8, borderTop: '1px solid #e0e0e0', mt: 6 }}>
+                <Container maxWidth="lg">
+                    <Typography variant="h4" fontWeight="800" sx={{ mb: 2, color: 'primary.main', textTransform: 'uppercase' }}>
+                        Fábrica y Venta de Chalecos en Guadalajara, Jalisco
+                    </Typography>
+                    <Typography variant="body1" paragraph color="text.secondary" sx={{ fontSize: '1.1rem', lineHeight: 1.8 }}>
+                        En <strong>MKing (Maquila King)</strong> somos especialistas en la <strong>fabricación y venta de chalecos de seguridad industrial en Guadalajara</strong>. Proveemos a empresas, industrias y contratistas en toda la Zona Metropolitana de Guadalajara (Zapopan, Tlaquepaque, Tonalá) y envíos a todo México con calidad de exportación y normas internacionales ISO 20471.
+                    </Typography>
+                    <Grid container spacing={4} sx={{ mt: 2 }}>
+                        <Grid item xs={12} md={4}>
+                            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'text.primary' }}>
+                                🏭 Chalecos al Mayoreo en Guadalajara
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Precios directos de fábrica para pedidos corporativos. Descuentos por volumen en chalecos de seguridad, reflejantes y tácticos para tu personal de campo u oficina.
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'text.primary' }}>
+                                🧵 Bordado y Personalización Local
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Agrega el logotipo de tu empresa con bordado de alta precisión o vinil reflectante. Personalización disponible en nuestra planta de Guadalajara desde 1 pieza.
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1, color: 'text.primary' }}>
+                                🚚 Envíos y Entregas en Guadalajara
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Contamos con entregas rápidas y opción de recolección directa en nuestra fábrica de Guadalajara. Stock disponible en los modelos más demandados.
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                    <Box sx={{ mt: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                        <Button component={RouterLink} to="/productos" variant="contained" color="primary">
+                            Ver Catálogo de Chalecos
+                        </Button>
+                        <Button component={RouterLink} to="/ubicaciones" variant="outlined" color="primary">
+                            Ver Planta Guadalajara
+                        </Button>
+                    </Box>
+                </Container>
+            </Box>
         </Box>
     )
 }

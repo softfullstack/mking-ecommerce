@@ -290,8 +290,9 @@ const About = () => {
     return (
         <Box>
             <Helmet>
-                <title>Nosotros | MKing – Fábrica de Chalecos de Seguridad Industrial en México</title>
-                <meta name="description" content="Conoce MKing - Maquila King: más de 10 años fabricando chalecos de seguridad industrial en Guadalajara, Jalisco. Fabricación 100% nacional, certificación ISO 20471 y bordado personalizado." />
+                <title>Fábrica de Chalecos en Guadalajara | Nosotros MKing</title>
+                <meta name="description" content="Conoce MKing (Maquila King): líderes fabricando chalecos de seguridad industrial en Guadalajara, Jalisco. Fabricación nacional con certificación ISO 20471 y bordado de logotipos." />
+                <meta name="keywords" content="fabrica de chalecos guadalajara, maquila de chalecos guadalajara, mking nosotros, chalecos de seguridad jalisco" />
                 <link rel="canonical" href="https://mking.com.mx/nosotros" />
             </Helmet>
 

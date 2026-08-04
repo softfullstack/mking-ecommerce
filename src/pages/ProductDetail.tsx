@@ -267,25 +267,37 @@ const ProductDetail = () => {
 
     // Helper to get absolute image URL for meta tags
     const getAbsoluteImageUrl = () => {
-        if (sortedImages.length === 0) return "";
-        const img = sortedImages[0];
+        if (!product) return "";
         let url = "";
 
-        if (typeof img === 'string') {
-            url = img;
-        } else if (img && typeof img === 'object') {
-            url = img.url || img.image_path || "";
+        if (sortedImages && sortedImages.length > 0) {
+            const img = sortedImages[0];
+            if (typeof img === 'string') {
+                url = img;
+            } else if (img && typeof img === 'object') {
+                url = (img as any).url || (img as any).image_path || "";
+            }
+        }
+
+        if (!url && (product as any).img_product) {
+            url = (product as any).img_product;
         }
 
         if (!url) return "";
-        if (url.startsWith('http')) return url;
-        
-        // Ensure we don't have double slashes if origin has no trailing slash (which it shouldn't)
-        const origin = window.location.origin;
+
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+
+        const origin = typeof window !== 'undefined' && window.location?.origin 
+            ? window.location.origin 
+            : 'https://mking.com.mx';
+
         return `${origin}${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
     const absoluteImageUrl = getAbsoluteImageUrl();
+    const productUrl = typeof window !== 'undefined' ? window.location.href : `https://mking.com.mx/producto/${uuid}`;
 
     return (
         <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
@@ -294,25 +306,52 @@ const ProductDetail = () => {
                 <meta name="description" content={`Compra ${product.name} en MKing. ${product.description ? product.description.substring(0, 120) : 'Chaleco de seguridad industrial de alta calidad'}. Precio: $${Number(product.price).toFixed(2)}. Envíos a todo México.`} />
                 <link rel="canonical" href={`https://mking.com.mx/producto/${uuid}`} />
                 
-                {/* Open Graph / Facebook */}
+                {/* Open Graph / Facebook / WhatsApp */}
                 <meta property="og:type" content="product" />
-                <meta property="og:url" content={window.location.href} />
+                <meta property="og:site_name" content="MKing Ecommerce" />
+                <meta property="og:url" content={productUrl} />
                 <meta property="og:title" content={`${product.name} | MKing`} />
                 <meta property="og:description" content={`${product.name} - $${Number(product.price).toFixed(2)} MXN. Chaleco de seguridad industrial de alta calidad.`} />
                 {absoluteImageUrl && <meta property="og:image" content={absoluteImageUrl} />}
                 {absoluteImageUrl && <meta property="og:image:secure_url" content={absoluteImageUrl} />}
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt" content={product.name} />
 
-                {/* Twitter */}
-                <meta property="twitter:card" content="summary_large_image" />
-                <meta property="twitter:url" content={window.location.href} />
-                <meta property="twitter:title" content={`${product.name} | MKing`} />
-                <meta property="twitter:description" content={`${product.name} - $${Number(product.price).toFixed(2)} MXN. Chaleco de seguridad industrial de alta calidad.`} />
-                {absoluteImageUrl && <meta property="twitter:image" content={absoluteImageUrl} />}
+                {/* Twitter Cards */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:url" content={productUrl} />
+                <meta name="twitter:title" content={`${product.name} | MKing`} />
+                <meta name="twitter:description" content={`${product.name} - $${Number(product.price).toFixed(2)} MXN. Chaleco de seguridad industrial de alta calidad.`} />
+                {absoluteImageUrl && <meta name="twitter:image" content={absoluteImageUrl} />}
+                {absoluteImageUrl && <meta name="twitter:image:alt" content={product.name} />}
 
+                {/* Meta datos de producto */}
                 <meta property="product:price:amount" content={String(product.price)} />
                 <meta property="product:price:currency" content="MXN" />
+
+                {/* JSON-LD Structured Data: Product */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Product",
+                        "name": product.name,
+                        "image": absoluteImageUrl ? [absoluteImageUrl] : [],
+                        "description": product.description || "Chaleco de seguridad industrial de alta calidad MKing",
+                        "sku": (product as any).sku || `MK-${product.id}`,
+                        "offers": {
+                            "@type": "Offer",
+                            "url": productUrl,
+                            "priceCurrency": "MXN",
+                            "price": product.price,
+                            "availability": "https://schema.org/InStock",
+                            "seller": {
+                                "@type": "Organization",
+                                "name": "MKing"
+                            }
+                        }
+                    })}
+                </script>
             </Helmet>
             <Breadcrumbs sx={{ mb: 3 }}>
                 <Link component={RouterLink} to="/" color="inherit">

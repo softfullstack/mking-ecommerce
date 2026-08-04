@@ -398,15 +398,16 @@ const ProductList = () => {
     return (
         <>
         <Helmet>
-            <title>Chalecos de Seguridad Industrial | Catálogo MKing México</title>
-            <meta name="description" content="Explora nuestro catálogo de chalecos de seguridad industrial, equipo de protección personal y ropa de trabajo. Filtros por color, categoría y precio. Envíos a todo México." />
+            <title>Chalecos en Guadalajara – Catálogo de Chalecos Industriales | MKing</title>
+            <meta name="description" content="Catálogo completo de chalecos de seguridad industrial en Guadalajara. Chalecos reflejantes, tácticos, ignífugos y ropa de trabajo directos de fábrica. Venta al mayoreo y menudeo." />
+            <meta name="keywords" content="chalecos en guadalajara, catálogo chalecos de seguridad, chalecos industriales guadalajara, chalecos reflejantes, ropa de trabajo guadalajara" />
             <link rel="canonical" href="https://mking.com.mx/productos" />
         </Helmet>
         <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
             <Box ref={headerRef} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 2, md: 4 } }}>
 
                 <Typography variant="h4" component="h1" sx={{ fontWeight: "bold", fontSize: { xs: "1.3rem", sm: "1.6rem", md: "2.125rem" } }}>
-                    Chalecos Industriales
+                    Chalecos Industriales en Guadalajara
                 </Typography>
 
                 <Box sx={{ display: "flex", gap: 2 }}>

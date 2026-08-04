@@ -200,8 +200,10 @@ const DescuentosEmpresas = () => {
     return (
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 10 }}>
             <Helmet>
-                <title>Descuentos para Empresas y Chalecos al Mayoreo | MKing</title>
-                <meta name="description" content="Calcula descuentos corporativos en chalecos de seguridad industrial. Precios de fábrica al mayoreo para empresas con logotipo incluido." />
+                <title>Chalecos al Mayoreo en Guadalajara | Descuentos para Empresas MKing</title>
+                <meta name="description" content="Calcula descuentos corporativos en chalecos de seguridad industrial al mayoreo en Guadalajara. Precios directos de fábrica para empresas con bordado de logotipo incluido." />
+                <meta name="keywords" content="chalecos al mayoreo guadalajara, chalecos de seguridad corporativos, cotizador chalecos guadalajara, precio de fabrica chalecos" />
+                <link rel="canonical" href="https://mking.com.mx/descuentos" />
             </Helmet>
 
             {/* Hero Header */}

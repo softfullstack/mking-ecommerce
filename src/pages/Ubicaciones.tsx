@@ -72,8 +72,9 @@ const Ubicaciones = () => {
     return (
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 10 }}>
             <Helmet>
-                <title>Nuestras Ubicaciones | MKing</title>
-                <meta name="description" content="Encuentra nuestras sucursales y fábricas de chalecos de seguridad industrial en Guadalajara y Monterrey. Direcciones, mapas interactivos y cómo llegar." />
+                <title>Fábrica de Chalecos en Guadalajara y Monterrey | Ubicaciones MKing</title>
+                <meta name="description" content="Visita nuestra fábrica y sucursales de chalecos de seguridad industrial en Guadalajara, Jalisco y Monterrey. Direcciones, atención directas y mapa de ubicación." />
+                <meta name="keywords" content="fabrica de chalecos guadalajara, chalecos en guadalajara ubicacion, sucursal chalecos de seguridad guadalajara, mking guadalajara" />
             </Helmet>
 
             {/* Hero Header */}

@@ -93,8 +93,10 @@ const Contact = () => {
     return (
         <Box sx={{ bgcolor: '#4b4b4bff', minHeight: '100vh', pb: 10 }}>
             <Helmet>
-                <title>Contacto y Redes Sociales | MKing</title>
-                <meta name="description" content="Ponte en contacto con MKing. Síguenos en nuestras redes sociales, conoce nuestros videos y ubícanos en nuestro mapa interactivo." />
+                <title>Contacto – Fábrica de Chalecos en Guadalajara | MKing</title>
+                <meta name="description" content="Ponte en contacto con MKing Guadalajara. Cotiza chalecos de seguridad industrial al mayoreo, solicita muestras o visítanos en Guadalajara, Jalisco." />
+                <meta name="keywords" content="contacto chalecos guadalajara, cotizar chalecos de seguridad guadalajara, fabrica chalecos mking" />
+                <link rel="canonical" href="https://mking.com.mx/contacto" />
             </Helmet>
 
             {/* Hero Header */}
