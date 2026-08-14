@@ -338,7 +338,7 @@ const Home = () => {
                                 variant="outlined"
                                 color="primary"
                                 size="small"
-                                sx={{ fontSize: { xs: "0.85rem", md: "0.95rem" } }}
+                                sx={{ borderColor: "#fff", color: "#fff", fontSize: { xs: "0.85rem", md: "0.95rem" } }}
                             >
                                 Comprar Ahora
                             </Button>
@@ -348,7 +348,7 @@ const Home = () => {
                                 variant="outlined"
                                 color="primary"
                                 size="small"
-                                sx={{ borderColor: "#fff", color: "#fff", fontSize: { xs: "0.85rem", md: "0.95rem" } }}
+                                sx={{ fontSize: { xs: "0.85rem", md: "0.95rem" } }}
                             >
                                 Ver Novedades
                             </Button>
@@ -451,7 +451,7 @@ const Home = () => {
             </Container>
 
             {/* Local SEO Section: Chalecos en Guadalajara */}
-            <Box sx={{ bgcolor: '#f8f9fa', py: 8, borderTop: '1px solid #e0e0e0', mt: 6 }}>
+            <Box sx={{ bgcolor: '#1d0300', py: 8, borderTop: '1px solid #e0e0e0', mt: 6 }}>
                 <Container maxWidth="lg">
                     <Typography variant="h4" fontWeight="800" sx={{ mb: 2, color: 'primary.main', textTransform: 'uppercase' }}>
                         Fábrica y Venta de Chalecos en Guadalajara, Jalisco
