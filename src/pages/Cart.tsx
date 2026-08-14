@@ -297,9 +297,9 @@ const Cart = () => {
             } catch (error: any) {
                 console.error('Error processing payment:', error?.response?.data || error.message)
                 const backendError = error?.response?.data
-                const msg = backendError?.cause?.message 
+                const msg = backendError?.cause?.message
                     || backendError?.cause?.description
-                    || backendError?.message 
+                    || backendError?.message
                     || 'Error al procesar el pago o registrar el pedido'
                 toast.error(msg)
                 reject() // Indicar al Brick que hubo un error de comunicación
@@ -587,7 +587,7 @@ const Cart = () => {
                                 <Box sx={{ mt: 3, display: "flex", alignItems: "center", justifyContent: "center" }}>
                                     <LocalShipping fontSize="small" sx={{ mr: 1 }} />
                                     <Typography variant="body2" align="center">
-                                        Envío gratuito en pedidos superiores a $100
+                                        Envío gratuito en compras a partir de 30 piezas.
                                     </Typography>
                                 </Box>
                             </CardContent>

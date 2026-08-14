@@ -271,7 +271,7 @@ const ProductDetail = () => {
 
         // 1. Buscar explícitamente la imagen con is_primary == 1
         if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-            const primaryImg = product.images.find((img: any) => 
+            const primaryImg = product.images.find((img: any) =>
                 img && (img.is_primary === 1 || img.is_primary === true || img.is_primary === "1")
             );
 
@@ -296,8 +296,8 @@ const ProductDetail = () => {
             return url;
         }
 
-        const origin = typeof window !== 'undefined' && window.location?.origin 
-            ? window.location.origin 
+        const origin = typeof window !== 'undefined' && window.location?.origin
+            ? window.location.origin
             : 'https://mking.com.mx';
 
         return `${origin}${url.startsWith('/') ? '' : '/'}${url}`;
@@ -312,7 +312,7 @@ const ProductDetail = () => {
                 <title>{product.name} | Chaleco de Seguridad Industrial - MKing México</title>
                 <meta name="description" content={`Compra ${product.name} en MKing. ${product.description ? product.description.substring(0, 120) : 'Chaleco de seguridad industrial de alta calidad'}. Precio: $${Number(product.price).toFixed(2)}. Envíos a todo México.`} />
                 <link rel="canonical" href={`https://mking.com.mx/producto/${uuid}`} />
-                
+
                 {/* Open Graph / Facebook / WhatsApp */}
                 <meta property="og:type" content="product" />
                 <meta property="og:site_name" content="MKing Ecommerce" />
@@ -604,7 +604,7 @@ const ProductDetail = () => {
                         {/* Shipping info */}
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
                             <LocalShipping />
-                            <Typography variant="body2">Envío gratuito en pedidos superiores a $100</Typography>
+                            <Typography variant="body2">Envío gratuito en compras a partir de 30 piezas.</Typography>
                         </Box>
 
                         {/* Guarantee */}
