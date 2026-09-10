@@ -87,7 +87,12 @@ const Footer = () => {
                         </Link>
                     </Box>
                     <Typography variant="body2" color="text.secondary" align="center">
-                        © {new Date().getFullYear()} SafetyVest, Inc. Todos los derechos reservados.
+                        <a href="https://mariotip.github.io/" target="_blank" rel="noopener noreferrer" style={{ color: "white" }}>
+                            Powered 💙 DevDul
+                        </a>
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" align="center">
+                        © {new Date().getFullYear()} MKing S.A. de C.V. Todos los derechos reservados.
                     </Typography>
                 </Box>
             </Container>

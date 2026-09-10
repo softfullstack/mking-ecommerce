@@ -436,7 +436,6 @@ const DescuentosEmpresas = () => {
                             {/* Left: Vest Interactive SVG Graphic */}
                             <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <Box sx={{ position: 'relative', width: '100%', maxWidth: 400, height: 480 }}>
-                                    {/* Safety Vest Interactive SVG Drawing */}
                                     <svg viewBox="0 0 400 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
                                         {/* Background Shadow */}
                                         <ellipse cx="200" cy="460" rx="140" ry="12" fill="rgba(0,0,0,0.4)" />
@@ -454,9 +453,6 @@ const DescuentosEmpresas = () => {
 
                                         {/* Neck Cutout */}
                                         <path d="M 155,93 C 180,120 220,120 245,93 L 230,93 C 215,108 185,108 170,93 Z" fill="#242424" />
-
-                                        {/* Reflector Stripes (Silver/White lines on safety vest) */}
-                                        {/* Vertical Left shoulder */}
                                         <path d="M 148,93 L 148,185" stroke="#e0e0e0" strokeWidth="18" fill="none" opacity="0.9" />
                                         <path d="M 148,93 L 148,185" stroke="#ffeb3b" strokeWidth="22" fill="none" opacity="0.4" />
                                         {/* Vertical Right shoulder */}
