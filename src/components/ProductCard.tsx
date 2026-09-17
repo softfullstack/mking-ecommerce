@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, RadioGroup, FormControlLabel, Radio, CardActions, Button } from "@mui/material"
+import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CardActions, Button } from "@mui/material"
 import { Link } from "react-router-dom"
 import { Product } from "../interfaces/ProductInterface"
 import { useState, useEffect } from "react"
@@ -87,6 +87,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         e.stopPropagation()
 
         if (normalizedSizesChoices.length > 1) {
+            setSelectedSize(normalizedSizesChoices[0])
             setIsSizeDialogOpen(true)
         } else {
             const sizeToAdd = normalizedSizesChoices.length === 1 ? normalizedSizesChoices[0] : "Única"
@@ -104,7 +105,11 @@ const ProductCard = ({ product }: { product: Product }) => {
         setSelectedSize("")
     }
 
-    const handleConfirmSize = () => {
+    const handleConfirmSize = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
         if (!selectedSize) {
             toast.warning("Por favor selecciona una talla")
             return
@@ -290,24 +295,90 @@ const ProductCard = ({ product }: { product: Product }) => {
                 </Button>
             </CardActions>
 
-            <Dialog open={isSizeDialogOpen} onClose={() => setIsSizeDialogOpen(false)}>
-                <DialogTitle>Selecciona la talla</DialogTitle>
-                <DialogContent>
-                    <FormControl>
-                        <RadioGroup
-                            value={selectedSize}
-                            onChange={(e) => setSelectedSize(e.target.value)}
-                        >
-                            {normalizedSizesChoices.map((size: string, idx: number) => (
-                                <FormControlLabel key={idx} value={size} control={<Radio />} label={size} />
-                            ))}
-                        </RadioGroup>
-                    </FormControl>
+            <Dialog 
+                open={isSizeDialogOpen} 
+                onClose={(_event, reason) => {
+                    if (reason === 'backdropClick') {
+                        setIsSizeDialogOpen(false)
+                    } else {
+                        setIsSizeDialogOpen(false)
+                    }
+                }}
+                onClick={(e) => e.stopPropagation()}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3,
+                        p: { xs: 1, sm: 2 },
+                        minWidth: { xs: 290, sm: 360 },
+                        maxWidth: 420,
+                    }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.15rem", pb: 0.5 }}>
+                    Selecciona una talla
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontWeight: "normal" }}>
+                        {name}
+                    </Typography>
+                </DialogTitle>
+                <DialogContent sx={{ py: 1.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", textTransform: "uppercase", display: "block", mb: 1.5, letterSpacing: 0.5 }}>
+                        Tallas disponibles:
+                    </Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                        {normalizedSizesChoices.map((size: string, idx: number) => {
+                            const isSelected = selectedSize === size
+                            return (
+                                <Button
+                                    key={idx}
+                                    variant={isSelected ? "contained" : "outlined"}
+                                    color={isSelected ? "error" : "inherit"}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        setSelectedSize(size)
+                                    }}
+                                    sx={{
+                                        minWidth: 50,
+                                        height: 42,
+                                        borderRadius: 2,
+                                        fontWeight: "bold",
+                                        fontSize: "0.875rem",
+                                        borderColor: isSelected ? "error.main" : "divider",
+                                        boxShadow: isSelected ? "0 2px 8px rgba(211, 47, 47, 0.35)" : "none",
+                                        "&:hover": {
+                                            borderColor: "error.main",
+                                        }
+                                    }}
+                                >
+                                    {size}
+                                </Button>
+                            )
+                        })}
+                    </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setIsSizeDialogOpen(false)}>Cancelar</Button>
-                    <Button onClick={handleConfirmSize} variant="contained" color="error" sx={{ borderRadius: 8, textTransform: "none", fontWeight: "bold", fontSize: "0.8rem", px: 2, py: 0.5 }}>
-                        Agregar al carrito
+                <DialogActions sx={{ px: 3, pb: 2, pt: 1, gap: 1 }}>
+                    <Button 
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            setIsSizeDialogOpen(false)
+                        }}
+                        sx={{ color: "text.secondary", textTransform: "none", fontWeight: 600 }}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button 
+                        onClick={(e) => handleConfirmSize(e)} 
+                        variant="contained" 
+                        color="error" 
+                        sx={{ 
+                            borderRadius: 8, 
+                            textTransform: "none", 
+                            fontWeight: "bold", 
+                            px: 2.5, 
+                            py: 0.8,
+                            boxShadow: "0 4px 12px rgba(211, 47, 47, 0.3)"
+                        }}
+                    >
+                        Agregar a la bolsa
                     </Button>
                 </DialogActions>
             </Dialog>

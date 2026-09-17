@@ -10,6 +10,7 @@ import Cart from "./pages/Cart"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import ConfirmEmail from "./pages/ConfirmEmail"
+import ForgotPassword from "./pages/ForgotPassword"
 import Profile from "./pages/Profile"
 import About from "./pages/About"
 import Novedades from "./pages/Novedades"
@@ -71,6 +72,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Register />} />
             <Route path="/confirmar-correo" element={<ConfirmEmail />} />
+            <Route path="/recuperar-password" element={<ForgotPassword />} />
             <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/nosotros" element={<About />} />
             <Route path="/novedades" element={<Novedades />} />

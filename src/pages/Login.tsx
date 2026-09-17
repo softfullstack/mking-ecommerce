@@ -62,6 +62,17 @@ const Login = () => {
                 return
             }
 
+            if (responseData?.redirectToRecovery || responseData?.code === 'E_TOO_MANY_ATTEMPTS_RECOVERY_SENT') {
+                navigate("/recuperar-password", {
+                    state: {
+                        email: data.email,
+                        step: 1,
+                        message: responseData?.message || "Has alcanzado 4 intentos fallidos. Te enviamos un código a tu correo para restablecer tu contraseña."
+                    }
+                })
+                return
+            }
+
             setLoginError(message)
         }
     }

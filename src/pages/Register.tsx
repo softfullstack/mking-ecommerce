@@ -28,7 +28,9 @@ const Register = () => {
     const [showPassword, setShowPassword] = React.useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
     const [registerSuccess, setRegisterSuccess] = React.useState(false)
+    const [successMessage, setSuccessMessage] = React.useState("")
     const [registerError, setRegisterError] = React.useState("")
+    const [alreadyRegistered, setAlreadyRegistered] = React.useState(false)
 
     const {
         register,
@@ -44,8 +46,10 @@ const Register = () => {
 
     const onSubmit = async (data: RegisterFormData) => {
         setRegisterError("")
+        setAlreadyRegistered(false)
         try {
-            await RegisterService(data)
+            const response = await RegisterService(data)
+            setSuccessMessage(response.data?.message || "¡Registro exitoso! Por favor verifica tu correo electrónico para el código de confirmación.")
             setRegisterSuccess(true)
 
             // Redirigir a la página de confirmación pasando el email
@@ -54,8 +58,13 @@ const Register = () => {
             }, 3000)
         } catch (error: any) {
             console.error(error)
-            const message = error.response?.data?.message || "Error al registrarse. Por favor intenta de nuevo."
+            const responseData = error.response?.data
+            const message = responseData?.message || "Error al registrarse. Por favor intenta de nuevo."
             setRegisterError(message)
+
+            if (responseData?.code === 'E_ALREADY_REGISTERED' || responseData?.redirectToLogin) {
+                setAlreadyRegistered(true)
+            }
         }
     }
 
@@ -72,13 +81,13 @@ const Register = () => {
             <Container maxWidth="sm" sx={{ py: 8 }}>
                 <Paper sx={{ p: 4, textAlign: "center", backgroundColor: "#1e1e1e" }}>
                     <Alert severity="success" sx={{ mb: 3 }}>
-                        ¡Registro exitoso! Por favor verifica tu correo electrónico para el código de confirmación. Serás redirigido automáticamente...
+                        {successMessage || "¡Registro exitoso! Por favor verifica tu correo electrónico para el código de confirmación."} Serás redirigido automáticamente...
                     </Alert>
                     <Typography variant="h5" sx={{ mb: 2 }}>
-                        ¡Gracias por registrarte!
+                        ¡Revisa tu correo electrónico!
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 3 }}>
-                        Tu cuenta ha sido creada correctamente.
+                        Te enviamos un código de confirmación de 6 dígitos a tu correo. Ingrésalo en la siguiente pantalla para activar tu cuenta.
                     </Typography>
                 </Paper>
             </Container>
@@ -98,8 +107,22 @@ const Register = () => {
                 </Box>
 
                 {registerError && (
-                    <Alert severity="error" sx={{ mb: 3 }}>
-                        {registerError}
+                    <Alert severity={alreadyRegistered ? "info" : "error"} sx={{ mb: 3 }}>
+                        <Typography variant="body2" sx={{ mb: alreadyRegistered ? 1.5 : 0 }}>
+                            {registerError}
+                        </Typography>
+                        {alreadyRegistered && (
+                            <Box sx={{ mt: 1 }}>
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="primary"
+                                    onClick={() => navigate("/login")}
+                                >
+                                    Iniciar Sesión
+                                </Button>
+                            </Box>
+                        )}
                     </Alert>
                 )}
 

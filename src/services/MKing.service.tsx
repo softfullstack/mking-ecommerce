@@ -46,6 +46,8 @@ axios.interceptors.response.use(
 export const LoginService = (body: any) => axios.post(`${apiUrl}/login`, body);
 export const RegisterService = (body: any) => axios.post(`${apiUrl}/register`, body);
 export const ConfirmEmailService = (body: { email: string; code: string }) => axios.post(`${apiUrl}/confirm-email`, body);
+export const ForgotPasswordService = (body: { email: string }) => axios.post(`${apiUrl}/forgot-password`, body);
+export const ResetPasswordService = (body: { email: string; code: string; password: string }) => axios.post(`${apiUrl}/reset-password`, body);
 export const GetMeService = () => axios.get(`${apiUrl}/me`);
 
 
