@@ -229,55 +229,57 @@ const ProductCard = ({ product }: { product: Product }) => {
                         {name}
                     </Typography>
 
-                    {normalizedColors.length > 0 && (
-                        <Box sx={{ display: "flex", alignItems: "center", mb: 1.5, gap: 1 }}>
-                            {((product as any).originalColors?.length > 0 ? (product as any).originalColors : normalizedColors).slice(0, 6).map((colorObj: any, index: number) => {
-                                const hexColor = typeof colorObj === 'string' ? colorObj : (colorObj.hex_code || normalizedColors[index]);
-                                const hasSecondColor = typeof colorObj === 'object' && colorObj.hex_code_1;
-                                
-                                const isSelected = (product as any).color_id !== undefined && typeof colorObj === 'object' 
-                                    ? colorObj.id === (product as any).color_id 
-                                    : index === 0;
-
-                                return (
-                                    <Box
-                                        key={index}
-                                        sx={{
-                                            width: 18,
-                                            height: 18,
-                                            borderRadius: "50%",
-                                            background: hasSecondColor 
-                                                ? `linear-gradient(130deg, ${hexColor} 50%, ${colorObj.hex_code_1} 50%)` 
-                                                : hexColor,
-                                            border: isSelected ? "2px solid #fff" : "1px solid #ccc",
-                                            boxShadow: isSelected ? "0 0 0 1px #333" : "none",
-                                            cursor: "pointer",
-                                        }}
-                                    />
-                                );
-                            })}
-                            {normalizedColors.length > 6 && (
-                                <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
-                                    +{normalizedColors.length - 6}
+                    <Box sx={{ mt: 'auto', display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 1 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+                            {discount && discount > 0 ? (
+                                <>
+                                    <Typography variant="h6" color="text.primary" sx={{ fontWeight: "bold", mr: 1, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
+                                        ${(price * (1 - discount / 100)).toFixed(2)}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
+                                        ${price.toFixed(2)}
+                                    </Typography>
+                                </>
+                            ) : (
+                                <Typography variant="h6" color="text.primary" sx={{ fontWeight: "bold", fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
+                                    ${price.toFixed(2)}
                                 </Typography>
                             )}
                         </Box>
-                    )}
 
-                    <Box sx={{ mt: 'auto', display: "flex", alignItems: "center", flexWrap: "wrap" }}>
-                        {discount && discount > 0 ? (
-                            <>
-                                <Typography variant="h6" color="text.primary" sx={{ fontWeight: "bold", mr: 1, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
-                                    ${(price * (1 - discount / 100)).toFixed(2)}
-                                </Typography>
-                                <Typography variant="body2" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
-                                    ${price.toFixed(2)}
-                                </Typography>
-                            </>
-                        ) : (
-                            <Typography variant="h6" color="text.primary" sx={{ fontWeight: "bold", fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
-                                ${price.toFixed(2)}
-                            </Typography>
+                        {normalizedColors.length > 0 && (
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, ml: "auto" }}>
+                                {((product as any).originalColors?.length > 0 ? (product as any).originalColors : normalizedColors).slice(0, 5).map((colorObj: any, index: number) => {
+                                    const hexColor = typeof colorObj === 'string' ? colorObj : (colorObj.hex_code || normalizedColors[index]);
+                                    const hasSecondColor = typeof colorObj === 'object' && colorObj.hex_code_1;
+                                    
+                                    const isSelected = (product as any).color_id !== undefined && typeof colorObj === 'object' 
+                                        ? colorObj.id === (product as any).color_id 
+                                        : index === 0;
+
+                                    return (
+                                        <Box
+                                            key={index}
+                                            sx={{
+                                                width: 16,
+                                                height: 16,
+                                                borderRadius: "50%",
+                                                background: hasSecondColor 
+                                                    ? `linear-gradient(130deg, ${hexColor} 50%, ${colorObj.hex_code_1} 50%)` 
+                                                    : hexColor,
+                                                border: isSelected ? "2px solid #fff" : "1px solid #ccc",
+                                                boxShadow: isSelected ? "0 0 0 1px #333" : "none",
+                                                cursor: "pointer",
+                                            }}
+                                        />
+                                    );
+                                })}
+                                {normalizedColors.length > 5 && (
+                                    <Typography variant="caption" color="text.secondary" sx={{ ml: 0.25, fontSize: "0.75rem" }}>
+                                        +{normalizedColors.length - 5}
+                                    </Typography>
+                                )}
+                            </Box>
                         )}
                     </Box>
                 </CardContent>
