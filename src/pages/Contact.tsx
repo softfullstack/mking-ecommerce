@@ -200,7 +200,7 @@ const Contact = () => {
                                 </Typography>
                                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
                                     <IconButton
-                                        href="https://www.facebook.com/maquilaking"
+                                        href="https://www.facebook.com/maquila.king"
                                         target="_blank"
                                         sx={{ bgcolor: '#1877F2', color: 'white', '&:hover': { bgcolor: '#155dbd' }, p: 2 }}
                                     >

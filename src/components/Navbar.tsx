@@ -79,6 +79,7 @@ const Navbar = () => {
     const menuItems = [
         { text: "Inicio", path: "/" },
         { text: "Productos", path: "/productos" },
+        { text: "Noticias", path: "/noticias" },
         { text: "Nosotros", path: "/nosotros" },
         { text: "Contacto", path: "/contacto" },
     ]

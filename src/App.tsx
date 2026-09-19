@@ -14,6 +14,7 @@ import ForgotPassword from "./pages/ForgotPassword"
 import Profile from "./pages/Profile"
 import About from "./pages/About"
 import Novedades from "./pages/Novedades"
+import Noticias from "./pages/Noticias"
 import Contact from "./pages/Contact"
 import Ubicaciones from "./pages/Ubicaciones"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
@@ -76,6 +77,7 @@ function App() {
             <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/nosotros" element={<About />} />
             <Route path="/novedades" element={<Novedades />} />
+            <Route path="/noticias" element={<Noticias />} />
             <Route path="/contacto" element={<Contact />} />
             <Route path="/ubicaciones" element={<Ubicaciones />} />
             <Route path="/descuentos" element={<DescuentosEmpresas />} />

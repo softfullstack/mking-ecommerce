@@ -59,7 +59,13 @@ const Register = () => {
         } catch (error: any) {
             console.error(error)
             const responseData = error.response?.data
-            const message = responseData?.message || "Error al registrarse. Por favor intenta de nuevo."
+            let message = responseData?.message || "Error al registrarse. Por favor intenta de nuevo."
+            if (responseData?.errors && Array.isArray(responseData.errors) && responseData.errors.length > 0) {
+                const validationDetails = responseData.errors.map((e: any) => e.message || `${e.field}: inválido`).join(', ')
+                message += `: ${validationDetails}`
+            } else if (responseData?.error) {
+                message += `: ${responseData.error}`
+            }
             setRegisterError(message)
 
             if (responseData?.code === 'E_ALREADY_REGISTERED' || responseData?.redirectToLogin) {

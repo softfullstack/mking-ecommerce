@@ -56,7 +56,7 @@ const Footer = () => {
                             SÍGUENOS
                         </Typography>
                         <Box sx={{ display: "flex", gap: 1 }}>
-                            <IconButton color="inherit" aria-label="Facebook" component="a" href="https://www.facebook.com/MKingbag" target="_blank" rel="noopener noreferrer">
+                            <IconButton color="inherit" aria-label="Facebook" component="a" href="https://www.facebook.com/maquila.king" target="_blank" rel="noopener noreferrer">
                                 <Facebook />
                             </IconButton>
                             <IconButton color="inherit" aria-label="Instagram" component="a" href="https://www.instagram.com/maquilaking/" target="_blank" rel="noopener noreferrer">
