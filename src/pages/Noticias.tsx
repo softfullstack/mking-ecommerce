@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Container, Typography, Grid, Card, CardContent, CardMedia, Button, Chip, Avatar, Tab, Tabs, IconButton, Tooltip, SvgIcon } from '@mui/material';
-import { PlayArrow as PlayArrowIcon, Facebook, Instagram, WhatsApp, OpenInNew as OpenInNewIcon, CheckCircle as VerifiedIcon, Visibility as VisibilityIcon, Favorite as FavoriteIcon, AutoAwesome as AutoAwesomeIcon, Campaign as CampaignIcon, } from '@mui/icons-material';
+import { PlayArrow as PlayArrowIcon, Facebook, Instagram, WhatsApp, OpenInNew as OpenInNewIcon, CheckCircle as VerifiedIcon, Visibility as VisibilityIcon, Favorite as FavoriteIcon, AutoAwesome as AutoAwesomeIcon, } from '@mui/icons-material';
 import { Helmet } from 'react-helmet-async';
 import { RECENT_STORIES, PLATFORM_PROFILES, SocialPlatform } from '../data/storiesData';
 import StoryViewerModal from '../components/stories/StoryViewerModal';
