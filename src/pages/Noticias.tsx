@@ -1,39 +1,8 @@
 import { useState } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Button,
-  Chip,
-  Avatar,
-  Tab,
-  Tabs,
-  IconButton,
-  Tooltip,
-  SvgIcon,
-} from '@mui/material';
-import {
-  PlayArrow as PlayArrowIcon,
-  Facebook,
-  Instagram,
-  WhatsApp,
-  OpenInNew as OpenInNewIcon,
-  CheckCircle as VerifiedIcon,
-  Visibility as VisibilityIcon,
-  Favorite as FavoriteIcon,
-  AutoAwesome as AutoAwesomeIcon,
-  Campaign as CampaignIcon,
-} from '@mui/icons-material';
+import { Box, Container, Typography, Grid, Card, CardContent, CardMedia, Button, Chip, Avatar, Tab, Tabs, IconButton, Tooltip, SvgIcon } from '@mui/material';
+import { PlayArrow as PlayArrowIcon, Facebook, Instagram, WhatsApp, OpenInNew as OpenInNewIcon, CheckCircle as VerifiedIcon, Visibility as VisibilityIcon, Favorite as FavoriteIcon, AutoAwesome as AutoAwesomeIcon, Campaign as CampaignIcon, } from '@mui/icons-material';
 import { Helmet } from 'react-helmet-async';
-import {
-  RECENT_STORIES,
-  PLATFORM_PROFILES,
-  SocialPlatform,
-} from '../data/storiesData';
+import { RECENT_STORIES, PLATFORM_PROFILES, SocialPlatform } from '../data/storiesData';
 import StoryViewerModal from '../components/stories/StoryViewerModal';
 
 const TikTokIcon = (props: any) => (
@@ -102,298 +71,17 @@ const Noticias = () => {
         }}
       >
         {/* Glow ambient effects */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '-15%',
-            left: '20%',
-            width: 380,
-            height: 380,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(211, 47, 47, 0.22) 0%, rgba(0,0,0,0) 70%)',
-            filter: 'blur(40px)',
-            pointerEvents: 'none',
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '-10%',
-            right: '15%',
-            width: 320,
-            height: 320,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(0, 242, 254, 0.15) 0%, rgba(0,0,0,0) 70%)',
-            filter: 'blur(50px)',
-            pointerEvents: 'none',
-          }}
-        />
-
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-          <Box sx={{ textAlign: 'center', maxWidth: 840, mx: 'auto', mb: 4 }}>
-            <Chip
-              icon={<AutoAwesomeIcon sx={{ color: '#ffb703 !important', fontSize: 16 }} />}
-              label="REDES SOCIALES OFICIALES"
-              size="small"
-              sx={{
-                bgcolor: 'rgba(255, 183, 3, 0.12)',
-                color: '#ffb703',
-                border: '1px solid rgba(255, 183, 3, 0.3)',
-                fontWeight: 700,
-                fontSize: '0.75rem',
-                letterSpacing: 1,
-                mb: 2,
-                px: 1,
-              }}
-            />
-
-            <Typography
-              variant="h2"
-              component="h1"
-              sx={{
-                fontWeight: 900,
-                fontSize: { xs: '2rem', sm: '2.8rem', md: '3.4rem' },
-                lineHeight: 1.15,
-                mb: 2,
-                background: 'linear-gradient(180deg, #FFFFFF 30%, #A0AEC0 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Historias Recientes & Novedades
-            </Typography>
-
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'rgba(255, 255, 255, 0.72)',
-                fontSize: { xs: '0.95rem', md: '1.15rem' },
-                lineHeight: 1.6,
-                maxWidth: 680,
-                mx: 'auto',
-              }}
-            >
-              Conoce el día a día de nuestra fábrica de chalecos de seguridad en Guadalajara.
-              Lanzamientos, pruebas de reflectividad, procesos de confección y pedidos de empresas.
-            </Typography>
-          </Box>
-
-          {/* CHANNELS QUICK ACTION CARDS */}
-          <Grid container spacing={2.5} justifyContent="center">
-            {/* Instagram */}
-            <Grid item xs={12} sm={4}>
-              <Box
-                component="a"
-                href={PLATFORM_PROFILES.instagram.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  p: 2.2,
-                  borderRadius: 3,
-                  bgcolor: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(225, 48, 108, 0.25)',
-                  textDecoration: 'none',
-                  color: 'white',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: 'rgba(225, 48, 108, 0.12)',
-                    borderColor: '#E1306C',
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 8px 25px rgba(225, 48, 108, 0.25)',
-                  },
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    background: PLATFORM_PROFILES.instagram.gradient,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 15px rgba(225, 48, 108, 0.4)',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Instagram sx={{ color: 'white', fontSize: 28 }} />
-                </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.95rem' }} noWrap>
-                      Instagram
-                    </Typography>
-                    <VerifiedIcon sx={{ fontSize: 15, color: '#3897f0' }} />
-                  </Box>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }} noWrap>
-                    {PLATFORM_PROFILES.instagram.handle}
-                  </Typography>
-                </Box>
-                <Chip
-                  label="Seguir"
-                  size="small"
-                  sx={{
-                    bgcolor: '#E1306C',
-                    color: 'white',
-                    fontWeight: 700,
-                    fontSize: '0.7rem',
-                    height: 26,
-                  }}
-                />
-              </Box>
-            </Grid>
-
-            {/* TikTok */}
-            <Grid item xs={12} sm={4}>
-              <Box
-                component="a"
-                href={PLATFORM_PROFILES.tiktok.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  p: 2.2,
-                  borderRadius: 3,
-                  bgcolor: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(0, 242, 254, 0.25)',
-                  textDecoration: 'none',
-                  color: 'white',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: 'rgba(0, 242, 254, 0.12)',
-                    borderColor: '#00F2FE',
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 8px 25px rgba(0, 242, 254, 0.25)',
-                  },
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    background: '#000',
-                    border: '2px solid #00F2FE',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 15px rgba(0, 242, 254, 0.35)',
-                    flexShrink: 0,
-                  }}
-                >
-                  <TikTokIcon sx={{ color: '#00F2FE', fontSize: 26 }} />
-                </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.95rem' }} noWrap>
-                      TikTok
-                    </Typography>
-                    <VerifiedIcon sx={{ fontSize: 15, color: '#3897f0' }} />
-                  </Box>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }} noWrap>
-                    {PLATFORM_PROFILES.tiktok.handle}
-                  </Typography>
-                </Box>
-                <Chip
-                  label="Seguir"
-                  size="small"
-                  sx={{
-                    bgcolor: '#00F2FE',
-                    color: '#000',
-                    fontWeight: 800,
-                    fontSize: '0.7rem',
-                    height: 26,
-                  }}
-                />
-              </Box>
-            </Grid>
-
-            {/* Facebook */}
-            <Grid item xs={12} sm={4}>
-              <Box
-                component="a"
-                href={PLATFORM_PROFILES.facebook.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  p: 2.2,
-                  borderRadius: 3,
-                  bgcolor: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(24, 119, 242, 0.25)',
-                  textDecoration: 'none',
-                  color: 'white',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: 'rgba(24, 119, 242, 0.12)',
-                    borderColor: '#1877F2',
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 8px 25px rgba(24, 119, 242, 0.25)',
-                  },
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
-                    background: PLATFORM_PROFILES.facebook.gradient,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 15px rgba(24, 119, 242, 0.4)',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Facebook sx={{ color: 'white', fontSize: 30 }} />
-                </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.95rem' }} noWrap>
-                      Facebook
-                    </Typography>
-                    <VerifiedIcon sx={{ fontSize: 15, color: '#3897f0' }} />
-                  </Box>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }} noWrap>
-                    {PLATFORM_PROFILES.facebook.handle}
-                  </Typography>
-                </Box>
-                <Chip
-                  label="Seguir"
-                  size="small"
-                  sx={{
-                    bgcolor: '#1877F2',
-                    color: 'white',
-                    fontWeight: 700,
-                    fontSize: '0.7rem',
-                    height: 26,
-                  }}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* TOP STORIES TRAY (Instagram/Facebook Carousel Style) */}
-      <Container maxWidth="lg" sx={{ mt: 5, mb: 6 }}>
-        <Box
-          sx={{
-            p: { xs: 2, sm: 3 },
-            borderRadius: 4,
-            bgcolor: 'rgba(255, 255, 255, 0.025)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5, px: 1 }}>
+        <Container maxWidth="lg" sx={{ mt: 0, mb: 0 }}>
+          <Box
+            sx={{
+              p: { xs: 1, sm: 2 },
+              borderRadius: 4,
+              bgcolor: 'rgba(255, 255, 255, 0.025)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+            }}
+          >
+            {/* <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5, px: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <CampaignIcon sx={{ color: '#D32F2F', fontSize: 24 }} />
               <Typography variant="h6" sx={{ fontWeight: 800, fontSize: { xs: '1rem', sm: '1.2rem' } }}>
@@ -420,112 +108,142 @@ const Noticias = () => {
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
               Toca una historia para verla en pantalla completa
             </Typography>
-          </Box>
+          </Box> */}
 
-          {/* Stories row scroll */}
-          <Box
-            sx={{
-              display: 'flex',
-              gap: { xs: 2.5, sm: 3.5 },
-              overflowX: 'auto',
-              py: 1,
-              px: 1,
-              scrollbarWidth: 'thin',
-              '&::-webkit-scrollbar': { height: 6 },
-              '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 3 },
-            }}
-          >
-            {RECENT_STORIES.map((story, index) => {
-              const profile = PLATFORM_PROFILES[story.platform];
-              return (
-                <Box
-                  key={story.id}
-                  onClick={() => openStoryViewerByIndex(index)}
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    minWidth: { xs: 80, sm: 94 },
-                    transition: 'transform 0.2s ease',
-                    '&:hover': {
-                      transform: 'scale(1.08)',
-                    },
-                  }}
-                >
-                  {/* Avatar Ring */}
+            {/* Stories row scroll */}
+            <Box
+              sx={{
+                display: 'flex',
+                gap: { xs: 2, sm: 4 },
+                overflowX: 'auto',
+                py: 1,
+                px: 1,
+                // scrollbarWidth: 'thin',
+                // '&::-webkit-scrollbar': { height: 6 },
+                // '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 3 },
+              }}
+            >
+              {RECENT_STORIES.map((story, index) => {
+                const profile = PLATFORM_PROFILES[story.platform];
+                return (
                   <Box
+                    key={story.id}
+                    onClick={() => openStoryViewerByIndex(index)}
                     sx={{
-                      position: 'relative',
-                      p: '3px',
-                      borderRadius: '50%',
-                      background: profile.gradient,
-                      boxShadow: `0 0 16px ${profile.color}50`,
-                      mb: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      minWidth: { xs: 80, sm: 94 },
+                      transition: 'transform 0.2s ease',
+                      '&:hover': {
+                        transform: 'scale(1.08)',
+                      },
                     }}
                   >
-                    <Avatar
-                      src={story.mediaUrl}
-                      alt={story.title}
-                      sx={{
-                        width: { xs: 62, sm: 74 },
-                        height: { xs: 62, sm: 74 },
-                        border: '3px solid #0b0c10',
-                        filter: 'contrast(1.05)',
-                      }}
-                    />
-                    {/* Platform tiny badge */}
+                    {/* Avatar Ring */}
                     <Box
                       sx={{
-                        position: 'absolute',
-                        bottom: 0,
-                        right: 0,
-                        bgcolor: profile.color,
+                        position: 'relative',
+                        p: '3px',
                         borderRadius: '50%',
-                        width: 22,
-                        height: 22,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '2px solid #0b0c10',
+                        background: profile.gradient,
+                        boxShadow: `0 0 16px ${profile.color}50`,
+                        mb: 1,
                       }}
                     >
-                      {getPlatformIcon(story.platform, 12)}
+                      <Avatar
+                        src={story.mediaUrl}
+                        alt={story.title}
+                        sx={{
+                          width: { xs: 62, sm: 74 },
+                          height: { xs: 62, sm: 74 },
+                          border: '3px solid #0b0c10',
+                          filter: 'contrast(1.05)',
+                        }}
+                      />
+                      {/* Platform tiny badge */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          bottom: 0,
+                          right: 0,
+                          bgcolor: profile.color,
+                          borderRadius: '50%',
+                          width: 22,
+                          height: 22,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          border: '2px solid #0b0c10',
+                        }}
+                      >
+                        {getPlatformIcon(story.platform, 12)}
+                      </Box>
                     </Box>
-                  </Box>
 
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: '0.72rem',
-                      textAlign: 'center',
-                      color: 'rgba(255,255,255,0.9)',
-                      maxWidth: 84,
-                      lineHeight: 1.2,
-                    }}
-                    noWrap
-                  >
-                    {story.title}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontSize: '0.65rem',
-                      color: 'rgba(255,255,255,0.45)',
-                    }}
-                  >
-                    {story.timeAgo}
-                  </Typography>
-                </Box>
-              );
-            })}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '0.72rem',
+                        textAlign: 'center',
+                        color: 'rgba(255,255,255,0.9)',
+                        maxWidth: 84,
+                        lineHeight: 1.2,
+                      }}
+                      noWrap
+                    >
+                      {story.title}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontSize: '0.65rem',
+                        color: 'rgba(255,255,255,0.45)',
+                      }}
+                    >
+                      {story.timeAgo}
+                    </Typography>
+                  </Box>
+                );
+              })}
+            </Box>
           </Box>
-        </Box>
-      </Container>
+        </Container>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '-15%',
+            left: '20%',
+            width: 380,
+            height: 380,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(211, 47, 47, 0.22) 0%, rgba(0,0,0,0) 70%)',
+            filter: 'blur(40px)',
+            pointerEvents: 'none',
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '-10%',
+            right: '15%',
+            width: 320,
+            height: 320,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(0, 242, 254, 0.15) 0%, rgba(0,0,0,0) 70%)',
+            filter: 'blur(50px)',
+            pointerEvents: 'none',
+          }}
+        />
+      </Box>
+
+      {/* TOP STORIES TRAY (Instagram/Facebook Carousel Style) */}
+
 
       {/* PLATFORM FILTER TABS */}
-      <Container maxWidth="lg" sx={{ mb: 4 }}>
+      <Container maxWidth="lg" sx={{ mb: 2 }}>
         <Box
           sx={{
             display: 'flex',
@@ -534,7 +252,7 @@ const Noticias = () => {
             alignItems: { xs: 'flex-start', sm: 'center' },
             gap: 2,
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-            pb: 1.5,
+            pb: 1,
           }}
         >
           <Tabs
@@ -549,10 +267,10 @@ const Noticias = () => {
                   selectedTab === 'instagram'
                     ? '#E1306C'
                     : selectedTab === 'tiktok'
-                    ? '#00F2FE'
-                    : selectedTab === 'facebook'
-                    ? '#1877F2'
-                    : '#D32F2F',
+                      ? '#00F2FE'
+                      : selectedTab === 'facebook'
+                        ? '#1877F2'
+                        : '#D32F2F',
                 height: 3,
                 borderRadius: '3px 3px 0 0',
               },
@@ -924,6 +642,210 @@ const Noticias = () => {
         </Grid>
       </Container>
 
+      {/* CHANNELS QUICK ACTION CARDS */}
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, mt: 5 }}>
+        <Grid container spacing={2.5} justifyContent="center">
+          {/* Instagram */}
+          <Grid item xs={12} sm={4}>
+            <Box
+              component="a"
+              href={PLATFORM_PROFILES.instagram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                p: 2.2,
+                borderRadius: 3,
+                bgcolor: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(225, 48, 108, 0.25)',
+                textDecoration: 'none',
+                color: 'white',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  bgcolor: 'rgba(225, 48, 108, 0.12)',
+                  borderColor: '#E1306C',
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 8px 25px rgba(225, 48, 108, 0.25)',
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  background: PLATFORM_PROFILES.instagram.gradient,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 15px rgba(225, 48, 108, 0.4)',
+                  flexShrink: 0,
+                }}
+              >
+                <Instagram sx={{ color: 'white', fontSize: 28 }} />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.95rem' }} noWrap>
+                    Instagram
+                  </Typography>
+                  <VerifiedIcon sx={{ fontSize: 15, color: '#3897f0' }} />
+                </Box>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }} noWrap>
+                  {PLATFORM_PROFILES.instagram.handle}
+                </Typography>
+              </Box>
+              <Chip
+                label="Seguir"
+                size="small"
+                sx={{
+                  bgcolor: '#E1306C',
+                  color: 'white',
+                  fontWeight: 700,
+                  fontSize: '0.7rem',
+                  height: 26,
+                }}
+              />
+            </Box>
+          </Grid>
+
+          {/* TikTok */}
+          <Grid item xs={12} sm={4}>
+            <Box
+              component="a"
+              href={PLATFORM_PROFILES.tiktok.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                p: 2.2,
+                borderRadius: 3,
+                bgcolor: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(0, 242, 254, 0.25)',
+                textDecoration: 'none',
+                color: 'white',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  bgcolor: 'rgba(0, 242, 254, 0.12)',
+                  borderColor: '#00F2FE',
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 8px 25px rgba(0, 242, 254, 0.25)',
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  background: '#000',
+                  border: '2px solid #00F2FE',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 15px rgba(0, 242, 254, 0.35)',
+                  flexShrink: 0,
+                }}
+              >
+                <TikTokIcon sx={{ color: '#00F2FE', fontSize: 26 }} />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.95rem' }} noWrap>
+                    TikTok
+                  </Typography>
+                  <VerifiedIcon sx={{ fontSize: 15, color: '#3897f0' }} />
+                </Box>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }} noWrap>
+                  {PLATFORM_PROFILES.tiktok.handle}
+                </Typography>
+              </Box>
+              <Chip
+                label="Seguir"
+                size="small"
+                sx={{
+                  bgcolor: '#00F2FE',
+                  color: '#000',
+                  fontWeight: 800,
+                  fontSize: '0.7rem',
+                  height: 26,
+                }}
+              />
+            </Box>
+          </Grid>
+
+          {/* Facebook */}
+          <Grid item xs={12} sm={4}>
+            <Box
+              component="a"
+              href={PLATFORM_PROFILES.facebook.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                p: 2.2,
+                borderRadius: 3,
+                bgcolor: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(24, 119, 242, 0.25)',
+                textDecoration: 'none',
+                color: 'white',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  bgcolor: 'rgba(24, 119, 242, 0.12)',
+                  borderColor: '#1877F2',
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 8px 25px rgba(24, 119, 242, 0.25)',
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  background: PLATFORM_PROFILES.facebook.gradient,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 15px rgba(24, 119, 242, 0.4)',
+                  flexShrink: 0,
+                }}
+              >
+                <Facebook sx={{ color: 'white', fontSize: 30 }} />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: '0.95rem' }} noWrap>
+                    Facebook
+                  </Typography>
+                  <VerifiedIcon sx={{ fontSize: 15, color: '#3897f0' }} />
+                </Box>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block' }} noWrap>
+                  {PLATFORM_PROFILES.facebook.handle}
+                </Typography>
+              </Box>
+              <Chip
+                label="Seguir"
+                size="small"
+                sx={{
+                  bgcolor: '#1877F2',
+                  color: 'white',
+                  fontWeight: 700,
+                  fontSize: '0.7rem',
+                  height: 26,
+                }}
+              />
+            </Box>
+          </Grid>
+        </Grid>
+      </Container>
+
       {/* OFFICIAL CHANNELS EMBED / FOLLOW BANNER */}
       <Container maxWidth="lg" sx={{ mt: 10 }}>
         <Box
@@ -1035,6 +957,56 @@ const Noticias = () => {
               WhatsApp
             </Button>
           </Box>
+        </Box>
+      </Container>
+
+      <Container sx={{ mt: 10 }}>
+        <Box sx={{ textAlign: 'center', maxWidth: 840, mx: 'auto', mb: 4 }}>
+          <Chip
+            icon={<AutoAwesomeIcon sx={{ color: '#ffb703 !important', fontSize: 16 }} />}
+            label="REDES SOCIALES OFICIALES"
+            size="small"
+            sx={{
+              bgcolor: 'rgba(255, 183, 3, 0.12)',
+              color: '#ffb703',
+              border: '1px solid rgba(255, 183, 3, 0.3)',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: 1,
+              mb: 2,
+              px: 1,
+            }}
+          />
+
+          <Typography
+            variant="h2"
+            component="h1"
+            sx={{
+              fontWeight: 900,
+              fontSize: { xs: '2rem', sm: '2.8rem', md: '3.4rem' },
+              lineHeight: 1.15,
+              mb: 2,
+              background: 'linear-gradient(180deg, #FFFFFF 30%, #A0AEC0 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Historias Recientes & Novedades
+          </Typography>
+
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.72)',
+              fontSize: { xs: '0.95rem', md: '1.15rem' },
+              lineHeight: 1.6,
+              maxWidth: 680,
+              mx: 'auto',
+            }}
+          >
+            Conoce el día a día de nuestra fábrica de chalecos de seguridad en Guadalajara.
+            Lanzamientos, pruebas de reflectividad, procesos de confección y pedidos de empresas.
+          </Typography>
         </Box>
       </Container>
 

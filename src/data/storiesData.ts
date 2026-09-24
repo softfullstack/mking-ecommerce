@@ -84,7 +84,7 @@ export const RECENT_STORIES: SocialStory[] = [
     author: 'MKing Maquila & Chalecos',
     handle: '@maquilaking',
     authorAvatar: '/images/logo.png',
-    title: 'Chaleco Ejecutivo Bicolor con Reflejantes 3M',
+    title: 'Chamarra Bicolor con Reflejantes',
     caption: '¡Nuevo lote listo! Diseñado para supervisores y brigadistas. Bandas reflejantes de alta visibilidad para máxima protección día y noche.',
     hashtags: ['#MKing', '#ChalecoEjecutivo', '#SeguridadIndustrial', '#Guadalajara', '#HechoEnMexico'],
     mediaUrl: '/images/stories/story_instagram.jpeg',
