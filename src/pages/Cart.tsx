@@ -1,25 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link as RouterLink } from "react-router-dom"
-import {
-    Box,
-    Container,
-    Typography,
-    Button,
-    Grid,
-    Card,
-    CardContent,
-    Divider,
-    IconButton,
-    TextField,
-    InputAdornment,
-    Alert,
-    Stepper,
-    Step,
-    StepLabel,
-    Paper,
-    Chip,
-    Stack
-} from "@mui/material"
+import { Box, Container, Typography, Button, Grid, Card, CardContent, Divider, IconButton, TextField, InputAdornment, Alert, Stepper, Step, StepLabel, Paper, Chip, Stack } from "@mui/material"
 import { Add, Remove, Delete, ArrowBack, LocalShipping, CheckCircle, Edit as EditIcon } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
 import useAuthStore from "../store/AuthStore"
@@ -42,6 +23,7 @@ const Cart = () => {
     const [activeStep, setActiveStep] = useState(0)
     const [customizerOpen, setCustomizerOpen] = useState(false)
     const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null)
+    const [completedOrder, setCompletedOrder] = useState<any>(null)
 
     // Guest Form State
     const [guestForm, setGuestForm] = useState({
@@ -258,27 +240,35 @@ const Cart = () => {
 
                 if (status === 'approved' || status === 'pending') {
                     try {
-                        // Crear cotización + orden pasando la info del pago y opcionalmente items/guest_info
+                        // Crear cotización + orden pasando la info del pago, items siempre y opcionalmente guest_info
                         const checkoutResponse = await CheckoutService({
                             external_reference: paymentReference,
                             payment_id: paymentId ? String(paymentId) : null,
                             payment_status: status,
+                            items: items.map(item => ({
+                                id: item.id,
+                                uuid: item.uuid,
+                                productId: item.id,
+                                productUuid: item.uuid,
+                                price: item.price,
+                                quantity: item.quantity,
+                                color: typeof item.color === 'object' && item.color !== null ? (item.color as any).name : item.color,
+                                size: typeof item.size === 'object' && item.size !== null ? (item.size as any).name : item.size,
+                            })),
                             ...(!isAuthenticated && {
-                                items: items.map(item => ({
-                                    id: item.id,
-                                    price: item.price,
-                                    quantity: item.quantity,
-                                    color: typeof item.color === 'object' && item.color !== null ? (item.color as any).name : item.color,
-                                    size: typeof item.size === 'object' && item.size !== null ? (item.size as any).name : item.size,
-                                })),
                                 guest_info: guestInfo,
                             })
                         })
 
-                        const orderFolio = checkoutResponse?.data?.order?.folio
+                        const orderData = checkoutResponse?.data?.order || checkoutResponse?.data?.quotation
+                        if (orderData) {
+                            setCompletedOrder(orderData)
+                        }
+
+                        const orderFolio = checkoutResponse?.data?.order?.folio || checkoutResponse?.data?.quotation?.folio
 
                         if (status === 'approved') {
-                            toast.success(`¡Pago aprobado! Tu pedido ${orderFolio || ''} ha sido registrado.`)
+                            toast.success(`¡Pago aprobado! Tu pedido ${orderFolio ? '#' + orderFolio : ''} ha sido registrado.`)
                         } else {
                             toast.info('Tu pago está en proceso. Te notificaremos por correo.')
                         }
@@ -944,7 +934,9 @@ const Cart = () => {
                 Tu pedido ha sido procesado correctamente. Hemos enviado un correo electrónico con los detalles de tu compra.
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-                Número de pedido: #ORD-{Math.floor(100000 + Math.random() * 900000)}
+                {completedOrder?.folio
+                    ? `Número de pedido: #${completedOrder.folio}`
+                    : 'Tu pago ha sido registrado exitosamente.'}
             </Typography>
             <Button component={RouterLink} to="/" variant="contained" color="primary" size="large">
                 Volver a la Tienda

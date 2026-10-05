@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Typography, Container, Grid, Paper, Box, Avatar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button, TextField, Chip, Card, CardContent, CardMedia, CardActions, Divider, IconButton, Stack } from '@mui/material';
+import { Typography, Container, Grid, Paper, Box, Avatar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Button, TextField, Chip, Card, CardContent, CardMedia, CardActions, Divider, IconButton, Stack, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import AddressDialog from '../components/AddressDialog';
 import SizeSelectionDialog from '../components/SizeSelectionDialog';
 import PersonIcon from '@mui/icons-material/Person';
@@ -12,6 +12,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CloseIcon from '@mui/icons-material/Close';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Accordion, AccordionSummary, AccordionDetails, MenuItem } from '@mui/material';
 import { useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -391,6 +394,18 @@ const ProfileSection = () => {
 const OrdersSection = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const handleOpenDetails = (order: any) => {
+    setSelectedOrder(order);
+    setDetailsOpen(true);
+  };
+
+  const handleCloseDetails = () => {
+    setDetailsOpen(false);
+    setSelectedOrder(null);
+  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -445,7 +460,9 @@ const OrdersSection = () => {
                   </Box>
                 </Grid>
                 <Grid item xs={6} sm={4}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{order.folio || `#ORD-${order.id}`}</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                    {order.order?.folio || order.folio || `#ORD-${order.id}`}
+                  </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {new Date(order.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </Typography>
@@ -456,17 +473,20 @@ const OrdersSection = () => {
                     ${Number(order.total_price).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {order.quotations?.length || 0} artículos
+                    {order.quotations?.length || 0} artículo(s)
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={2}>
                   {(() => {
                     const statusMap: Record<string, { label: string; color: 'warning' | 'info' | 'success' }> = {
                       received: { label: 'Recibido / Procesando', color: 'warning' },
+                      approved: { label: 'Recibido / Procesando', color: 'warning' },
+                      pending: { label: 'Pendiente', color: 'warning' },
                       in_transit: { label: 'En Tránsito', color: 'info' },
                       delivered: { label: 'Entregado', color: 'success' },
                     }
-                    const s = statusMap[order.status] || statusMap['received']
+                    const rawStatus = order.order?.status || order.status
+                    const s = statusMap[rawStatus] || statusMap['received']
                     return (
                       <Chip
                         label={s.label}
@@ -483,7 +503,7 @@ const OrdersSection = () => {
                     size="small"
                     color="error"
                     sx={{ textTransform: 'none', fontWeight: 'bold' }}
-                    onClick={() => console.log('Ver detalles', order.uuid)}
+                    onClick={() => handleOpenDetails(order)}
                   >
                     Ver Detalles
                   </Button>
@@ -493,6 +513,189 @@ const OrdersSection = () => {
           ))}
         </Stack>
       )}
+
+      {/* Modal de Detalles del Pedido */}
+      <Dialog
+        open={detailsOpen}
+        onClose={handleCloseDetails}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1e1e1e',
+            color: '#fff',
+            borderRadius: 2,
+            backgroundImage: 'none'
+          }
+        }}
+      >
+        {selectedOrder && (
+          <>
+            <DialogTitle sx={{ m: 0, p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+                  Detalles del Pedido
+                  <Chip
+                    label={selectedOrder.order?.folio || selectedOrder.folio}
+                    color="primary"
+                    size="small"
+                    sx={{ fontWeight: 'bold' }}
+                  />
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Realizado el {new Date(selectedOrder.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </Typography>
+              </Box>
+              <IconButton onClick={handleCloseDetails} sx={{ color: 'text.secondary', '&:hover': { color: '#fff' } }}>
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+
+            <DialogContent dividers sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', py: 3 }}>
+              {/* Order Info Cards */}
+              <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid item xs={12} sm={6}>
+                  <Paper sx={{ p: 2, bgcolor: '#252525', borderRadius: 1.5, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: 0.5 }}>
+                      Estado del Pedido
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
+                      <LocalShippingIcon color="primary" />
+                      <Box>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                          {selectedOrder.order?.status === 'delivered' ? 'Entregado' :
+                           selectedOrder.order?.status === 'in_transit' ? 'En Tránsito' :
+                           'Recibido / En Producción'}
+                        </Typography>
+                        {selectedOrder.order?.deliveryDate && (
+                          <Typography variant="caption" color="text.secondary">
+                            Entrega estimada: {new Date(selectedOrder.order.deliveryDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <Paper sx={{ p: 2, bgcolor: '#252525', borderRadius: 1.5, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: 0.5 }}>
+                      Información de Pago
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
+                      <CheckCircleIcon color="success" />
+                      <Box>
+                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                          Pago Aprobado (Mercado Pago)
+                        </Typography>
+                        {selectedOrder.paymentId && (
+                          <Typography variant="caption" color="text.secondary">
+                            ID Transacción: #{selectedOrder.paymentId}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  </Paper>
+                </Grid>
+              </Grid>
+
+              {/* Items List */}
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
+                Artículos Comprados ({selectedOrder.quotations?.length || 0})
+              </Typography>
+
+              <Stack spacing={1.5} sx={{ mb: 3 }}>
+                {selectedOrder.quotations && selectedOrder.quotations.length > 0 ? (
+                  selectedOrder.quotations.map((item: any) => {
+                    const productImg = item.product?.images?.[0]?.url || item.product?.images?.[0]?.image_path || item.product?.img_product;
+                    return (
+                      <Paper
+                        key={item.id}
+                        sx={{
+                          p: 2,
+                          bgcolor: '#252525',
+                          borderRadius: 1.5,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          border: '1px solid rgba(255, 255, 255, 0.05)'
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          {productImg ? (
+                            <Box
+                              component="img"
+                              src={productImg}
+                              alt={item.product?.name || 'Producto'}
+                              sx={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 1 }}
+                            />
+                          ) : (
+                            <Box sx={{ width: 56, height: 56, bgcolor: '#333', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <InventoryIcon sx={{ color: 'text.secondary' }} />
+                            </Box>
+                          )}
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                              {item.product?.name || 'Producto MKing'}
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 2, mt: 0.5 }}>
+                              {item.customName && (
+                                <Typography variant="caption" color="text.secondary">
+                                  Talla: <strong>{item.customName}</strong>
+                                </Typography>
+                              )}
+                              {item.embroideryImage && (
+                                <Typography variant="caption" color="text.secondary">
+                                  Color: <strong>{item.embroideryImage}</strong>
+                                </Typography>
+                              )}
+                            </Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Cantidad: {item.quantity} × ${Number(item.price).toFixed(2)}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                          ${Number(item.subtotal || item.price * item.quantity).toFixed(2)}
+                        </Typography>
+                      </Paper>
+                    );
+                  })
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    No se encontraron detalles de artículos para esta orden.
+                  </Typography>
+                )}
+              </Stack>
+
+              {/* Total Summary */}
+              <Box sx={{ bgcolor: '#252525', p: 2, borderRadius: 1.5, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary">Subtotal</Typography>
+                  <Typography variant="body2">${Number(selectedOrder.total_price).toFixed(2)}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary">Envío</Typography>
+                  <Typography variant="body2" color="success.main">Gratis</Typography>
+                </Box>
+                <Divider sx={{ my: 1, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Total Pagado</Typography>
+                  <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold' }}>
+                    ${Number(selectedOrder.total_price).toFixed(2)} MXN
+                  </Typography>
+                </Box>
+              </Box>
+            </DialogContent>
+
+            <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <Button onClick={handleCloseDetails} variant="contained" color="inherit" sx={{ bgcolor: '#333', '&:hover': { bgcolor: '#444' } }}>
+                Cerrar
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </Box>
   );
 };
