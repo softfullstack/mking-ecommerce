@@ -669,23 +669,38 @@ const OrdersSection = () => {
               </Stack>
 
               {/* Total Summary */}
-              <Box sx={{ bgcolor: '#252525', p: 2, borderRadius: 1.5, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">Subtotal</Typography>
-                  <Typography variant="body2">${Number(selectedOrder.total_price).toFixed(2)}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">Envío</Typography>
-                  <Typography variant="body2" color="success.main">Gratis</Typography>
-                </Box>
-                <Divider sx={{ my: 1, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Total Pagado</Typography>
-                  <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold' }}>
-                    ${Number(selectedOrder.total_price).toFixed(2)} MXN
-                  </Typography>
-                </Box>
-              </Box>
+              {(() => {
+                const totalPieces = selectedOrder.quotations?.reduce((acc: number, item: any) => acc + (Number(item.quantity) || 1), 0) || 0;
+                const isFreeShipping = totalPieces >= 30;
+
+                return (
+                  <Box sx={{ bgcolor: '#252525', p: 2, borderRadius: 1.5, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">Subtotal</Typography>
+                      <Typography variant="body2">${Number(selectedOrder.total_price).toFixed(2)}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">Envío</Typography>
+                      {isFreeShipping ? (
+                        <Typography variant="body2" color="success.main" sx={{ fontWeight: 'medium' }}>
+                          Gratis (30+ piezas)
+                        </Typography>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          Por cotizar / A convenir
+                        </Typography>
+                      )}
+                    </Box>
+                    <Divider sx={{ my: 1, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Total Pagado</Typography>
+                      <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold' }}>
+                        ${Number(selectedOrder.total_price).toFixed(2)} MXN
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })()}
             </DialogContent>
 
             <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>

@@ -336,7 +336,7 @@ const Cart = () => {
     }
 
     const calculateShipping = () => {
-        return calculateSubtotal() > 100 ? 0 : 10
+        return totalItems >= 30 ? 0 : 150
     }
 
     const calculateTotal = () => {
