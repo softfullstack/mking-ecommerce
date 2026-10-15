@@ -1,3 +1,5 @@
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
@@ -13,9 +15,12 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    // Permite soportar librerías que usen directivas de cliente
+  // eslint.config.js es flat config; se corre aparte con `npm run lint`
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
 export default nextConfig;
+
+initOpenNextCloudflareForDev();

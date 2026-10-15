@@ -33,8 +33,9 @@ function getImageUrl(product: any): string {
   return `${SITE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
-export async function generateMetadata({ params }: { params: { uuid: string } }): Promise<Metadata> {
-  const product = await fetchProduct(params.uuid);
+export async function generateMetadata({ params }: { params: Promise<{ uuid: string }> }): Promise<Metadata> {
+  const { uuid } = await params;
+  const product = await fetchProduct(uuid);
   if (!product) return {};
 
   const name = String(product.name).trim();
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: { params: { uuid: string } })
     product.description ? product.description.substring(0, 120) : "Chaleco de seguridad industrial de alta calidad"
   }`;
   const image = getImageUrl(product);
-  const url = `${SITE_URL}/producto/${params.uuid}`;
+  const url = `${SITE_URL}/producto/${uuid}`;
 
   return {
     title: `${name} | Chaleco de Seguridad Industrial - MKing México`,

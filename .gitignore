@@ -30,3 +30,8 @@ dist/
 .next/
 out/
 *.tsbuildinfo
+
+# Cloudflare / OpenNext
+.open-next/
+.wrangler/
+.dev.vars
