@@ -1,7 +1,7 @@
 import React from 'react';
 import { Fab, Zoom, Tooltip } from '@mui/material';
 import { WhatsApp as WhatsAppIcon } from '@mui/icons-material';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@/utils/navigationBridge';
 
 interface WhatsAppFloatingButtonProps {
     phoneNumber: string;

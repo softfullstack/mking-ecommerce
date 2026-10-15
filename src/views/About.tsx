@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { Box, Container, Typography, Grid, Card, CardContent, Button, Divider } from "@mui/material"
 import { Helmet } from "react-helmet-async"
-import { Link as RouterLink } from "react-router-dom"
+import { RouterLink } from "@/utils/navigationBridge"
 import {
     Factory as FactoryIcon,
     Verified as VerifiedIcon,

@@ -26,3 +26,7 @@ dist-ssr
 .env.production
 #ignore dist folder and all its contents
 dist/
+# Next.js
+.next/
+out/
+*.tsbuildinfo

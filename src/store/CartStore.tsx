@@ -157,6 +157,8 @@ const useCartStore = create<CartStore>()(
         }),
         {
             name: "cart-storage",
+            // Se rehidrata en ClientProviders después de montar, para no romper la hidratación de Next
+            skipHydration: true,
         },
     ),
 )

@@ -16,7 +16,7 @@ import {
     StepLabel,
 } from "@mui/material"
 import { Visibility, VisibilityOff, LockReset, EmailOutlined, CheckCircleOutline } from "@mui/icons-material"
-import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom"
+import { useNavigate, useLocation, RouterLink } from "@/utils/navigationBridge"
 import { useForm } from "react-hook-form"
 import { Helmet } from "react-helmet-async"
 import gsap from "gsap"

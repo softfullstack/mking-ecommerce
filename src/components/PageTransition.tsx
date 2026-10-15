@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation } from "@/utils/navigationBridge"
 import { Box } from "@mui/material"
 import gsap from "gsap"
 

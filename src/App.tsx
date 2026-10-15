@@ -3,20 +3,20 @@ import { ThemeProvider, CssBaseline, Box } from "@mui/material"
 import { Theme } from "./Theme"
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
-import Home from "./pages/Home"
-import ProductList from "./pages/ProductList"
-import ProductDetail from "./pages/ProductDetail"
-import Cart from "./pages/Cart"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import ConfirmEmail from "./pages/ConfirmEmail"
-import ForgotPassword from "./pages/ForgotPassword"
-import Profile from "./pages/Profile"
-import About from "./pages/About"
-import Novedades from "./pages/Novedades"
-import Noticias from "./pages/Noticias"
-import Contact from "./pages/Contact"
-import Ubicaciones from "./pages/Ubicaciones"
+import Home from "./views/Home"
+import ProductList from "./views/ProductList"
+import ProductDetail from "./views/ProductDetail"
+import Cart from "./views/Cart"
+import Login from "./views/Login"
+import Register from "./views/Register"
+import ConfirmEmail from "./views/ConfirmEmail"
+import ForgotPassword from "./views/ForgotPassword"
+import Profile from "./views/Profile"
+import About from "./views/About"
+import Novedades from "./views/Novedades"
+import Noticias from "./views/Noticias"
+import Contact from "./views/Contact"
+import Ubicaciones from "./views/Ubicaciones"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ScrollToTop from "./components/ScrollToTop"
 import PageTransition from "./components/PageTransition"
@@ -29,7 +29,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import WhatsAppFloatingButton from './components/WhatsAppFloatingButton';
 import useUIStore from './store/UIStore';
-import DescuentosEmpresas from './pages/DescuentosEmpresas'
+import DescuentosEmpresas from './views/DescuentosEmpresas'
 
 function App() {
   const { currentProductName } = useUIStore()

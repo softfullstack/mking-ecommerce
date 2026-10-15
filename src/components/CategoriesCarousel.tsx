@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, IconButton, Card, CardMedia, useTheme, useMediaQuery } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { Link } from '@/utils/navigationBridge';
 
 interface CategoryCarouselItem {
     id: number;

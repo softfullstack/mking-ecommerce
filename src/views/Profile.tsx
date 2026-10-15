@@ -17,7 +17,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Accordion, AccordionSummary, AccordionDetails, MenuItem } from '@mui/material';
 import { useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from '@/utils/navigationBridge';
 import useAuthStore from '../store/AuthStore';
 import useCartStore from '../store/CartStore';
 import { GetMeService, DeleteFavoriteService, GetOrdersService, UpdateProfileService, GetRegimenFiscalService, GetCfdisService, GetAddressesService, CreateAddressService, UpdateAddressService, DeleteAddressService } from '../services/MKing.service';
@@ -121,7 +121,11 @@ const ProfileSection = () => {
       if (user.image) {
         // If image is full URL or needs constructing, handling here.
         // Assuming backend sends correct URL or path.
-        const imgUrl = user.image.startsWith('http') ? user.image : `${import.meta.env.VITE_AWS_URL || 'https://mking-ecommerce.s3.us-east-2.amazonaws.com/ecommerce'}/${user.image}`;
+        const awsUrl =
+          (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_AWS_URL) ||
+          (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_AWS_URL) ||
+          'https://mking-ecommerce.s3.us-east-2.amazonaws.com/ecommerce';
+        const imgUrl = user.image.startsWith('http') ? user.image : `${awsUrl}/${user.image}`;
         setImagePreview(imgUrl);
       }
     }
@@ -974,20 +978,11 @@ const AddressesSection = () => {
 export default function Profile() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = searchParams.get('tab') || 'perfil';
-  const [activeTab, setActiveTab] = useState(initialTab);
+  // El tab activo vive en la URL (?tab=...), así no se desincroniza con la navegación de Next
+  const activeTab = searchParams.get('tab') || 'perfil';
   const { user, login, logout } = useAuthStore();
 
-  // Sync activeTab state with URL search param
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab && tab !== activeTab) {
-      setActiveTab(tab);
-    }
-  }, [searchParams, activeTab]);
-
   const handleTabChange = (id: string) => {
-    setActiveTab(id);
     setSearchParams({ tab: id });
   };
 
@@ -1043,7 +1038,7 @@ export default function Profile() {
           <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
             {user && (
               <Box sx={{ p: { xs: 2, md: 3 }, textAlign: 'center', bgcolor: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px solid rgba(255, 255, 255, 0.12)', display: { xs: 'none', md: 'block' } }}>
-                <Avatar sx={{ width: { xs: 60, md: 80 }, height: { xs: 60, md: 80 }, mx: 'auto', mb: { xs: 1, md: 2 }, bgcolor: 'primary.main', fontSize: '2rem' }} src={user.image ? (user.image.startsWith('http') ? user.image : `${import.meta.env.VITE_AWS_URL}/${user.image}`) : undefined}>
+                <Avatar sx={{ width: { xs: 60, md: 80 }, height: { xs: 60, md: 80 }, mx: 'auto', mb: { xs: 1, md: 2 }, bgcolor: 'primary.main', fontSize: '2rem' }} src={user.image ? (user.image.startsWith('http') ? user.image : `${(typeof process !== "undefined" && process.env?.NEXT_PUBLIC_AWS_URL) || (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_AWS_URL) || 'https://mking-ecommerce.s3.us-east-2.amazonaws.com/ecommerce'}/${user.image}`) : undefined}>
                   {!user.image && (user.name ? user.name.charAt(0).toUpperCase() : <PersonIcon />)}
                 </Avatar>
                 <Typography variant="subtitle1" fontWeight="bold" sx={{ fontSize: { xs: '0.85rem', md: '1rem' } }}>{user.name} {user.last_name}</Typography>

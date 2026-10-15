@@ -1,7 +1,10 @@
 import axios from "axios";
 import { Response } from "../utils/Response";
 
-const apiUrl = import.meta.env.VITE_BASE_URL;
+const apiUrl =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_BASE_URL) ||
+  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_BASE_URL) ||
+  "http://localhost:3333/api/b2c";
 let cancelToken: any;
 
 axios.interceptors.request.use(

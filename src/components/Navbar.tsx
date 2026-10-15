@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { RouterLink, useNavigate } from "../utils/navigationBridge"
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem, Badge, Drawer, List, ListItem, ListItemText, ListItemButton, Divider, ListItemIcon } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { Menu as MenuIcon, ShoppingBag as ShoppingBagIcon, Close, Person as PersonIcon, Favorite as FavoriteIcon, LocationOn as LocationOnIcon, Logout as LogoutIcon } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
 import useAuthStore from "../store/AuthStore"
-import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import LogoIcon from "../assets/images/logo-header.png";
 import gsap from "gsap"
@@ -110,7 +109,7 @@ const Navbar = () => {
                             textDecoration: "none",
                         }}
                     >
-                        <Logo src={LogoIcon} alt="MKing" />
+                        <Logo src={typeof LogoIcon === 'string' ? LogoIcon : (LogoIcon as any)?.src || '/images/logo-header.png'} alt="MKing" />
                     </Typography>
 
                     {/* Mobile menu button */}
@@ -139,7 +138,7 @@ const Navbar = () => {
                             flexGrow: 1,
                         }}
                     >
-                        <Logo src={LogoIcon} alt="MKing" />
+                        <Logo src={typeof LogoIcon === 'string' ? LogoIcon : (LogoIcon as any)?.src || '/images/logo-header.png'} alt="MKing" />
                     </Typography>
 
                     {/* Desktop menu */}

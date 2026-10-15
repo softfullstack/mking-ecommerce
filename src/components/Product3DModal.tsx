@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ThreeDRotationIcon from '@mui/icons-material/ThreeDRotation';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import gsap from 'gsap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/utils/navigationBridge';
 
 interface Product3DModalProps {
     open: boolean;

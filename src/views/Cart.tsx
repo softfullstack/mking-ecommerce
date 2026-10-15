@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { RouterLink } from "@/utils/navigationBridge"
 import { Box, Container, Typography, Button, Grid, Card, CardContent, Divider, IconButton, TextField, InputAdornment, Alert, Stepper, Step, StepLabel, Paper, Chip, Stack } from "@mui/material"
 import { Add, Remove, Delete, ArrowBack, LocalShipping, CheckCircle, Edit as EditIcon } from "@mui/icons-material"
 import useCartStore from "../store/CartStore"
@@ -12,7 +12,13 @@ import AddressDialog from "../components/AddressDialog"
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react'
 import { toast } from "react-toastify"
 
-initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY || '')
+const mpKey =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) ||
+  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_MERCADOPAGO_PUBLIC_KEY) ||
+  '';
+if (typeof window !== "undefined" && mpKey) {
+  initMercadoPago(mpKey);
+}
 
 const Cart = () => {
     const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart, updateCustomizations, guestInfo, setGuestInfo } = useCartStore()

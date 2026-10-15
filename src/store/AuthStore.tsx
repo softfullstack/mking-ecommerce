@@ -51,6 +51,8 @@ const useAuthStore = create<AuthState>()(
         }),
         {
             name: "auth-storage", // local storage key
+            // Se rehidrata en ClientProviders después de montar, para no romper la hidratación de Next
+            skipHydration: true,
         }
     )
 )

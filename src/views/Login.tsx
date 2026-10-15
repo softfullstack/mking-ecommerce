@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import { Helmet } from "react-helmet-async"
-import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom"
+import { useNavigate, useLocation, RouterLink } from "@/utils/navigationBridge"
 import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Alert } from "@mui/material"
 import { Visibility, VisibilityOff, Google, Facebook } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
@@ -41,7 +41,6 @@ const Login = () => {
         try {
             const response = await LoginService(data)
             const { token, user } = response.data
-            console.log('%c este es el usuer y el token', 'color: green', user, token);
             // otambien mostrar la imagen del cliente 
             // Store token
             localStorage.setItem("token", token)

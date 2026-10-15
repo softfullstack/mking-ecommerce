@@ -1,5 +1,5 @@
 import React from "react"
-import { useNavigate, Link as RouterLink } from "react-router-dom"
+import { useNavigate, RouterLink } from "@/utils/navigationBridge"
 import { Box, Container, Typography, TextField, Button, Divider, Link, InputAdornment, IconButton, Paper, Checkbox, FormControlLabel, Alert, Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
 import { Visibility, VisibilityOff, Google, Facebook, ExpandMore as ExpandMoreIcon } from "@mui/icons-material"
 import { useForm, FieldValues } from "react-hook-form"

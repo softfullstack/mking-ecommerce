@@ -1,5 +1,5 @@
 import { Card, CardActionArea, CardContent, CardMedia, Typography, Box, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CardActions, Button } from "@mui/material"
-import { Link } from "react-router-dom"
+import { Link } from "@/utils/navigationBridge"
 import { Product } from "../interfaces/ProductInterface"
 import { useState, useEffect } from "react"
 import { getPreferredIdentifier } from "../utils/uuidUtils"

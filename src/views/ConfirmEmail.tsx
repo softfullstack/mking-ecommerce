@@ -1,5 +1,5 @@
 import React from "react"
-import { useLocation, useNavigate, Link as RouterLink } from "react-router-dom"
+import { useLocation, useNavigate, RouterLink } from "@/utils/navigationBridge"
 import { Box, Container, Typography, TextField, Button, Paper, Alert, CircularProgress, Link } from "@mui/material"
 import { ConfirmEmailService } from "../services/MKing.service"
 

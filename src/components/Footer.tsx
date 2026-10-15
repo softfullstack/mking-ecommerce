@@ -1,6 +1,6 @@
 import { Box, Container, Grid, Typography, Link, IconButton, Divider, SvgIcon } from "@mui/material"
 import { Facebook, Instagram, WhatsApp } from "@mui/icons-material"
-import { Link as RouterLink } from "react-router-dom"
+import { RouterLink } from "../utils/navigationBridge"
 
 const TikTokIcon = (props: any) => (
     <SvgIcon {...props} viewBox="0 0 24 24">
@@ -65,7 +65,7 @@ const Footer = () => {
                             <IconButton color="inherit" aria-label="TikTok" component="a" href="https://www.tiktok.com/@maquilaking" target="_blank" rel="noopener noreferrer">
                                 <TikTokIcon />
                             </IconButton>
-                            <IconButton color="inherit" aria-label="WhatsApp" component="a" href="https://api.whatsapp.com/send?phone=523351146348&text=Hola%2C%20vengo%20desde%20MKing%20y%20deseo%20m%C3%A1s%20informaci%C3%B3n.%20http%3A%2F%2Flocalhost%3A5173%2F" target="_blank" rel="noopener noreferrer">
+                            <IconButton color="inherit" aria-label="WhatsApp" component="a" href="https://api.whatsapp.com/send?phone=523351146348&text=Hola%2C%20vengo%20desde%20MKing%20y%20deseo%20m%C3%A1s%20informaci%C3%B3n.%20https%3A%2F%2Fmking.com.mx%2F" target="_blank" rel="noopener noreferrer">
                                 <WhatsApp />
                             </IconButton>
                         </Box>

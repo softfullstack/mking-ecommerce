@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Box, Button, Container, Grid, Typography } from "@mui/material"
-import { Link as RouterLink } from "react-router-dom"
+import { RouterLink } from "../utils/navigationBridge"
 import { Helmet } from "react-helmet-async"
 import ProductsCarousel from "../components/ProductsCarousel"
 import { GetCollectionBySlugService, ProdutcList } from "../services/MKing.service"

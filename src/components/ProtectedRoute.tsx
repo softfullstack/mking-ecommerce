@@ -1,5 +1,5 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Navigate, Outlet } from '@/utils/navigationBridge';
 import useAuthStore from '../store/AuthStore';
 
 interface ProtectedRouteProps {
@@ -8,6 +8,11 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
+  // localStorage solo existe en el navegador: esperar a montar para que el HTML del servidor coincida
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
   const token = localStorage.getItem('token');
 
   // Si no hay token guardado ni estado de autenticación activo, redirigir

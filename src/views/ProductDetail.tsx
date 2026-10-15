@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Helmet } from "react-helmet-async"
-import { useParams, Link as RouterLink, useNavigate } from "react-router-dom"
+import { useParams, RouterLink, useNavigate } from "@/utils/navigationBridge"
 import { Box, Container, Grid, Typography, Button, Divider, Rating, Tabs, Tab, List, ListItem, ListItemText, Chip, IconButton, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Breadcrumbs, Link, Dialog } from "@mui/material"
 import { Favorite, FavoriteBorder, Share, LocalShipping, Verified, ArrowBack, Close } from "@mui/icons-material"
 import ProductCarousel from "../components/ProductCarousel"
@@ -19,7 +19,7 @@ import useUIStore from "../store/UIStore"
 
 const ProductDetail = () => {
     const { setProductName } = useUIStore()
-    const { uuid } = useParams()
+    const { uuid } = useParams<{ uuid: string }>()
     const navigate = useNavigate()
     const [product, setProduct] = useState<Product | null>(null)
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
